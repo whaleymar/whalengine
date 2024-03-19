@@ -1,5 +1,4 @@
 // #include <iostream>
-// #include "../lib/glfw/include/GLFW/glfw3.h"
 // #include "Util/MathUtil.h"
 // #include "Util/Vector.h"
 //
@@ -20,35 +19,24 @@
 //     return 0;
 // }
 
-#include <iostream>
-
-// GLAD
+// clang-format off
 #include <glad/gl.h>
-// #include "../lib/glad/include/glad/gl.h"
+#include <GLFW/glfw3.h>  // always include after glad
+// clang-format on
 
-// GLFW (include after glad)
-#include <GLFW/glfw3.h>
-// #include "../lib/glfw/include/GLFW/glfw3.h"
+#include <iostream>
+#include "Gfx/Shader.h"
+#include "Gfx/VertexObject.h"
 
-// This example is taken from http://learnopengl.com/
-// http://learnopengl.com/code_viewer.php?code=getting-started/hellowindow2
-// The code originally used GLEW, I replaced it with Glad
-
-// Compile:
-// g++ example/c++/hellowindow2.cpp -Ibuild/include build/src/gl.c -lglfw -ldl
-
-// Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void MainLoop(GLFWwindow* window, whal::ShaderProgram program);
 
 // Window dimensions
-const GLuint WIDTH = 800, HEIGHT = 600;
+const GLuint WIDTH = 1280, HEIGHT = 720;
 
 // The MAIN function, from here we start the application and run the game loop
 int main() {
-    std::cout << "Starting GLFW context, OpenGL 3.3" << std::endl;
-    // Init GLFW
     glfwInit();
-    // Set all the required options for GLFW
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -73,33 +61,54 @@ int main() {
         return -1;
     }
 
-    // Successfully loaded OpenGL
     std::cout << "Loaded OpenGL " << GLAD_VERSION_MAJOR(version) << "." << GLAD_VERSION_MINOR(version) << std::endl;
 
-    // Define the viewport dimensions
-    glViewport(0, 0, WIDTH, HEIGHT);
-
-    // Game loop
-    while (!glfwWindowShouldClose(window)) {
-        // Check if any events have been activated (key pressed, mouse moved etc.) and call corresponding response functions
-        glfwPollEvents();
-
-        // Render
-        // Clear the colorbuffer
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // Swap the screen buffers
-        glfwSwapBuffers(window);
+    // Load Shaders
+    auto program = whal::InitShaders();
+    if (!program.isExpected()) {
+        std::cout << "Failed to initialize shaders. Got error:\n" << program.error() << std::endl;
     }
 
-    // Terminates GLFW, clearing any resources allocated by GLFW.
+    glViewport(0, 0, WIDTH, HEIGHT);
+    MainLoop(window, *program);
+
+    // clear resources
     glfwTerminate();
     return 0;
 }
 
+void MainLoop(GLFWwindow* window, whal::ShaderProgram program) {
+    auto verts = whal::MakeRectVertices(100, 100);
+    auto vao = whal::Vao();
+    auto vbo = whal::Vbo();
+    u32 nVertices = 6;
+
+    while (!glfwWindowShouldClose(window)) {
+        // check inputs
+        glfwPollEvents();
+
+        // Render
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // gfx.UpdateShaderVars(program)
+
+        vao.bind();
+        // vbo.bind();  // dont think i need to bind. binding vao implicitly does it for me
+        vbo.buffer(verts.data(), verts.size() * 4);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        program.useProgram();
+        glDrawArrays(GL_TRIANGLES, 0, nVertices);
+
+        // Swap the screen buffers
+        glfwSwapBuffers(window);
+    }
+}
+
 // Is called whenever a key is pressed/released via GLFW
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-    // if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    //     glfwSetWindowShouldClose(window, GL_TRUE);
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
 }
