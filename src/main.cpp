@@ -28,6 +28,9 @@
 #include "Gfx/Shader.h"
 #include "Gfx/VertexObject.h"
 
+#include "ECS/Lib/ECS.h"
+#include "Util/Vector.h"
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MainLoop(GLFWwindow* window, whal::ShaderProgram program);
 
@@ -83,9 +86,39 @@ void MainLoop(GLFWwindow* window, whal::ShaderProgram program) {
     auto vbo = whal::Vbo();
     u32 nVertices = 6;
 
+    struct Position {
+        whal::Vector2i pos;
+    };
+    Position pos({5, 5});
+
+    struct Velocity {
+        whal::Vector2i v;
+    };
+    Velocity vel({0, 0});
+    // Position pos = Position(whal::Vector2i(5, 5));
+
+    auto& ecs = whal::ecs::ECS::getInstance();
+    auto entity = ecs.entity().value();
+    ecs.add<Position>(entity, pos);
+    ecs.add<Velocity>(entity, vel);
+
+    auto entity2 = ecs.entity().value();
+    ecs.add<Position>(entity2, pos);
+    // entity2.add<Position>(pos);
+    ecs.add<Velocity>(entity2, vel);
+
+    std::optional<Position> _pos = ecs.getComponent<Position>(entity);
+    if (_pos) {
+        std::cout << _pos.value().pos.len() << std::endl;
+    } else {
+        std::cout << "null position for entity" << std::endl;
+    }
+
     while (!glfwWindowShouldClose(window)) {
         // check inputs
         glfwPollEvents();
+        // std::__shared_ptr<whal::ecs::IComponentArray, (__gnu_cxx::_Lock_policy)2>::get (this=0xfffdaaaaaa0efcf0) at
+        // /usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/13.2.1/../../../../include/c++/13.2.1/bits/shared_ptr_base.h:1666 1666	      { return _M_ptr; }
 
         // Render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

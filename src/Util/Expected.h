@@ -17,7 +17,7 @@ template <class T>
 class Expected {
 public:
     Expected(T value) : mExpected(value), mIsExpected(true){};
-    Expected(Error error) : mError(error), mIsExpected(false){};
+    Expected(Error error) : mExpected(T()), mError(error), mIsExpected(false){};
 
     static Expected<T> error(std::string trace) { return Expected(Error(trace)); }
 
