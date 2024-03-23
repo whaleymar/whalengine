@@ -20,6 +20,9 @@ public:
     friend Expected<Entity>;  // create dummy id on error
     EntityID id() const { return mId; }
 
+    EntityID operator()() const { return mId; }
+    bool operator==(Entity other) const { return mId == other.mId; }
+
 private:
     EntityID mId = 0;
 };

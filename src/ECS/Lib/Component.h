@@ -54,12 +54,12 @@ public:
         mIndexToEntity.erase(lastIx);
     }
 
-    std::optional<T> getData(const Entity entity) const {
+    std::optional<T*> getData(const Entity entity) {
         if (mEntityToIndex.find(entity.id()) == mEntityToIndex.end()) {
             return std::nullopt;
         }
         const u32 ix = mEntityToIndex.at(entity.id());
-        return mComponentTable.at(ix);
+        return &mComponentTable.at(ix);
     }
 
     void entityDestroyed(const Entity entity) override {

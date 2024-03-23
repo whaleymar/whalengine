@@ -28,7 +28,9 @@
 #include "Gfx/Shader.h"
 #include "Gfx/VertexObject.h"
 
+#include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
+#include "ECS/Systems/Physics.h"
 #include "Util/Vector.h"
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -86,39 +88,45 @@ void MainLoop(GLFWwindow* window, whal::ShaderProgram program) {
     auto vbo = whal::Vbo();
     u32 nVertices = 6;
 
-    struct Position {
-        whal::Vector2i pos;
-    };
-    Position pos({5, 5});
+    whal::Position pos({5, 5});
 
-    struct Velocity {
-        whal::Vector2i v;
-    };
-    Velocity vel({0, 0});
+    whal::Velocity vel({0, 0});
     // Position pos = Position(whal::Vector2i(5, 5));
 
     auto& ecs = whal::ecs::ECS::getInstance();
+    auto physicsSystem = ecs.registerSystem<whal::PhysicsSystem>();
+
     auto entity = ecs.entity().value();
-    ecs.add<Position>(entity, pos);
-    ecs.add<Velocity>(entity, vel);
+    ecs.add<whal::Position>(entity, pos);
+    ecs.add<whal::Velocity>(entity, vel);
+    std::cout << "created entity " << entity.id() << std::endl;
 
     auto entity2 = ecs.entity().value();
-    ecs.add<Position>(entity2, pos);
-    // entity2.add<Position>(pos);
-    ecs.add<Velocity>(entity2, vel);
+    ecs.add<whal::Position>(entity2, pos);
+    ecs.add<whal::Velocity>(entity2, vel);
+    std::cout << "created entity " << entity2.id() << std::endl;
 
-    std::optional<Position> _pos = ecs.getComponent<Position>(entity);
-    if (_pos) {
-        std::cout << _pos.value().pos.len() << std::endl;
-    } else {
-        std::cout << "null position for entity" << std::endl;
-    }
+    // std::optional<whal::Position*> _pos = ecs.getComponent<whal::Position>(entity);
+    // if (_pos) {
+    //     std::cout << "position vec len: " << _pos.value()->e.len() << std::endl;
+    // } else {
+    //     std::cout << "null position for entity" << std::endl;
+    // }
 
     while (!glfwWindowShouldClose(window)) {
         // check inputs
         glfwPollEvents();
         // std::__shared_ptr<whal::ecs::IComponentArray, (__gnu_cxx::_Lock_policy)2>::get (this=0xfffdaaaaaa0efcf0) at
         // /usr/bin/../lib64/gcc/x86_64-pc-linux-gnu/13.2.1/../../../../include/c++/13.2.1/bits/shared_ptr_base.h:1666 1666	      { return _M_ptr; }
+
+        // update systems
+        physicsSystem->update();
+        auto e1Position = ecs.getComponent<whal::Position>(entity);
+        if (e1Position) {
+            std::cout << "position vec len: " << e1Position.value()->e.y() << std::endl;
+        } else {
+            std::cout << "null position for entity" << std::endl;
+        }
 
         // Render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

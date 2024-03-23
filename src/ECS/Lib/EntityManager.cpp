@@ -16,10 +16,10 @@ Expected<Entity> EntityManager::createEntity() {
     if (mEntityCount + 1 == MAX_ENTITIES) {
         return Expected<Entity>::error("Cannot allocate any more entities");
     }
-    Entity id = mAvailableIDs.front();
+    EntityID id = mAvailableIDs.front();
     mAvailableIDs.pop();
     mEntityCount++;
-    return id;
+    return Entity(id);
 }
 
 void EntityManager::destroyEntity(Entity entity) {

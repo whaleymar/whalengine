@@ -51,7 +51,7 @@ public:
     }
 
     template <typename T>
-    std::optional<T> getComponent(const Entity entity) const {
+    std::optional<T*> getComponent(const Entity entity) const {
         return mComponentManager->getComponent<T>(entity);
     }
 

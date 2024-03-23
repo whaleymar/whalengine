@@ -14,11 +14,24 @@ struct Vector2 {
         e[0] = 0;
         e[1] = 0;
     }
+
     Vector2(T elem1, T elem2) {
         e[0] = elem1;
         e[1] = elem2;
     }
 
+    Vector2(const Vector2<T>& other) {
+        e[0] = other.e[0];
+        e[1] = other.e[1];
+    }
+
+    Vector2<T>& operator=(const Vector2<T>& other) {
+        if (this != &other) {
+            e[0] = other.e[0];
+            e[1] = other.e[1];
+        }
+        return *this;
+    }
     inline Vector2<T> operator+(const Vector2<T> other) const { return Vector2<T>(e[0] + other.e[0], e[1] + other.e[1]); }
     inline Vector2<T> operator-(const Vector2<T> other) const { return Vector2<T>(e[0] - other.e[0], e[1] - other.e[1]); }
     inline Vector2<T> operator*(const Vector2<T> other) const { return Vector2<T>(e[0] * other.e[0], e[1] * other.e[1]); }

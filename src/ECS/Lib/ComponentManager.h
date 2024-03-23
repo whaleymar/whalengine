@@ -10,8 +10,6 @@
 
 namespace whal::ecs {
 
-// TODO const correctness
-
 class ComponentManager {
 public:
     template <typename T>
@@ -37,10 +35,13 @@ public:
     void addComponent(const Entity entity, T component) {
         const ComponentType type = getComponentID<T>();
         auto it = std::find(mComponentTypes.begin(), mComponentTypes.end(), type);
+        int ix;
         if (it == mComponentTypes.end()) {
             registerComponent<T>();
+            ix = mComponentTypes.size() - 1;
+        } else {
+            ix = std::distance(mComponentTypes.begin(), it);
         }
-        int ix = mComponentTypes.size() - 1;
         getComponentArray<T>(ix)->addData(entity, component);
     }
 
@@ -56,7 +57,7 @@ public:
     }
 
     template <typename T>
-    std::optional<T> getComponent(const Entity entity) const {
+    std::optional<T*> getComponent(const Entity entity) const {
         const ComponentType type = getComponentID<T>();
         auto it = std::find(mComponentTypes.begin(), mComponentTypes.end(), type);
         if (it == mComponentTypes.end()) {
@@ -72,7 +73,6 @@ public:
         }
     }
 
-private:
     // assign unique IDs to each component type
     static inline ComponentType ComponentID = 0;
     template <typename T>
@@ -81,6 +81,7 @@ private:
         return id;
     }
 
+private:
     template <typename T>
     std::shared_ptr<ComponentArray<T>> getComponentArray(int ix) const {
         return std::static_pointer_cast<ComponentArray<T>>(mComponentArrays[ix]);
