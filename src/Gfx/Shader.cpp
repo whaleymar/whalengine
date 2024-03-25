@@ -2,8 +2,9 @@
 
 #include <format>
 
+#include <glad/gl.h>
+
 #include "Util/FileIO.h"
-#include "glad/gl.h"
 
 #define VERTEX_SHADER_PATH "shader/vertex.glsl"
 #define FRAG_SHADER_PATH "shader/fragment.glsl"
@@ -45,6 +46,10 @@ Expected<ShaderProgram> InitShaders() {
 
 ShaderProgram::ShaderProgram() {
     mHandle = glCreateProgram();
+
+    drawOffsetUniform = glGetUniformLocation(mHandle, "offset");
+    textureUniform = glGetUniformLocation(mHandle, "tex");
+    millis = glGetUniformLocation(mHandle, "millis");
 }
 
 void ShaderProgram::useProgram() const {
@@ -78,6 +83,20 @@ std::optional<Error> Shader::compile(const char* sourcePath) const {
         return Error(infoLog);
     }
     return std::nullopt;
+}
+
+void updateShaderVars(ShaderProgram program) {
+    // only affects the *current* vao bound to glArrayBuffer
+
+    glBindFragDataLocation(program.handle(), 0, "outputColor");
+    u32 vertAttrib = glGetAttribLocation(program.handle(), "vert");
+    glEnableVertexAttribArray(vertAttrib);
+    glVertexAttribPointer(vertAttrib, 3, GL_FLOAT, GL_FALSE, STRIDE_SIZE * sizeof(float), (void*)0);
+
+    u32 texCoordAttrib = glGetAttribLocation(program.handle(), "vertTexCoord");
+    glEnableVertexAttribArray(texCoordAttrib);
+    // last arg is byte offset to first vertex's UV data
+    glVertexAttribPointer(texCoordAttrib, 2, GL_FLOAT, GL_FALSE, STRIDE_SIZE * sizeof(float), (void*)(3 * sizeof(float)));
 }
 
 }  // namespace whal

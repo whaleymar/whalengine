@@ -1,8 +1,8 @@
 #version 330
 
-// uniform sampler2D texture1;
+uniform sampler2D texture1;
 
-// in vec2 fragTexCoord;
+in vec2 fragTexCoord;
 
 out vec4 outputColor;
 
@@ -20,7 +20,6 @@ vec2 norm(vec2 vec) {
 
 void main() {
     outputColor =vec4(1.0, 0.5, 0.2, 1.); 
-    // outputColor = vec4(1., 1., 0., 1.);
     // outputColor = texture(texture1, fragTexCoord);
 }
 

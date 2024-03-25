@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ECS/Components/Position.h"
 #include "ECS/Lib/ECS.h"
 
@@ -7,7 +9,7 @@ class PhysicsSystem : public ecs::ISystem<Position> {
 public:
     void update() override {
         for (auto const& [entityid, entity] : getEntities()) {
-            auto pos = ecs::ECS::getInstance().getComponent<Position>(entity);
+            Position& pos = entity.get<Position>();
             pos.e = pos.e + Vector2i(0, 1);
         }
     }

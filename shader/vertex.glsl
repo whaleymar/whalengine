@@ -1,7 +1,21 @@
 #version 330
-layout (location = 0) in vec3 aPos;
+
+uniform mat4 projection;
+uniform mat4 model;
+
+uniform vec3 offset;
+
+in vec3 vert;
+in vec2 vertTexCoord;
+
+out vec2 fragTexCoord;
 
 void main() {
-    gl_Position = vec4(aPos, 1.0);
-}
+    // only use x and y from offset because 2D
+    // my opengl has -1,-1 as the bottom left of the screen
+    // vec4 totalOffset = vec4(offset.x, offset.y, 0., 0.) + vec4(1., 1., 0., 0.);
+    // gl_Position = projection * vec4(vert, 1.) + totalOffset;
 
+    gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+    fragTexCoord = vertTexCoord;
+}

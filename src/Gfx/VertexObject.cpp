@@ -7,20 +7,16 @@ Vao::Vao() {
     glGenVertexArrays(1, &mHandle);
 }
 
-Vao::~Vao() {
-    glDeleteVertexArrays(1, &mHandle);
-}
-
 void Vao::bind() const {
     glBindVertexArray(mHandle);
 }
 
-Vbo::Vbo() {
-    glGenBuffers(1, &mHandle);
+void Vao::free() {
+    glDeleteVertexArrays(1, &mHandle);
 }
 
-Vbo::~Vbo() {
-    glDeleteBuffers(1, &mHandle);
+Vbo::Vbo() {
+    glGenBuffers(1, &mHandle);
 }
 
 void Vbo::bind() const {
@@ -30,6 +26,10 @@ void Vbo::bind() const {
 void Vbo::buffer(f32* vertices, u32 sizeBytes) const {
     bind();
     glBufferData(GL_ARRAY_BUFFER, sizeBytes, vertices, GL_STATIC_DRAW);
+}
+
+void Vbo::free() {
+    glDeleteBuffers(1, &mHandle);
 }
 
 std::array<f32, 30> MakeRectVertices(f32 pixelWidth, f32 pixelHeight) {

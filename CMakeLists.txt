@@ -17,6 +17,7 @@ add_executable(engine ${SOURCES_BASE})
 target_include_directories(engine
     PUBLIC src
     PUBLIC "${PROJECT_SOURCE_DIR}/lib/glad/include"
+    # PUBLIC "${PROJECT_SOURCE_DIR}/lib/CImg"
     )
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)

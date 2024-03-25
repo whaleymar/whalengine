@@ -50,6 +50,9 @@ struct Vector2 {
 typedef Vector2<f32> Vector2f;
 typedef Vector2<s32> Vector2i;
 
+Vector2f toFloatVec(const Vector2i intVec);
+Vector2i toIntVec(const Vector2f floatVec);
+
 namespace Vector {
 
 static Vector2f zero2f = Vector2f();

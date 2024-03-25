@@ -55,6 +55,12 @@ public:
     void remove();
 
     template <typename T>
+    std::optional<T*> tryGet() const;
+
+    template <typename T>
+    T& get() const;
+
+    template <typename T>
     bool has() const;
 
     void kill();
@@ -268,7 +274,7 @@ public:
     virtual void update(){};
 
 protected:
-    std::unordered_map<EntityID, Entity> getEntities() { return mEntities; }
+    std::unordered_map<EntityID, Entity> getEntities() const { return mEntities; }
 
 private:
     std::unordered_map<EntityID, Entity> mEntities;
@@ -464,8 +470,18 @@ void Entity::remove() {
 }
 
 template <typename T>
+std::optional<T*> Entity::tryGet() const {
+    return ECS::getInstance().tryGetComponent<T>(*this);
+}
+
+template <typename T>
+T& Entity::get() const {
+    return ECS::getInstance().getComponent<T>(*this);
+}
+
+template <typename T>
 bool Entity::has() const {
-    ECS::getInstance().hasComponent<T>(*this);
+    return ECS::getInstance().hasComponent<T>(*this);
 }
 
 }  // namespace whal::ecs

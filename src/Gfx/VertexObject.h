@@ -10,18 +10,18 @@ namespace whal {
 class Vao : IUseOpenGLHandle {
 public:
     Vao();
-    ~Vao();
 
     void bind() const;
+    void free();
 };
 
 class Vbo : IUseOpenGLHandle {
 public:
     Vbo();
-    ~Vbo();
 
     void bind() const;
     void buffer(f32* vertices, u32 sizeBytes) const;
+    void free();
 };
 
 std::array<f32, 30> MakeRectVertices(f32 pixelWidth, f32 pixelHeight);

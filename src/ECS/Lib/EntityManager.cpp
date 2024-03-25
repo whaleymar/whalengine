@@ -1,5 +1,4 @@
 #include "ECS/Lib/ECS.h"
-// #include "ECS/Lib/Entity.h"
 
 namespace whal::ecs {
 
