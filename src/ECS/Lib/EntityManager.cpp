@@ -1,5 +1,5 @@
-#include "ECS/Lib/EntityManager.h"
-#include "ECS/Lib/Entity.h"
+#include "ECS/Lib/ECS.h"
+// #include "ECS/Lib/Entity.h"
 
 namespace whal::ecs {
 

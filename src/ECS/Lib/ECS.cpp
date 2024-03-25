@@ -1,8 +1,8 @@
 #include "ECS/Lib/ECS.h"
 
-#include "ECS/Lib/ComponentManager.h"
-#include "ECS/Lib/EntityManager.h"
-#include "ECS/Lib/SystemManager.h"
+// #include "ECS/Lib/ComponentManager.h"
+// #include "ECS/Lib/EntityManager.h"
+// #include "ECS/Lib/SystemManager.h"
 
 namespace whal::ecs {
 
