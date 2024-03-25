@@ -16,6 +16,6 @@ void main() {
     // vec4 totalOffset = vec4(offset.x, offset.y, 0., 0.) + vec4(1., 1., 0., 0.);
     // gl_Position = projection * vec4(vert, 1.) + totalOffset;
 
-    gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+    gl_Position = vec4(vert, 1.);
     fragTexCoord = vertTexCoord;
 }
