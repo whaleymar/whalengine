@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include "ECS/Components/Draw.h"
+#include "ECS/Components/PlayerControl.h"
 #include "ECS/Systems/Gfx.h"
 #include "Gfx/Shader.h"
 // #include "Gfx/Texture.h"
@@ -27,7 +28,6 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    // Create a GLFWwindow object that we can use for GLFW's functions
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH_PIXELS, WINDOW_HEIGHT_PIXELS, WINDOW_TITLE, NULL, NULL);
     glfwMakeContextCurrent(window);
     if (window == NULL) {
@@ -77,6 +77,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     auto entity = ecs.entity().value();
     entity.add<Position>(Position({0, 0}));
     entity.add<Draw>();
+    entity.add<PlayerControl>();
 
     // auto entity2 = ecs.entity().value();
     // entity2.add<Position>(pos);

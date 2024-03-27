@@ -9,16 +9,27 @@ A WIP 2D game engine written in C++ with OpenGL and GLFW, backed by a simple Ent
 - sound
 - lighting
 - textures
-    - stitch textures into atlas at startup
+    - stitch textures into atlas at startup (or with script)
 - physics
 
 ## Components
 - Follow
 - Light 
-- collider
+- actor collider
+- solid collider
+- player controlled
+- lifetime
+
+## Entity Prefabs
+- particle
 
 ## Errors
 - image lib has exceptions
+
+## Non-ECS Systems
+- delta time 
+- Scenes
+- loading from file
 
 ## Misc
 - only store xy coord in vertices

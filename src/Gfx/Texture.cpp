@@ -15,7 +15,7 @@ Texture::Texture() {
 
 Texture::~Texture() {
     if (mData) {
-        free(mData);
+        delete mData;
     }
 }
 
