@@ -4,6 +4,11 @@
 
 #include <glad/gl.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Gfx/GfxUtil.h"
 #include "Util/FileIO.h"
 
 #define VERTEX_SHADER_PATH "shader/vertex.glsl"
@@ -28,6 +33,7 @@ Expected<ShaderProgram> InitShaders() {
     }
 
     ShaderProgram program;
+    program.useProgram();
     u32 handle = program.handle();
     glAttachShader(handle, vertexShader.handle());
     glAttachShader(handle, fragmentShader.handle());
@@ -41,19 +47,35 @@ Expected<ShaderProgram> InitShaders() {
         return Expected<ShaderProgram>::error(std::format("Got Linker Error: {}", infoLog));
     }
 
+    program.init();
+    program.onWindowResize();
+
     return program;
 }
 
 ShaderProgram::ShaderProgram() {
     mHandle = glCreateProgram();
-
-    drawOffsetUniform = glGetUniformLocation(mHandle, "offset");
-    textureUniform = glGetUniformLocation(mHandle, "tex");
-    millis = glGetUniformLocation(mHandle, "millis");
 }
 
 void ShaderProgram::useProgram() const {
     glUseProgram(mHandle);
+}
+
+void ShaderProgram::init() {
+    useProgram();
+
+    drawOffsetUniform = glGetUniformLocation(mHandle, "offset");
+    textureUniform = glGetUniformLocation(mHandle, "tex");
+    // millis = glGetUniformLocation(mHandle, "millis");
+}
+
+void ShaderProgram::onWindowResize() {
+    // Adjust camera projection
+    useProgram();
+
+    glm::mat4 projection = glm::ortho(0.0f, static_cast<f32>(WINDOW_WIDTH_PIXELS), static_cast<f32>(WINDOW_HEIGHT_PIXELS), 0.0f, -1.0f, 1.0f);
+    projectionUniform = glGetUniformLocation(mHandle, "projection");
+    glUniformMatrix4fv(projectionUniform, 1, false, glm::value_ptr(projection));
 }
 
 Shader::Shader(bool isVertexShader) {

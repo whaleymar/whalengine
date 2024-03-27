@@ -19,7 +19,6 @@ void GraphicsSystem::drawEntities(ShaderProgram program) {
         Position& pos = entity.get<Position>();
         Draw& draw = entity.get<Draw>();
 
-        // TODO convert to pixel location instead of cast
         Vector2f floatPos = toFloatVec(pos.e);
         glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
 
@@ -30,5 +29,7 @@ void GraphicsSystem::drawEntities(ShaderProgram program) {
         glDrawArrays(GL_TRIANGLES, 0, draw.nVertices);
     }
 }
+
+// Vector2f getPixelPosition(const Vector2i position) {}
 
 }  // namespace whal

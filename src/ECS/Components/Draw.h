@@ -15,9 +15,9 @@ struct Draw {
     Vao vao;
     Vbo vbo;
     s32 depth;
-    Vector2i scale = {1, 1};
-    Vector2i atlasPosition = {0, 0};
-    Vector2i frameSize = {8, 8};
+    Vector2f scale = {1, 1};
+    Vector2i atlasPositionTexels = {0, 0};
+    Vector2i frameSizeTexels = {8, 8};
     bool isUVUpdateNeeded = false;
 };
 

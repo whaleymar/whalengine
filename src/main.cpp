@@ -12,15 +12,13 @@
 // #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
 #include "ECS/Systems/Physics.h"
+#include "Gfx/GfxUtil.h"
 #include "Util/Vector.h"
 
 using namespace whal;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MainLoop(GLFWwindow* window, ShaderProgram program);
-
-// Window dimensions
-const GLuint WIDTH = 1280, HEIGHT = 720;
 
 int main() {
     glfwInit();
@@ -30,7 +28,7 @@ int main() {
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     // Create a GLFWwindow object that we can use for GLFW's functions
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH_PIXELS, WINDOW_HEIGHT_PIXELS, WINDOW_TITLE, NULL, NULL);
     glfwMakeContextCurrent(window);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -54,9 +52,10 @@ int main() {
     auto program = InitShaders();
     if (!program.isExpected()) {
         std::cout << "Failed to initialize shaders. Got error:\n" << program.error() << std::endl;
+        return -1;
     }
 
-    glViewport(0, 0, WIDTH, HEIGHT);
+    // glViewport(0, 0, WINDOW_WIDTH_PIXELS, WINDOW_HEIGHT_PIXELS);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -87,14 +86,10 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
         glfwPollEvents();
 
         // update systems
-        // physicsSystem->update();
+        physicsSystem->update();
 
-        // auto e1Position = ecs.tryGetComponent<Position>(entity);
-        // if (e1Position) {
-        //     std::cout << "position vec len: " << e1Position.value()->e.y() << std::endl;
-        // } else {
-        //     std::cout << "null position for entity" << std::endl;
-        // }
+        // Position& pos = entity.get<Position>();
+        // std::cout << pos.e.x() << " " << pos.e.y() << std::endl;
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

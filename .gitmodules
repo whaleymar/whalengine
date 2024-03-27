@@ -5,3 +5,6 @@
 [submodule "lib/glad"]
 	path = lib/glad
 	url = https://github.com/Dav1dde/glad.git
+[submodule "lib/glm"]
+	path = lib/glm
+	url = https://github.com/g-truc/glm.git

@@ -17,10 +17,13 @@ class ShaderProgram : public IUseOpenGLHandle {
 public:
     ShaderProgram();
     void useProgram() const;
+    void init();
+    void onWindowResize();
 
     u32 drawOffsetUniform;
     u32 textureUniform;
     u32 millis;
+    u32 projectionUniform;
 };
 
 class Shader : public IUseOpenGLHandle {

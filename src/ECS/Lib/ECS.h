@@ -69,7 +69,6 @@ private:
     EntityID mId = 0;
 };
 
-// TODO compile-time inheritance?
 class IComponentArray {
 public:
     virtual ~IComponentArray() = default;

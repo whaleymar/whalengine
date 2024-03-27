@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.13)
 project(engine CXX C)
 cmake_policy(SET CMP0079 NEW)
 
+add_subdirectory(lib/glm) # needs to be here to avoid recursive variable-setting
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 set(CMAKE_CXX_FLAGS "-Wall -g")
@@ -17,7 +19,7 @@ add_executable(engine ${SOURCES_BASE})
 target_include_directories(engine
     PUBLIC src
     PUBLIC "${PROJECT_SOURCE_DIR}/lib/glad/include"
-    # PUBLIC "${PROJECT_SOURCE_DIR}/lib/CImg"
+    # PUBLIC "${PROJECT_SOURCE_DIR}/lib/glm/glm"
     )
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -38,6 +40,8 @@ target_link_libraries(engine glad)
 
 add_subdirectory(lib/glfw)
 target_link_libraries(engine glfw)
+
+target_link_libraries(engine glm)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(engine OpenGL::GL)
