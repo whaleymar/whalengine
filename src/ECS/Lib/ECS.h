@@ -4,11 +4,9 @@
 #include <array>
 #include <bitset>
 #include <cassert>
-#include <functional>
 #include <memory>
 #include <optional>
 #include <queue>
-#include <type_traits>
 #include <unordered_map>
 #include <vector>
 
@@ -71,12 +69,6 @@ private:
     EntityID mId = 0;
 };
 
-class IComponent {
-public:
-    virtual void onAdd(){};
-    virtual void onRemove(){};
-};
-
 class IComponentArray {
 public:
     virtual ~IComponentArray() = default;
@@ -90,16 +82,13 @@ public:
     void addData(const Entity entity, T component) {
         if (mEntityToIndex.find(entity.id()) != mEntityToIndex.end()) {
             const u32 ix = mEntityToIndex[entity.id()];
-            // mComponentTable[ix].onRemove();
             mComponentTable[ix] = component;
-            // mComponentTable[ix].onAdd();
             return;
         }
         const u32 ix = mSize++;
         mEntityToIndex[entity.id()] = ix;
         mIndexToEntity[ix] = entity.id();
         mComponentTable[ix] = component;
-        // mComponentTable[ix].onAdd();
     }
 
     void setData(const Entity entity, T component) { mComponentTable[mEntityToIndex[entity.id()]] = component; }
@@ -111,8 +100,6 @@ public:
 
         // maintain density of entities
         const u32 removeIx = mEntityToIndex[entity.id()];
-        // mComponentTable[removeIx].onRemove();
-
         const u32 lastIx = --mSize;
         mComponentTable[removeIx] = mComponentTable[lastIx];
 
@@ -176,10 +163,8 @@ class ComponentManager {
 public:
     template <typename T>
     void registerComponent() {
-        // static_assert(std::is_base_of_v<IComponent, T>, "Component must inherit IComponent");
-
         const ComponentType type = getComponentID<T>();
-        assert(std::find(mComponentTypes.begin(), mComponentTypes.end(), type) == mComponentTypes.end());
+        assert(std::find(mComponentTypes.begin(), mComponentTypes.end(), type) == mComponentTypes.end());  // msg: component type already registered
         mComponentTypes.push_back(type);
         mComponentArrays.push_back(std::make_shared<ComponentArray<T>>());
     }
@@ -288,6 +273,8 @@ public:
     friend SystemManager;
     virtual ~SystemBase() = default;
     virtual void update(){};
+    virtual void onAdd(const Entity){};
+    virtual void onRemove(const Entity){};
 
 protected:
     std::unordered_map<EntityID, Entity> getEntities() const { return mEntities; }
@@ -334,7 +321,7 @@ public:
         static_assert(is_base_of_template<ISystem, T>::value, "Cannot register class which doesn't inherit ISystem");
         const SystemId id = getSystemID<T>();
         auto it = std::find(mSystemIDs.begin(), mSystemIDs.end(), id);
-        assert(it == mSystemIDs.end());
+        assert(it == mSystemIDs.end());  // msg: system already registered
 
         mSystemIDs.push_back(id);
         auto system = std::make_shared<T>();
@@ -347,7 +334,7 @@ public:
     void setPattern(const Pattern pattern) {
         const SystemId id = getSystemID<T>();
         auto it = std::find(mSystemIDs.begin(), mSystemIDs.end(), id);
-        assert(it != mSystemIDs.end());
+        assert(it != mSystemIDs.end());  // msg: can't set pattern for unregistered system
         int ix = std::distance(mSystemIDs.begin(), it);
         mPatterns[ix] = pattern;
     }
@@ -355,7 +342,11 @@ public:
     void entityDestroyed(const Entity entity) const {
         // TODO make thread safe
         for (const auto& system : mSystems) {
-            system->mEntities.erase(entity.mId);
+            auto const ix = system->mEntities.find(entity.id());
+            if (ix != system->mEntities.end()) {
+                system->mEntities.erase(entity.id());
+                system->onRemove(entity);
+            }
         }
     }
 
@@ -363,10 +354,17 @@ public:
         // TODO make thread safe
         for (size_t i = 0; i < mSystemIDs.size(); i++) {
             auto const& systemPattern = mPatterns[i];
+            auto const ix = mSystems[i]->mEntities.find(entity.id());
             if ((newEntityPattern & systemPattern) == systemPattern) {
+                if (ix != mSystems[i]->mEntities.end()) {
+                    // already in system
+                    continue;
+                }
                 mSystems[i]->mEntities.insert({entity.id(), entity});
-            } else {
+                mSystems[i]->onAdd(entity);
+            } else if (ix != mSystems[i]->mEntities.end()) {
                 mSystems[i]->mEntities.erase(entity.id());
+                mSystems[i]->onRemove(entity);
             }
         }
     }

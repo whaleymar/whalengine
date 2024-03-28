@@ -32,9 +32,11 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     auto& ecs = ecs::ECS::getInstance();
     auto controlSystem = ecs.registerSystem<ControllerSystem>();
     auto physicsSystem = ecs.registerSystem<PhysicsSystem>();
+    auto graphicsSystem = ecs.registerSystem<GraphicsSystem>();
+
+    // single-component systems for syncing the global collision manager:
     auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
     auto solidBodyMgr = ecs.registerSystem<SolidBodyManager>();
-    auto graphicsSystem = ecs.registerSystem<GraphicsSystem>();
 
     auto entity = ecs.entity().value();
     entity.add<Position>(Position({0, 0}));
@@ -62,10 +64,9 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
         // update systems
         Deltatime::getInstance().update();
         Frametracker::getInstance().update();
-        rigidBodyMgr->update();
-        solidBodyMgr->update();
         controlSystem->update();
         physicsSystem->update();
+        rigidBodyMgr->update();
 
         // std::cout << Deltatime::getInstance().get() << std::endl;
         // if (Frametracker::getInstance().getFrame() == 0)

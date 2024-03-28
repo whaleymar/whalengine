@@ -19,6 +19,7 @@ public:
     ActorCollider(Vector2f position, Vector2i half);
 
     void moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback);
+    bool isAlive() const { return mIsAlive; }
 
     template <typename T>
     std::optional<HitInfo> checkCollision(const std::vector<T*>& objects, const Vector2i position) const;
@@ -28,7 +29,6 @@ public:
     virtual bool isRiding(const SolidCollider* solid) const;
 
 private:
-    // TODO store pointer to parent entity, then send kill/move signal from here?
     bool mIsAlive = true;
 };
 

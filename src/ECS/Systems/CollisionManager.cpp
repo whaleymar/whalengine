@@ -1,31 +1,37 @@
 #include "CollisionManagerSystem.h"
+#include "Util/Print.h"
 
 #include "Physics/CollisionManager.h"
 
 namespace whal {
 
-// this is a really dumb way of making the collision manager be correct
-// but i've tried like 5 other things and at this point I just want it to work
-// something I could try: give an onAdd and onRemove vfunc to ISystem and use those here
-
 void RigidBodyManager::update() {
-    auto& mgr = CollisionManager::getInstance();
-    mgr.clearActors();
-
-    for (auto const& [entityid, entity] : getEntities()) {
-        auto ptr = &entity.get<RigidBody>().collider;
-        mgr.add(ptr);
+    for (auto& [entityid, entity] : getEntities()) {
+        if (!entity.get<RigidBody>().collider.isAlive()) {
+            entity.kill();
+        }
     }
+    print(CollisionManager::getInstance().getAllActors().size());
 }
 
-void SolidBodyManager::update() {
-    auto& mgr = CollisionManager::getInstance();
-    mgr.clearSolids();
+void RigidBodyManager::onAdd(ecs::Entity entity) {
+    auto pCollider = &entity.get<RigidBody>().collider;
+    CollisionManager::getInstance().add(pCollider);
+}
 
-    for (auto const& [entityid, entity] : getEntities()) {
-        auto ptr = &entity.get<SolidBody>().collider;
-        mgr.add(ptr);
-    }
+void RigidBodyManager::onRemove(ecs::Entity entity) {
+    auto pCollider = &entity.get<RigidBody>().collider;
+    CollisionManager::getInstance().remove(pCollider);
+}
+
+void SolidBodyManager::onAdd(ecs::Entity entity) {
+    auto pCollider = &entity.get<SolidBody>().collider;
+    CollisionManager::getInstance().add(pCollider);
+}
+
+void SolidBodyManager::onRemove(ecs::Entity entity) {
+    auto pCollider = &entity.get<SolidBody>().collider;
+    CollisionManager::getInstance().remove(pCollider);
 }
 
 }  // namespace whal

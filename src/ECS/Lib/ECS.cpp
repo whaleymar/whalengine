@@ -13,9 +13,9 @@ Expected<Entity> ECS::entity() const {
 }
 
 void ECS::kill(Entity entity) const {
+    mSystemManager->entityDestroyed(entity);  // this goes first so onDelete can fetch components
     mEntityManager->destroyEntity(entity);
     mComponentManager->entityDestroyed(entity);
-    mSystemManager->entityDestroyed(entity);
 }
 
 }  // namespace whal::ecs
