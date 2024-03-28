@@ -14,5 +14,13 @@ The main changes are:
 
 ## TODO
 
-- Entity should have some compile() method which sets mIsAlive=true and sends a patternChanged signal -> patternChanged signal not sent for dead entities, which will prevent a bunch of patternChanged calls from happening while an entity is initialized
+### Need:
 
+- thread-safe system methods
+- auto-call systems
+- system scheduler (every X frames)
+
+# Nice to have
+
+- Entity should have some compile() method which sets mIsAlive=true and sends a patternChanged signal -> patternChanged signal not sent for dead entities, which will prevent a bunch of patternChanged calls from happening while an entity is initialized
+- prefabs

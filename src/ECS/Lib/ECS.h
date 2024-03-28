@@ -142,7 +142,6 @@ private:
     u32 mSize;
 };
 
-// TODO a way to temporarily deactivate a component without changing the pattern?
 class EntityManager {
 public:
     EntityManager();
@@ -153,7 +152,6 @@ public:
     Pattern getPattern(Entity entity) const;
 
 private:
-    // ? priority queue to ensure entities are packed? makes insert + delete nlogn
     std::queue<EntityID> mAvailableIDs;
     std::array<Pattern, MAX_ENTITIES> mPatterns;
     u32 mEntityCount = 0;
