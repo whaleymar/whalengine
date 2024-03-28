@@ -10,3 +10,4 @@ The main changes are:
 
 1. Components should have a default constructor and be copyable
 2. Components should have a unique type (after name mangling -> aliases aren't unique)
+3. Systems should have a default constructor

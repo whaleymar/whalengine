@@ -4,22 +4,75 @@
 // clang-format on
 
 #include <iostream>
+
 #include "ECS/Components/Draw.h"
-#include "ECS/Components/PlayerControl.h"
+// #include "ECS/Components/PlayerControl.h"
+#include "ECS/Components/Velocity.h"
+#include "ECS/Lib/ECS.h"
+#include "ECS/Systems/Controller.h"
 #include "ECS/Systems/Gfx.h"
+#include "ECS/Systems/Physics.h"
+
 #include "Gfx/Shader.h"
 // #include "Gfx/Texture.h"
-
-// #include "ECS/Components/Velocity.h"
-#include "ECS/Lib/ECS.h"
-#include "ECS/Systems/Physics.h"
 #include "Gfx/GfxUtil.h"
+
+#include "Systems/Deltatime.h"
+#include "Systems/Frametracker.h"
+#include "Systems/InputHandler.h"
+
 #include "Util/Vector.h"
 
 using namespace whal;
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-void MainLoop(GLFWwindow* window, ShaderProgram program);
+void MainLoop(GLFWwindow* window, ShaderProgram program) {
+    // Texture mainTexture;
+    // mainTexture.loadAtlas("data/sprites.png");
+
+    auto& ecs = ecs::ECS::getInstance();
+    auto controlSystem = ecs.registerSystem<ControllerSystem>();
+    auto physicsSystem = ecs.registerSystem<PhysicsSystem>();
+    auto graphicsSystem = ecs.registerSystem<GraphicsSystem>();
+
+    auto entity = ecs.entity().value();
+    entity.add<Position>(Position({0, 0}));
+    entity.add<Velocity>();
+    entity.add<Draw>();
+    entity.add<PlayerControl>();
+
+    auto entity2 = ecs.entity().value();
+    entity2.add<Position>(Position({150, -15}));
+    entity2.add<Velocity>();
+    entity2.add<Draw>();
+    entity2.add<PlayerControl>();
+
+    while (!glfwWindowShouldClose(window)) {
+        // check inputs
+        glfwPollEvents();
+        if (Input::getInstance().isPause()) {
+            glfwSetWindowShouldClose(window, GL_TRUE);
+        }
+
+        // update systems
+        Deltatime::getInstance().update();
+        Frametracker::getInstance().update();
+        controlSystem->update();
+        // physicsSystem->update();
+
+        // std::cout << Deltatime::getInstance().get() << std::endl;
+        // if (Frametracker::getInstance().getFrame() == 0)
+        //     std::cout << Frametracker::getInstance().getFPS() << std::endl;
+
+        // Render
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // mainTexture.bind();
+
+        graphicsSystem->drawEntities(program);
+
+        // Swap the screen buffers
+        glfwSwapBuffers(window);
+    }
+}
 
 int main() {
     glfwInit();
@@ -36,10 +89,8 @@ int main() {
         return -1;
     }
 
-    // Set the required callback functions
     glfwSetKeyCallback(window, key_callback);
 
-    // Load OpenGL functions, gladLoadGL returns the loaded version, 0 on error.
     int version = gladLoadGL(glfwGetProcAddress);
     if (version == 0) {
         std::cout << "Failed to initialize OpenGL context" << std::endl;
@@ -55,7 +106,7 @@ int main() {
         return -1;
     }
 
-    // glViewport(0, 0, WINDOW_WIDTH_PIXELS, WINDOW_HEIGHT_PIXELS);
+    // glViewport(0, 0, WINDOW_WIDTH_PIXELS, WINDOW_HEIGHT_PIXELS); idk what this does
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -64,47 +115,4 @@ int main() {
     // clear resources
     glfwTerminate();
     return 0;
-}
-
-void MainLoop(GLFWwindow* window, ShaderProgram program) {
-    // Texture mainTexture;
-    // mainTexture.loadAtlas("data/sprites.png");
-
-    auto& ecs = ecs::ECS::getInstance();
-    auto physicsSystem = ecs.registerSystem<PhysicsSystem>();
-    auto graphicsSystem = ecs.registerSystem<GraphicsSystem>();
-
-    auto entity = ecs.entity().value();
-    entity.add<Position>(Position({0, 0}));
-    entity.add<Draw>();
-    entity.add<PlayerControl>();
-
-    // auto entity2 = ecs.entity().value();
-    // entity2.add<Position>(pos);
-
-    while (!glfwWindowShouldClose(window)) {
-        // check inputs
-        glfwPollEvents();
-
-        // update systems
-        physicsSystem->update();
-
-        // Position& pos = entity.get<Position>();
-        // std::cout << pos.e.x() << " " << pos.e.y() << std::endl;
-
-        // Render
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // mainTexture.bind();
-
-        graphicsSystem->drawEntities(program);
-
-        // Swap the screen buffers
-        glfwSwapBuffers(window);
-    }
-}
-
-// Is called whenever a key is pressed/released via GLFW
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
 }

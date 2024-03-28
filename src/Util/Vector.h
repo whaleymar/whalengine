@@ -33,9 +33,30 @@ struct Vector2 {
         return *this;
     }
     inline Vector2<T> operator+(const Vector2<T> other) const { return Vector2<T>(e[0] + other.e[0], e[1] + other.e[1]); }
+    inline Vector2<T> operator+=(const Vector2<T> other) {
+        e[0] += other.e[0];
+        e[1] += other.e[1];
+        return *this;
+    }
     inline Vector2<T> operator-(const Vector2<T> other) const { return Vector2<T>(e[0] - other.e[0], e[1] - other.e[1]); }
+    inline Vector2<T> operator-=(const Vector2<T> other) {
+        e[0] -= other.e[0];
+        e[1] -= other.e[1];
+        return *this;
+    }
     inline Vector2<T> operator*(const Vector2<T> other) const { return Vector2<T>(e[0] * other.e[0], e[1] * other.e[1]); }
+    inline Vector2<T> operator*=(const Vector2<T> other) {
+        e[0] *= other.e[0];
+        e[1] *= other.e[1];
+        return *this;
+    }
     inline Vector2<T> operator*(const f32 scalar) const { return Vector2<T>(e[0] * scalar, e[1] * scalar); }
+    inline Vector2<T> operator*=(const f32 scalar) {
+        e[0] *= scalar;
+        e[1] *= scalar;
+        return *this;
+    }
+
     inline T x() const { return e[0]; }
     inline T y() const { return e[1]; }
 

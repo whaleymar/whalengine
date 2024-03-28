@@ -1,14 +1,18 @@
 #pragma once
 
-// #include "al/Nerve/NerveExecutor.h"
+#include "Util/Types.h"
 
 namespace whal {
 
-// can't inherit from NerveExecutor because it has an explicit destructor -> no copy
-// can't allocate pointer because I would need a destructor
-// should create a singleton controller and point to that instead I guess?
+// could be interesting:
+// time/function for how fast I arrive at top speed
+// jump trajectory
+// coyote time window
+
 struct PlayerControl {
-    PlayerControl();
+    PlayerControl(f32 moveSpeed_ = 10, f32 jumpHeight_ = 25);
+    f32 moveSpeed;
+    f32 jumpHeight;
 };
 
 }  // namespace whal
