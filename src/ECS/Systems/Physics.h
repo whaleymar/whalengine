@@ -1,20 +1,15 @@
 #pragma once
 
 #include "ECS/Components/Position.h"
+#include "ECS/Components/RigidBody.h"
+#include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
 
 namespace whal {
 
-class PhysicsSystem : public ecs::ISystem<Position> {
+class PhysicsSystem : public ecs::ISystem<Position, Velocity, RigidBody> {
 public:
-    void update() override {
-        for (auto& [entityid, entity] : getEntities()) {
-            // Position& pos = entity.get<Position>();
-            // pos.e = pos.e + Vector2i(0, 1);
-            Position pos = entity.get<Position>();
-            entity.set<Position>(Position(pos.e + Vector2i(0, 1)));
-        }
-    }
+    void update() override;
 };
 
 }  // namespace whal

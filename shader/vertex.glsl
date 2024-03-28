@@ -10,7 +10,8 @@ in vec2 vertTexCoord;
 out vec2 fragTexCoord;
 
 void main() {
-    vec4 totalOffset = projection * vec4(offset.x, offset.y, 0., 0.) + vec4(1., -1., 0., 0.);
+    // idk why i need to flip the y coord
+    vec4 totalOffset = projection * vec4(offset.x, -1.*offset.y, 0., 0.) + vec4(1., -1., 0., 0.);
     gl_Position = projection * vec4(vert.xy, 0., 1.) + totalOffset;
 
     fragTexCoord = vertTexCoord;

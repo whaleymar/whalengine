@@ -8,6 +8,11 @@ The main changes are:
 
 ## Constraints
 
-1. Components should have a default constructor and be copyable
+1. Components should have a default constructor and be copyable (you can still use other constructors for initialization)
 2. Components should have a unique type (after name mangling -> aliases aren't unique)
 3. Systems should have a default constructor
+
+## TODO
+
+- Entity should have some compile() method which sets mIsAlive=true and sends a patternChanged signal -> patternChanged signal not sent for dead entities, which will prevent a bunch of patternChanged calls from happening while an entity is initialized
+

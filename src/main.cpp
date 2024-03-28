@@ -5,10 +5,10 @@
 
 #include <iostream>
 
-#include "ECS/Components/Draw.h"
-// #include "ECS/Components/PlayerControl.h"
+#include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
+#include "ECS/Systems/CollisionManagerSystem.h"
 #include "ECS/Systems/Controller.h"
 #include "ECS/Systems/Gfx.h"
 #include "ECS/Systems/Physics.h"
@@ -32,6 +32,8 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     auto& ecs = ecs::ECS::getInstance();
     auto controlSystem = ecs.registerSystem<ControllerSystem>();
     auto physicsSystem = ecs.registerSystem<PhysicsSystem>();
+    auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
+    auto solidBodyMgr = ecs.registerSystem<SolidBodyManager>();
     auto graphicsSystem = ecs.registerSystem<GraphicsSystem>();
 
     auto entity = ecs.entity().value();
@@ -40,11 +42,15 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     entity.add<Draw>();
     entity.add<PlayerControl>();
 
+    s32 halflen = entity.get<Draw>().frameSizeTexels.x() * static_cast<s32>(PIXELS_PER_TEXEL) / 2;
+    entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), halflen, halflen));
+
     auto entity2 = ecs.entity().value();
     entity2.add<Position>(Position({150, -15}));
     entity2.add<Velocity>();
     entity2.add<Draw>();
-    entity2.add<PlayerControl>();
+    // entity2.add<PlayerControl>();
+    entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
 
     while (!glfwWindowShouldClose(window)) {
         // check inputs
@@ -56,8 +62,10 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
         // update systems
         Deltatime::getInstance().update();
         Frametracker::getInstance().update();
+        rigidBodyMgr->update();
+        solidBodyMgr->update();
         controlSystem->update();
-        // physicsSystem->update();
+        physicsSystem->update();
 
         // std::cout << Deltatime::getInstance().get() << std::endl;
         // if (Frametracker::getInstance().getFrame() == 0)

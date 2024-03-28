@@ -4,9 +4,11 @@
 #include <array>
 #include <bitset>
 #include <cassert>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <queue>
+#include <type_traits>
 #include <unordered_map>
 #include <vector>
 
@@ -69,6 +71,12 @@ private:
     EntityID mId = 0;
 };
 
+class IComponent {
+public:
+    virtual void onAdd(){};
+    virtual void onRemove(){};
+};
+
 class IComponentArray {
 public:
     virtual ~IComponentArray() = default;
@@ -81,13 +89,17 @@ class ComponentArray : public IComponentArray {
 public:
     void addData(const Entity entity, T component) {
         if (mEntityToIndex.find(entity.id()) != mEntityToIndex.end()) {
-            mComponentTable[mEntityToIndex[entity.id()]] = component;
+            const u32 ix = mEntityToIndex[entity.id()];
+            // mComponentTable[ix].onRemove();
+            mComponentTable[ix] = component;
+            // mComponentTable[ix].onAdd();
             return;
         }
         const u32 ix = mSize++;
         mEntityToIndex[entity.id()] = ix;
         mIndexToEntity[ix] = entity.id();
         mComponentTable[ix] = component;
+        // mComponentTable[ix].onAdd();
     }
 
     void setData(const Entity entity, T component) { mComponentTable[mEntityToIndex[entity.id()]] = component; }
@@ -99,6 +111,8 @@ public:
 
         // maintain density of entities
         const u32 removeIx = mEntityToIndex[entity.id()];
+        // mComponentTable[removeIx].onRemove();
+
         const u32 lastIx = --mSize;
         mComponentTable[removeIx] = mComponentTable[lastIx];
 
@@ -125,6 +139,7 @@ public:
         return mComponentTable.at(ix);
     }
 
+    // TODO does this need to be virtual?
     void entityDestroyed(const Entity entity) override {
         if (mEntityToIndex.find(entity.id()) == mEntityToIndex.end()) {
             return;
@@ -161,6 +176,8 @@ class ComponentManager {
 public:
     template <typename T>
     void registerComponent() {
+        // static_assert(std::is_base_of_v<IComponent, T>, "Component must inherit IComponent");
+
         const ComponentType type = getComponentID<T>();
         assert(std::find(mComponentTypes.begin(), mComponentTypes.end(), type) == mComponentTypes.end());
         mComponentTypes.push_back(type);

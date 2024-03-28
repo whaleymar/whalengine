@@ -2,7 +2,6 @@
 
 #include <vector>
 
-// #include "Physics/Collision/AABB.h"
 #include "Physics/Collision/HitInfo.h"
 #include "Physics/IUseCollision.h"
 #include "Util/Types.h"
@@ -24,6 +23,7 @@ public:
     template <typename T>
     std::optional<HitInfo> checkCollision(const std::vector<T*>& objects, const Vector2i position) const;
 
+    // squish is a CollisionCallback. Not sure if I will define others
     virtual void squish(const HitInfo hitInfo);
     virtual bool isRiding(const SolidCollider* solid) const;
 

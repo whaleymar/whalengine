@@ -1,6 +1,9 @@
 #include "Physics/Solid.h"
 
 #include <algorithm>
+#include <cmath>
+
+#include "Physics/Actor.h"
 #include "Physics/Collision/AABB.h"
 #include "Physics/CollisionManager.h"
 #include "Util/Vector.h"
@@ -12,8 +15,8 @@ SolidCollider::SolidCollider(Vector2f position, Vector2i half) : IUseCollision(A
 }
 
 void SolidCollider::move(f32 x, f32 y) {
-    s32 toMoveX = static_cast<s32>(x);
-    s32 toMoveY = static_cast<s32>(y);
+    s32 toMoveX = std::round(x);
+    s32 toMoveY = std::round(y);
     if (toMoveX == 0 && toMoveY == 0) {
         return;
     }

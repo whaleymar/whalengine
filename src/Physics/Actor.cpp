@@ -1,5 +1,6 @@
 #include "Physics/Actor.h"
 
+#include <cmath>
 #include <type_traits>
 
 #include "Physics/CollisionManager.h"
@@ -15,7 +16,7 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
 
 void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback) {
     // TODO doesn't handle colliding with other actors
-    s32 toMove = static_cast<s32>(amount);
+    s32 toMove = std::round(amount);
     if (toMove == 0) {
         return;
     }
@@ -40,7 +41,7 @@ void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
 
 template <typename T>
 std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<T*>& objects, const Vector2i position) const {
-    static_assert(std::is_base_of_v<IUseCollision, T>);
+    static_assert(std::is_base_of_v<IUseCollision, T>, "collider must inherit IUseCollision");
 
     auto movedCollider = AABB(position, mCollider.mHalf);
     for (auto& object : objects) {

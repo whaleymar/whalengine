@@ -1,9 +1,11 @@
 #pragma once
 
 #include <vector>
-#include "Physics/Actor.h"
 
 namespace whal {
+
+class ActorCollider;
+class SolidCollider;
 
 class CollisionManager {
 public:
@@ -12,17 +14,23 @@ public:
         return instance;
     }
 
-    std::vector<ActorCollider*>& getAllActors() { return mActors; }
-    std::vector<SolidCollider*>& getAllSolids() { return mSolids; }
+    const std::vector<ActorCollider*>& getAllActors() const { return mActors; }
+    const std::vector<SolidCollider*>& getAllSolids() const { return mSolids; }
+    void add(ActorCollider* actor);
+    void add(SolidCollider* solid);
+    void remove(ActorCollider* actor);
+    void remove(SolidCollider* solid);
+    void clearActors();
+    void clearSolids();
 
 private:
-    CollisionManager(){};
+    CollisionManager() = default;
 
     CollisionManager(const CollisionManager&) = delete;
     void operator=(const CollisionManager&) = delete;
 
-    std::vector<ActorCollider*> mActors;
-    std::vector<SolidCollider*> mSolids;
+    std::vector<ActorCollider*> mActors{};
+    std::vector<SolidCollider*> mSolids{};
 };
 
 }  // namespace whal
