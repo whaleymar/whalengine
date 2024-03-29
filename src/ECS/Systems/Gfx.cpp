@@ -3,6 +3,9 @@
 #include "Gfx/Shader.h"
 #include "Util/Vector.h"
 
+#include "ECS/Components/Draw.h"
+#include "ECS/Components/Position.h"
+
 // clang-format off
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>  // always include after glad

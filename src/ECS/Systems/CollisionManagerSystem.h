@@ -1,10 +1,11 @@
 #pragma once
 
-#include "ECS/Components/RigidBody.h"
-#include "ECS/Components/SolidBody.h"
 #include "ECS/Lib/ECS.h"
 
 namespace whal {
+
+struct RigidBody;
+struct SolidBody;
 
 class RigidBodyManager : public ecs::ISystem<RigidBody> {
 public:

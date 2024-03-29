@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ECS/Components/Position.h"
-// #include "ECS/Components/RigidBody.h"
-#include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
 
 namespace whal {
+
+struct Position;
+struct Velocity;
 
 // class PhysicsSystem : public ecs::ISystem<Position, Velocity, RigidBody> {
 class PhysicsSystem : public ecs::ISystem<Position, Velocity> {

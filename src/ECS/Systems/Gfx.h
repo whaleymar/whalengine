@@ -1,10 +1,11 @@
 #pragma once
 
-#include "ECS/Components/Draw.h"
-#include "ECS/Components/Position.h"
 #include "ECS/Lib/ECS.h"
 
 namespace whal {
+
+struct Position;
+struct Draw;
 
 class ShaderProgram;
 

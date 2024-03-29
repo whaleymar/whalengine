@@ -5,12 +5,18 @@
 
 #include <iostream>
 
+#include "ECS/Components/Draw.h"
+#include "ECS/Components/PathControl.h"
+#include "ECS/Components/PlayerControl.h"
+#include "ECS/Components/Position.h"
+#include "ECS/Components/RigidBody.h"
 #include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
 #include "ECS/Systems/CollisionManagerSystem.h"
 #include "ECS/Systems/Controller.h"
 #include "ECS/Systems/Gfx.h"
+#include "ECS/Systems/PathController.h"
 #include "ECS/Systems/Physics.h"
 
 #include "Gfx/Shader.h"
@@ -31,6 +37,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
 
     auto& ecs = ecs::ECS::getInstance();
     auto controlSystem = ecs.registerSystem<ControllerSystem>();
+    auto pathSystem = ecs.registerSystem<PathControllerSystem>();
     auto physicsSystem = ecs.registerSystem<PhysicsSystem>();
     auto graphicsSystem = ecs.registerSystem<GraphicsSystem>();
 
@@ -42,7 +49,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     entity.add<Position>(Position({0, 0}));
     entity.add<Velocity>();
     entity.add<Draw>();
-    // entity.add<PlayerControl>();
+    entity.add<PlayerControl>();
 
     s32 halflen = entity.get<Draw>().frameSizeTexels.x() * static_cast<s32>(PIXELS_PER_TEXEL) / 2;
     entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), halflen, halflen));
@@ -51,8 +58,12 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     entity2.add<Position>(Position({150, -15}));
     entity2.add<Velocity>();
     entity2.add<Draw>();
-    entity2.add<PlayerControl>();
+    // entity2.add<PlayerControl>();
     entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
+    auto pathControl = PathControl();
+    pathControl.checkpoints.push_back(Position({150, -15}));
+    pathControl.checkpoints.push_back(Position({-150, -15}));
+    entity2.add<PathControl>(pathControl);
 
     while (!glfwWindowShouldClose(window)) {
         // check inputs
@@ -65,6 +76,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
         Deltatime::getInstance().update();
         Frametracker::getInstance().update();
         controlSystem->update();
+        pathSystem->update();
         physicsSystem->update();
         rigidBodyMgr->update();
 

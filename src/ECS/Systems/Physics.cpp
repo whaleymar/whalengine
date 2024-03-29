@@ -1,7 +1,10 @@
 #include "Physics.h"
 
+#include "ECS/Components/Position.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/SolidBody.h"
+
+#include "ECS/Components/Velocity.h"
 #include "Gfx/GfxUtil.h"
 #include "Systems/Deltatime.h"
 

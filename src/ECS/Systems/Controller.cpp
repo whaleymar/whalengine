@@ -1,5 +1,7 @@
 #include "Controller.h"
-// #include <iostream>
+
+#include "ECS/Components/PlayerControl.h"
+#include "ECS/Components/Velocity.h"
 
 #include "Systems/InputHandler.h"
 

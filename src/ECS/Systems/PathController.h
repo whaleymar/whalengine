@@ -4,11 +4,11 @@
 
 namespace whal {
 
-struct PlayerControl;
-struct Position;
+struct PathControl;
 struct Velocity;
+struct Position;
 
-class ControllerSystem : public ecs::ISystem<PlayerControl, Position, Velocity> {
+class PathControllerSystem : public ecs::ISystem<PathControl, Position, Velocity> {
 public:
     void update() override;
 };

@@ -1,5 +1,7 @@
 #include "CollisionManagerSystem.h"
 
+#include "ECS/Components/RigidBody.h"
+#include "ECS/Components/SolidBody.h"
 #include "Physics/CollisionManager.h"
 
 namespace whal {
