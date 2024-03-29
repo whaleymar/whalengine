@@ -16,7 +16,7 @@ public:
     std::vector<ActorCollider*> getRidingActors() const;
 
 private:
-    void moveDirection(f32 toMove, Vector2i toMoveVec, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding);
+    void moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding);
 };
 
 }  // namespace whal

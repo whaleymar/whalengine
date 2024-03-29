@@ -42,7 +42,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     entity.add<Position>(Position({0, 0}));
     entity.add<Velocity>();
     entity.add<Draw>();
-    entity.add<PlayerControl>();
+    // entity.add<PlayerControl>();
 
     s32 halflen = entity.get<Draw>().frameSizeTexels.x() * static_cast<s32>(PIXELS_PER_TEXEL) / 2;
     entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), halflen, halflen));
@@ -51,7 +51,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     entity2.add<Position>(Position({150, -15}));
     entity2.add<Velocity>();
     entity2.add<Draw>();
-    // entity2.add<PlayerControl>();
+    entity2.add<PlayerControl>();
     entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
 
     while (!glfwWindowShouldClose(window)) {

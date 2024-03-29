@@ -74,6 +74,10 @@ typedef Vector2<s32> Vector2i;
 Vector2f toFloatVec(const Vector2i intVec);
 Vector2i toIntVec(const Vector2f floatVec);
 
+// template <typename T>
+// Vector2<T> lerp(const Vector2<T>, const Vector2<T>);
+Vector2f lerp(const Vector2f, const Vector2f, const f32);
+
 namespace Vector {
 
 static Vector2f zero2f = Vector2f();

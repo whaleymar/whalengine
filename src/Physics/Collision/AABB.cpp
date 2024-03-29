@@ -100,7 +100,7 @@ const std::optional<HitInfo> AABB::collide(Segment segment) const {
 bool AABB::isOverlapping(AABB other) const {
     const auto delta = other.mCenter - mCenter;
     const auto overlap = mHalf + other.mHalf;
-    return overlap.x() > abs(delta.x()) || overlap.y() > abs(delta.y());
+    return overlap.x() > abs(delta.x()) && overlap.y() > abs(delta.y());
 }
 
 }  // namespace whal
