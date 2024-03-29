@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cmath>
 #include <concepts>
+#include "Util/Types.h"
 
 #define EPSILON 0.001
 
@@ -35,4 +37,11 @@ template <std::floating_point T>
 inline bool isNearZero(T value) {
     return abs(value) < EPSILON;
 }
+
+// inline Number auto lerp(Number auto n1, Number auto n2, f32 t) {
+// return (1-t) * n1 + t * n2;
+inline f32 lerp(f32 n1, f32 n2, f32 t) {
+    return std::lerp(n1, n2, t);
+}
+
 }  // namespace whal

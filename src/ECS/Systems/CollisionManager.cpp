@@ -1,5 +1,4 @@
 #include "CollisionManagerSystem.h"
-#include "Util/Print.h"
 
 #include "Physics/CollisionManager.h"
 
@@ -11,7 +10,6 @@ void RigidBodyManager::update() {
             entity.kill();
         }
     }
-    print(CollisionManager::getInstance().getAllActors().size());
 }
 
 void RigidBodyManager::onAdd(ecs::Entity entity) {
