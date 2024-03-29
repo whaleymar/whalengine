@@ -33,8 +33,9 @@ inline SignedNumber auto sign(SignedNumber auto const number) {
     return number < 0 ? -1 : 1;
 }
 
+// this might be broken
 template <std::floating_point T>
-inline bool isNearZero(const T value) {
+inline bool isNearZero(const T value, const T epsilon = EPSILON) {
     return abs(value) < EPSILON;
 }
 

@@ -4,11 +4,12 @@
 #include "ECS/Components/Position.h"
 #include "ECS/Components/Velocity.h"
 
-#include "Util/MathUtil.h"
 #include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
+
+constexpr f32 CHECKPOINT_DISTANCE_THRESHOLD = 1.0;  // this is pretty big because velocity is currently in pixels/sec
 
 void PathControllerSystem::update() {
     for (auto& [entityid, entity] : getEntities()) {
@@ -16,7 +17,11 @@ void PathControllerSystem::update() {
         auto& position = entity.get<Position>();
 
         Vector2f delta = toFloatVec(path.getTarget().e - position.e);
-        if (isNearZero(delta.len())) {
+
+        // scale checkpoint threshold with speed
+        f32 speed = entity.get<Velocity>().e.len();
+        f32 epsilon = speed > 0 ? CHECKPOINT_DISTANCE_THRESHOLD * speed : CHECKPOINT_DISTANCE_THRESHOLD;
+        if (delta.len() < epsilon) {
             print("setting next checkpoint for entity", entityid);
             path.step();
             entity.set<Velocity>(Velocity());
