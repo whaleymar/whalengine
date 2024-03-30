@@ -20,6 +20,8 @@ public:
 
     void moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback);
     bool isAlive() const { return mIsAlive; }
+    bool isGrounded() const { return mIsGrounded; }
+    void setGrounded(bool grounded) { mIsGrounded = grounded; }
 
     template <typename T>
     std::optional<HitInfo> checkCollision(const std::vector<T*>& objects, const Vector2i position) const;
@@ -30,6 +32,7 @@ public:
 
 private:
     bool mIsAlive = true;
+    bool mIsGrounded = false;
 };
 
 }  // namespace whal

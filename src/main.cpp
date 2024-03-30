@@ -54,16 +54,23 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     s32 halflen = entity.get<Draw>().frameSizeTexels.x() * static_cast<s32>(PIXELS_PER_TEXEL) / 2;
     entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), halflen, halflen));
 
-    auto entity2 = ecs.entity().value();
-    entity2.add<Position>(Position({150, -15}));
-    entity2.add<Velocity>();
-    entity2.add<Draw>();
-    // entity2.add<PlayerControl>();
-    entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
-    auto pathControl = PathControl();
-    pathControl.checkpoints.push_back(Position({150, -15}));
-    pathControl.checkpoints.push_back(Position({-150, -15}));
-    entity2.add<PathControl>(pathControl);
+    for (s32 i = 0; i < 30; i++) {
+        auto block = ecs.entity().value();
+        block.add<Position>(Position({-180 + 16 * i, -300}));
+        block.add<Velocity>();
+        block.add<Draw>();
+        block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), halflen, halflen));
+    }
+    // auto entity2 = ecs.entity().value();
+    // entity2.add<Position>(Position({150, -15}));
+    // entity2.add<Velocity>();
+    // entity2.add<Draw>();
+    // // entity2.add<PlayerControl>();
+    // entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
+    // auto pathControl = PathControl();
+    // pathControl.checkpoints.push_back(Position({150, -15}));
+    // pathControl.checkpoints.push_back(Position({-150, -15}));
+    // entity2.add<PathControl>(pathControl);
 
     while (!glfwWindowShouldClose(window)) {
         // check inputs

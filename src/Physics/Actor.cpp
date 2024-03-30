@@ -23,6 +23,7 @@ void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
 
     auto& solids = CollisionManager::getInstance().getAllSolids();
     s32 moveSign = sign(toMove);
+    bool isMovingDown = !isXDirection && moveSign == -1;
     auto moveVector = isXDirection ? Vector2i(moveSign, 0) : Vector2i(0, moveSign);
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveVector;
@@ -31,6 +32,9 @@ void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
         } else {
+            if (isMovingDown) {
+                setGrounded(true);
+            }
             if (callback != nullptr) {
                 ((*this).*callback)(hitInfo.value());
             }
