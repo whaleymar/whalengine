@@ -4,15 +4,61 @@
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Velocity.h"
 
+#include "Systems/Deltatime.h"
 #include "Systems/InputHandler.h"
 
 namespace whal {
 
-void ControllerSystem::update() {
+void ControllerSystemRB::update() {
     auto& input = Input::getInstance();
+    f32 dt = Deltatime::getInstance().get();
     for (auto& [entityid, entity] : getEntities()) {
         Velocity& vel = entity.get<Velocity>();
+        RigidBody& rb = entity.get<RigidBody>();
 
+        f32 deltaX = 0;
+        if (input.isLeft()) {
+            deltaX -= 1;
+        }
+        if (input.isRight()) {
+            deltaX += 1;
+        }
+
+        f32 deltaY = 0;
+        if (input.isJump()) {
+            if (rb.collider.isGrounded()) {
+                rb.isJumping = true;
+
+                deltaY += rb.jumpInitialVelocity;
+                rb.jumpSecondsRemaining = rb.jumpSecondsMax;
+            } else if (rb.isJumping) {
+                f32 damping = rb.jumpSecondsRemaining / rb.jumpSecondsMax;
+                damping *= damping;  // TODO play around with this
+                deltaY += rb.jumpInitialVelocity * damping;
+                rb.jumpSecondsRemaining -= dt;
+                if (rb.jumpSecondsRemaining < 0) {
+                    rb.jumpSecondsRemaining = 0;
+                    rb.isJumping = false;
+                }
+            }
+        } else {
+            rb.isJumping = false;
+        }
+
+        // if (input.isDown()) {
+        //     delta += Vector::unitfDown;
+        // }
+
+        PlayerControlRB& control = entity.get<PlayerControlRB>();
+        deltaX *= control.moveSpeed;
+
+        vel.impulse += Vector2f(deltaX, deltaY);
+    }
+}
+
+void ControllerSystemFree::update() {
+    auto& input = Input::getInstance();
+    for (auto& [entityid, entity] : getEntities()) {
         Vector2f delta;
         if (input.isLeft()) {
             delta += Vector::unitfLeft;
@@ -20,42 +66,18 @@ void ControllerSystem::update() {
         if (input.isRight()) {
             delta += Vector::unitfRight;
         }
-
-        // only RigidBodys can jump
-        std::optional<RigidBody*> rb = entity.tryGet<RigidBody>();
-        if (rb) {
-            if (input.isJump()) {
-                if (rb.value()->collider.isGrounded()) {
-                    rb.value()->isJumping = true;
-                }
-            } else {
-                rb.value()->isJumping = false;
-            }
+        if (input.isUp()) {
+            delta += Vector::unitfUp;
         }
-        // if (input.isUp()) {
-        //     delta += Vector::unitfUp;
-        // }
-        // if (input.isDown()) {
-        //     delta += Vector::unitfDown;
-        // }
+        if (input.isDown()) {
+            delta += Vector::unitfDown;
+        }
 
-        // TODO compare speed vs calling constructor
-        // Position& pos = entity.get<Position>();
-        // pos.e = pos.e + Vector2i(0, 1);
-
-        PlayerControl& control = entity.get<PlayerControl>();
+        PlayerControlFree& control = entity.get<PlayerControlFree>();
         delta *= control.moveSpeed;
 
-        // TODO how to add to velocity without 1. killing all momentum and 2. without infinite speed and 3. without a hard speed cap
-        // --> maybe a controller-only speed cap? only add up to max value
-        // entity.set(Velocity(delta + entity.get<Velocity>().e));
-        vel.e.e[0] = delta.x();
-        // Velocity vel = Velocity(delta);
-        // entity.set(vel);
-
-        // Velocity& vel = entity.get<Velocity>();
-        // std::cout << vel.e.x() << " " << vel.e.y() << std::endl;
-        // std::cout << delta.x() << " " << delta.y() << std::endl;
+        Velocity newVel = Velocity(delta);
+        entity.set(newVel);
     }
 }
 

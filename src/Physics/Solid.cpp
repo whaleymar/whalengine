@@ -6,6 +6,8 @@
 #include "Physics/Actor.h"
 #include "Physics/Collision/AABB.h"
 #include "Physics/CollisionManager.h"
+#include "Systems/Deltatime.h"
+#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
@@ -21,6 +23,7 @@ void SolidCollider::move(f32 x, f32 y) {
         return;
     }
 
+    // check riding status *before* moving
     auto riding = getRidingActors();
 
     // turn off collision so actors moved by the solid don't get stuck on it
@@ -45,14 +48,21 @@ void SolidCollider::move(f32 x, f32 y) {
 }
 
 void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding) {
+    f32 dt = Deltatime::getInstance().get();
     for (auto& actor : CollisionManager::getInstance().getAllActors()) {
         // push takes priority over carry
         if (mCollider.isOverlapping(actor->getCollider())) {
             f32 actorEdge = (actor->getCollider().*edgeFunc)();
-            actor->moveDirection(isXDirection, solidEdge - actorEdge, &ActorCollider::squish);
+            toMove = solidEdge - actorEdge;
+            actor->moveDirection(isXDirection, toMove, &ActorCollider::squish);
+            f32 momentum = toMove / dt;
+            print(toMove, dt);
+            actor->setMomentum(momentum, isXDirection);
         } else if (std::find(riding.begin(), riding.end(), actor) != riding.end()) {
             // I might change this for solids moving down faster than gravity TODO
             actor->moveDirection(isXDirection, toMove, nullptr);
+            f32 momentum = toMove / dt;
+            actor->setMomentum(momentum, isXDirection);
         }
     }
 }

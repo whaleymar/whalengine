@@ -5,9 +5,8 @@
 namespace whal {
 
 struct Velocity {
-    // Velocity() = default;
-    // Velocity(Vector2f vel) { e = vel; }
-    Vector2f e;
+    Vector2f vel;
+    Vector2f impulse;
 };
 
 }  // namespace whal

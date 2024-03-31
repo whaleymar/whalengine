@@ -36,7 +36,8 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     // mainTexture.loadAtlas("data/sprites.png");
 
     auto& ecs = ecs::ECS::getInstance();
-    auto controlSystem = ecs.registerSystem<ControllerSystem>();
+    auto controlSystemRB = ecs.registerSystem<ControllerSystemRB>();
+    auto controlSystemFree = ecs.registerSystem<ControllerSystemFree>();
     auto pathSystem = ecs.registerSystem<PathControllerSystem>();
     auto physicsSystem = ecs.registerSystem<PhysicsSystem>();
     auto graphicsSystem = ecs.registerSystem<GraphicsSystem>();
@@ -49,7 +50,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     entity.add<Position>(Position({0, 0}));
     entity.add<Velocity>();
     entity.add<Draw>();
-    entity.add<PlayerControl>();
+    entity.add<PlayerControlRB>();
 
     s32 halflen = entity.get<Draw>().frameSizeTexels.x() * static_cast<s32>(PIXELS_PER_TEXEL) / 2;
     entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), halflen, halflen));
@@ -61,16 +62,17 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
         block.add<Draw>();
         block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), halflen, halflen));
     }
-    // auto entity2 = ecs.entity().value();
-    // entity2.add<Position>(Position({150, -15}));
-    // entity2.add<Velocity>();
-    // entity2.add<Draw>();
-    // // entity2.add<PlayerControl>();
-    // entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
-    // auto pathControl = PathControl();
-    // pathControl.checkpoints.push_back(Position({150, -15}));
-    // pathControl.checkpoints.push_back(Position({-150, -15}));
-    // entity2.add<PathControl>(pathControl);
+    auto entity2 = ecs.entity().value();
+    entity2.add<Position>(Position({150, -300}));
+    entity2.add<Velocity>();
+    entity2.add<Draw>();
+    // entity2.add<PlayerControlFree>();
+    entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
+
+    auto pathControl = PathControl();
+    pathControl.checkpoints.push_back(Position({150, -300}));
+    pathControl.checkpoints.push_back(Position({150, 300}));
+    entity2.add<PathControl>(pathControl);
 
     while (!glfwWindowShouldClose(window)) {
         // check inputs
@@ -82,7 +84,8 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
         // update systems
         Deltatime::getInstance().update();
         Frametracker::getInstance().update();
-        controlSystem->update();
+        controlSystemRB->update();
+        controlSystemFree->update();
         pathSystem->update();
         physicsSystem->update();
         rigidBodyMgr->update();

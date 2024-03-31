@@ -10,6 +10,8 @@
 
 namespace whal {
 
+constexpr s32 MOMENTUM_LIFETIME_FRAMES = 10;
+
 ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(AABB(half)) {
     mCollider.setPosition(position);
 }
@@ -41,6 +43,20 @@ void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
             break;
         }
     }
+}
+
+void ActorCollider::setMomentum(const f32 momentum, const bool isXDirection) {
+    if (isXDirection) {
+        mStoredMomentum.e[0] = momentum;
+    } else {
+        mStoredMomentum.e[1] = momentum;
+    }
+    mMomentumFramesLeft = MOMENTUM_LIFETIME_FRAMES;
+}
+
+void ActorCollider::resetMomentum() {
+    mStoredMomentum = {0, 0};
+    mMomentumFramesLeft = 0;
 }
 
 template <typename T>

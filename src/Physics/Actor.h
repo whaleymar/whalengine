@@ -21,7 +21,10 @@ public:
     void moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback);
     bool isAlive() const { return mIsAlive; }
     bool isGrounded() const { return mIsGrounded; }
-    void setGrounded(bool grounded) { mIsGrounded = grounded; }
+    void setGrounded(const bool grounded) { mIsGrounded = grounded; }
+    void setMomentum(const f32 momentum, const bool isXDirection);
+    void resetMomentum();
+    Vector2f getMomentum() const { return mStoredMomentum; }
 
     template <typename T>
     std::optional<HitInfo> checkCollision(const std::vector<T*>& objects, const Vector2i position) const;
@@ -31,6 +34,9 @@ public:
     virtual bool isRiding(const SolidCollider* solid) const;
 
 private:
+    Vector2f mStoredMomentum;
+    s32 mMomentumFramesLeft = 0;
+    // f32 mMass = 1; // could give solids a mass and use mass ratio to calculate force
     bool mIsAlive = true;
     bool mIsGrounded = false;
 };

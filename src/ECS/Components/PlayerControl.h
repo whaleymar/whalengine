@@ -9,10 +9,15 @@ namespace whal {
 // jump trajectory
 // coyote time window
 
-struct PlayerControl {
-    PlayerControl(f32 moveSpeed_ = 10, f32 jumpHeight_ = 25);
+struct PlayerControlRB {
+    PlayerControlRB(f32 moveSpeed_ = 10, f32 jumpHeight_ = 25);
     f32 moveSpeed;
     f32 jumpHeight;
+};
+
+struct PlayerControlFree {
+    PlayerControlFree(f32 moveSpeed_ = 10);
+    f32 moveSpeed;
 };
 
 }  // namespace whal
