@@ -2,7 +2,6 @@
 
 #include <cmath>
 
-#include "ECS/Components/PlayerControl.h"
 #include "ECS/Components/Position.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/SolidBody.h"
@@ -10,18 +9,18 @@
 #include "ECS/Components/Velocity.h"
 #include "Gfx/GfxUtil.h"
 #include "Systems/Deltatime.h"
-#include "Systems/InputHandler.h"
 #include "Util/MathUtil.h"
-#include "Util/Print.h"
 
 namespace whal {
 
 constexpr f32 GRAVITY = -35;
+constexpr f32 TERMINAL_VELOCITY_Y = -15;
+
 constexpr f32 FRICTION = 0.25;
 constexpr f32 IMPULSE_DAMPING_FACTOR = 0.25;
-constexpr f32 TERMINAL_VELOCITY_Y = -15;
+
 constexpr f32 JUMP_PEAK_GRAVITY_MULT = 0.5;
-constexpr f32 JUMP_PEAK_SPEED_MAX = -3.5;
+constexpr f32 JUMP_PEAK_SPEED_MAX = -3.5;  // once Y velocity is below this, no longer considered "jumping"
 
 void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
     bool isInJumpPeak = isJumping && isBetween(velocity.total.y(), JUMP_PEAK_SPEED_MAX, 0.0f);
@@ -34,8 +33,7 @@ void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
 }
 
 void applyFriction(Vector2f& velocity, f32 dt) {
-    // TODO dt?
-    velocity.e[0] *= (1 - FRICTION);
+    velocity.e[0] *= (1 - FRICTION * dt);
 }
 
 void PhysicsSystem::update() {
@@ -77,14 +75,7 @@ void PhysicsSystem::update() {
 
             // friction
             if (vel.stable.x()) {
-                if (entity.has<PlayerControlRB>()) {
-                    auto& input = Input::getInstance();
-                    if (!input.isLeft() && !input.isRight()) {
-                        applyFriction(vel.stable, dt);
-                    }
-                } else {
-                    applyFriction(vel.stable, dt);
-                }
+                applyFriction(vel.stable, dt);
             }
 
             // gravity and momentum

@@ -20,6 +20,7 @@ public:
     void set(InputType input);
     void reset(InputType input);
     void loadMappings() const;
+    void useJump();
 
     bool isLeft() const { return mIsLeft; }
     bool isRight() const { return mIsRight; }
@@ -27,6 +28,8 @@ public:
     bool isDown() const { return mIsDown; }
     bool isJump() const { return mIsJump; }
     bool isPause() const { return mIsPause; }
+
+    bool isJumpUsed() const { return mIsJumpUsed; }
 
     inline static std::unordered_map<int, InputType> KeyMap;
 
@@ -41,6 +44,8 @@ private:
     bool mIsDown = false;
     bool mIsJump = false;
     bool mIsPause = false;
+
+    bool mIsJumpUsed = false;
 };
 
 }  // namespace whal

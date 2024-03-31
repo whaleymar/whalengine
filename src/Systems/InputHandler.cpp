@@ -27,6 +27,7 @@ void Input::set(InputType input) {
 
     case InputType::JUMP:
         mIsJump = true;
+        mIsJumpUsed = false;
         break;
 
     case InputType::PAUSE:
@@ -74,6 +75,10 @@ void Input::loadMappings() const {
     KeyMap.insert({GLFW_KEY_S, InputType::DOWN});
     KeyMap.insert({GLFW_KEY_SPACE, InputType::JUMP});
     KeyMap.insert({GLFW_KEY_ESCAPE, InputType::PAUSE});
+}
+
+void Input::useJump() {
+    mIsJumpUsed = true;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {

@@ -26,8 +26,9 @@ void ControllerSystemRB::update() {
 
         f32 impulseY = 0;
         if (input.isJump()) {
-            if (rb.collider.isGrounded()) {
+            if (rb.collider.isGrounded() && !input.isJumpUsed()) {
                 rb.isJumping = true;
+                input.useJump();
 
                 impulseY += rb.jumpInitialVelocity;
                 rb.jumpSecondsRemaining = rb.jumpSecondsMax;
