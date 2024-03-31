@@ -25,6 +25,9 @@ public:
     void setMomentum(const f32 momentum, const bool isXDirection);
     void resetMomentum();
     Vector2f getMomentum() const { return mStoredMomentum; }
+    bool isMomentumStored() const { return mMomentumFramesLeft > 0; }
+    void momentumNotUsed();
+    void checkIsGrounded(const std::vector<SolidCollider*>& solids);
 
     template <typename T>
     std::optional<HitInfo> checkCollision(const std::vector<T*>& objects, const Vector2i position) const;

@@ -29,6 +29,11 @@ inline T clamp(const T number, const T min, const T max) {
     return number;
 }
 
+template <std::totally_ordered T>
+inline bool isBetween(const T number, const T min, const T max) {
+    return number >= min && number <= max;
+}
+
 inline SignedNumber auto sign(SignedNumber auto const number) {
     return number < 0 ? -1 : 1;
 }

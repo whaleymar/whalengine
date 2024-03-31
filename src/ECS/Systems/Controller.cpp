@@ -16,25 +16,25 @@ void ControllerSystemRB::update() {
         Velocity& vel = entity.get<Velocity>();
         RigidBody& rb = entity.get<RigidBody>();
 
-        f32 deltaX = 0;
+        f32 impulseX = 0;
         if (input.isLeft()) {
-            deltaX -= 1;
+            impulseX -= 1;
         }
         if (input.isRight()) {
-            deltaX += 1;
+            impulseX += 1;
         }
 
-        f32 deltaY = 0;
+        f32 impulseY = 0;
         if (input.isJump()) {
             if (rb.collider.isGrounded()) {
                 rb.isJumping = true;
 
-                deltaY += rb.jumpInitialVelocity;
+                impulseY += rb.jumpInitialVelocity;
                 rb.jumpSecondsRemaining = rb.jumpSecondsMax;
             } else if (rb.isJumping) {
                 f32 damping = rb.jumpSecondsRemaining / rb.jumpSecondsMax;
                 damping *= damping;  // TODO play around with this
-                deltaY += rb.jumpInitialVelocity * damping;
+                impulseY += rb.jumpInitialVelocity * damping;
                 rb.jumpSecondsRemaining -= dt;
                 if (rb.jumpSecondsRemaining < 0) {
                     rb.jumpSecondsRemaining = 0;
@@ -45,14 +45,10 @@ void ControllerSystemRB::update() {
             rb.isJumping = false;
         }
 
-        // if (input.isDown()) {
-        //     delta += Vector::unitfDown;
-        // }
-
         PlayerControlRB& control = entity.get<PlayerControlRB>();
-        deltaX *= control.moveSpeed;
+        impulseX *= control.moveSpeed;
 
-        vel.impulse += Vector2f(deltaX, deltaY);
+        vel.impulse += Vector2f(impulseX, impulseY);
     }
 }
 

@@ -1,5 +1,8 @@
 #include "Physics.h"
 
+#include <cmath>
+
+#include "ECS/Components/PlayerControl.h"
 #include "ECS/Components/Position.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/SolidBody.h"
@@ -7,27 +10,32 @@
 #include "ECS/Components/Velocity.h"
 #include "Gfx/GfxUtil.h"
 #include "Systems/Deltatime.h"
+#include "Systems/InputHandler.h"
+#include "Util/MathUtil.h"
 #include "Util/Print.h"
 
 namespace whal {
 
 constexpr f32 GRAVITY = -35;
-constexpr f32 FRICTION = 0.5;
+constexpr f32 FRICTION = 0.25;
+constexpr f32 IMPULSE_DAMPING_FACTOR = 0.25;
 constexpr f32 TERMINAL_VELOCITY_Y = -15;
-constexpr f32 JUMP_GRAVITY_MULT = 0.8;
+constexpr f32 JUMP_PEAK_GRAVITY_MULT = 0.5;
+constexpr f32 JUMP_PEAK_SPEED_MAX = -3.5;
 
-void applyGravity(Vector2f& velocity, f32 dt, bool isJumping) {
-    f32 multiplier = 1 - static_cast<f32>(isJumping) * (1 - JUMP_GRAVITY_MULT);
-    f32 newVelY = velocity.y() + GRAVITY * multiplier * dt;
+void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
+    bool isInJumpPeak = isJumping && isBetween(velocity.total.y(), JUMP_PEAK_SPEED_MAX, 0.0f);
+    f32 peakMultiplier = 1 - static_cast<f32>(isInJumpPeak) * (1 - JUMP_PEAK_GRAVITY_MULT);
+    f32 newVelY = velocity.stable.y() + GRAVITY * peakMultiplier * dt;
     if (newVelY < TERMINAL_VELOCITY_Y) {
         newVelY = TERMINAL_VELOCITY_Y;
     }
-    velocity.e[1] = newVelY;
+    velocity.stable.e[1] = newVelY;
 }
 
-void applyFriction(Vector2f& velocity) {
-    // TODO dt
-    velocity.e[0] *= FRICTION;
+void applyFriction(Vector2f& velocity, f32 dt) {
+    // TODO dt?
+    velocity.e[0] *= (1 - FRICTION);
 }
 
 void PhysicsSystem::update() {
@@ -41,14 +49,22 @@ void PhysicsSystem::update() {
         // TODO? update collider position to match position component before moving?
         // only necessary if i change position outside of PhysicsSystem
 
-        // velocity currently in pixels per second
-        if (rb) {
-            print(rb.value()->collider.getMomentum().y());
+        // if impulse ends, use residual
+        Vector2f impulse = vel.impulse;
+        if (!impulse.x() && vel.residualImpulse.x()) {
+            impulse.e[0] += vel.residualImpulse.x();
         }
-        Vector2f totalVelocity = vel.vel + vel.impulse;
+        if (!impulse.y() && vel.residualImpulse.y()) {
+            impulse.e[1] += vel.residualImpulse.y();
+        }
+
+        // velocity currently in pixels per second
+        Vector2f totalVelocity = vel.stable + impulse;
         f32 moveX = totalVelocity.x() * dt * PIXELS_PER_TEXEL * TEXELS_PER_TILE;
         f32 moveY = totalVelocity.y() * dt * PIXELS_PER_TEXEL * TEXELS_PER_TILE;
+        vel.residualImpulse = impulse * (1 - IMPULSE_DAMPING_FACTOR);
         vel.impulse = {0, 0};
+        vel.total = totalVelocity;
 
         // I can split this into separate systems if this gets slow
         if (rb) {
@@ -58,19 +74,40 @@ void PhysicsSystem::update() {
             rb.value()->collider.moveDirection(true, moveX, nullptr);
             rb.value()->collider.moveDirection(false, moveY, nullptr);
             needsPositionUpdateRB.push_back(entity);
+
+            // friction
+            if (vel.stable.x()) {
+                if (entity.has<PlayerControlRB>()) {
+                    auto& input = Input::getInstance();
+                    if (!input.isLeft() && !input.isRight()) {
+                        applyFriction(vel.stable, dt);
+                    }
+                } else {
+                    applyFriction(vel.stable, dt);
+                }
+            }
+
+            // gravity and momentum
+            bool isMomentumStored = rb.value()->collider.isMomentumStored();
             if (!rb.value()->collider.isGrounded()) {
-                if (totalVelocity.y() < 0) {
+                if (totalVelocity.y() < JUMP_PEAK_SPEED_MAX) {
                     // falling == not jumping
+                    // a little lower than 0 while applying reduced gravity
                     rb.value()->isJumping = false;
                 }
-                applyGravity(vel.vel, dt, rb.value()->isJumping);
+                applyGravity(vel, dt, rb.value()->isJumping);
+                if (isMomentumStored) {
+                    vel.stable += rb.value()->collider.getMomentum() * dt;
+                    rb.value()->collider.resetMomentum();
+                }
+
             } else {
                 if (totalVelocity.y() < 0 && !rb.value()->isJumping) {
                     // zero gravity when grounded and not trying to jump, otherwise entity falls at terminal velocity after walking off platform
-                    vel.vel.e[1] = 0;
+                    vel.stable.e[1] = 0;
                 }
-                if (vel.vel.x()) {
-                    applyFriction(vel.vel);
+                if (isMomentumStored) {
+                    rb.value()->collider.momentumNotUsed();
                 }
             }
 

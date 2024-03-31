@@ -19,11 +19,16 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
 void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback) {
     // TODO doesn't handle colliding with other actors
     s32 toMove = std::round(amount);
+    auto& solids = CollisionManager::getInstance().getAllSolids();
+
     if (toMove == 0) {
+        // manually check isGrounded (gravity may not move an actor by a full pixel every frame)
+        if (!isXDirection) {
+            checkIsGrounded(solids);
+        }
         return;
     }
 
-    auto& solids = CollisionManager::getInstance().getAllSolids();
     s32 moveSign = sign(toMove);
     bool isMovingDown = !isXDirection && moveSign == -1;
     auto moveVector = isXDirection ? Vector2i(moveSign, 0) : Vector2i(0, moveSign);
@@ -57,6 +62,22 @@ void ActorCollider::setMomentum(const f32 momentum, const bool isXDirection) {
 void ActorCollider::resetMomentum() {
     mStoredMomentum = {0, 0};
     mMomentumFramesLeft = 0;
+}
+
+void ActorCollider::momentumNotUsed() {
+    mMomentumFramesLeft--;
+    if (!mMomentumFramesLeft) {
+        resetMomentum();
+    }
+}
+
+void ActorCollider::checkIsGrounded(const std::vector<SolidCollider*>& solids) {
+    for (auto solid : solids) {
+        if (isRiding(solid)) {
+            mIsGrounded = true;
+            return;
+        }
+    }
 }
 
 template <typename T>

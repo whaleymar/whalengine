@@ -18,7 +18,7 @@ void PathControllerSystem::update() {
         Vector2f delta = toFloatVec(path.getTarget().e - position.e);
 
         // scale checkpoint threshold with speed
-        f32 speed = entity.get<Velocity>().vel.len();
+        f32 speed = entity.get<Velocity>().stable.len();
         f32 epsilon = speed > 0 ? CHECKPOINT_DISTANCE_THRESHOLD * speed : CHECKPOINT_DISTANCE_THRESHOLD;
         if (delta.len() < epsilon) {
             path.step();

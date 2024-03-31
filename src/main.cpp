@@ -69,15 +69,17 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     // entity2.add<PlayerControlFree>();
     entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
 
-    auto pathControl = PathControl();
+    auto pathControl = PathControl(25);
     pathControl.checkpoints.push_back(Position({150, -300}));
     pathControl.checkpoints.push_back(Position({150, 300}));
     entity2.add<PathControl>(pathControl);
 
+    auto& input = Input::getInstance();
     while (!glfwWindowShouldClose(window)) {
         // check inputs
+
         glfwPollEvents();
-        if (Input::getInstance().isPause()) {
+        if (input.isPause()) {
             glfwSetWindowShouldClose(window, GL_TRUE);
         }
 
