@@ -32,5 +32,4 @@ A WIP 2D game engine written in C++ with OpenGL and GLFW, backed by a simple Ent
 
 
 ## TOP PRIORITY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-- put velocity in non-pixel units!!!
 - entity copying (prefabs)

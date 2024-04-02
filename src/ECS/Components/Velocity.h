@@ -4,7 +4,11 @@
 
 namespace whal {
 
+// velocity in tiles per second
 struct Velocity {
+    Velocity() = default;
+    Velocity(Vector2f velocity);
+
     Vector2f stable;
     Vector2f impulse;
     Vector2f total;  // for tracking true speed

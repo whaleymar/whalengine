@@ -46,33 +46,39 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
     auto solidBodyMgr = ecs.registerSystem<SolidBodyManager>();
 
+    auto s_TPT = static_cast<s32>(TEXELS_PER_TILE);
     auto entity = ecs.entity().value();
-    entity.add<Position>(Position({0, 0}));
+    entity.add<Position>(Position({0, 5 * s_TPT}));
     entity.add<Velocity>();
     entity.add<Draw>();
-    entity.add<PlayerControlRB>();
+    // entity.add<PlayerControlRB>();
+    entity.add<PlayerControlFree>(PlayerControlFree(1));
 
-    s32 halflen = entity.get<Draw>().frameSizeTexels.x() * static_cast<s32>(PIXELS_PER_TEXEL) / 2;
+    s32 halflen = Draw().frameSizeTexels.x() / 2;
     entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), halflen, halflen));
 
-    for (s32 i = 0; i < 30; i++) {
+    for (s32 i = 1; i < 9; i++) {
+        if (i % 2 == 0)
+            continue;
         auto block = ecs.entity().value();
-        block.add<Position>(Position({-180 + 16 * i, -300}));
+        block.add<Position>(Position({s_TPT * i, s_TPT}));
         block.add<Velocity>();
         block.add<Draw>();
         block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), halflen, halflen));
     }
-    auto entity2 = ecs.entity().value();
-    entity2.add<Position>(Position({150, -300}));
-    entity2.add<Velocity>();
-    entity2.add<Draw>();
+    // auto entity2 = ecs.entity().value();
+    // entity2.add<Position>(Position({0, 0}));
+    // entity2.add<Velocity>();
+    // entity2.add<Draw>();
     // entity2.add<PlayerControlFree>();
-    entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
+    // entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
 
-    auto pathControl = PathControl(25);
-    pathControl.checkpoints.push_back(Position({150, -300}));
-    pathControl.checkpoints.push_back(Position({150, 300}));
-    entity2.add<PathControl>(pathControl);
+    // auto pathControl = PathControl(1);
+    // pathControl.checkpoints.push_back(Position({320, 0}));
+    // pathControl.checkpoints.push_back(Position({320, 180}));
+    // pathControl.checkpoints.push_back(Position({0, 180}));
+    // pathControl.checkpoints.push_back(Position({0, 0}));
+    // entity2.add<PathControl>(pathControl);
 
     auto& input = Input::getInstance();
     while (!glfwWindowShouldClose(window)) {
@@ -93,8 +99,8 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
         rigidBodyMgr->update();
 
         // std::cout << Deltatime::getInstance().get() << std::endl;
-        // if (Frametracker::getInstance().getFrame() == 0)
-        //     std::cout << Frametracker::getInstance().getFPS() << std::endl;
+        // if (Frametracker::getInstance().getFrame() == 0) {
+        // };  //     std::cout << Frametracker::getInstance().getFPS() << std::endl;
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

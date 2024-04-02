@@ -5,9 +5,14 @@
 namespace whal {
 
 static const char* WINDOW_TITLE = "Untitled Engine";
+
+// EFFECTIVE GRID SIZE: 320 x 180
 static constexpr u32 WINDOW_WIDTH_PIXELS = 1280;
 static constexpr u32 WINDOW_HEIGHT_PIXELS = 720;
 static constexpr u32 PIXELS_PER_TEXEL = 4;
+// constexpr u32 WINDOW_WIDTH_PIXELS = 1600;
+// constexpr u32 WINDOW_HEIGHT_PIXELS = 900;
+// constexpr u32 PIXELS_PER_TEXEL = 5;
 // constexpr u32 WINDOW_WIDTH_PIXELS = 1920;
 // constexpr u32 WINDOW_HEIGHT_PIXELS = 1080;
 // constexpr u32 PIXELS_PER_TEXEL = 6;

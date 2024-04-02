@@ -22,7 +22,7 @@ void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
     auto& solids = CollisionManager::getInstance().getAllSolids();
 
     if (toMove == 0) {
-        // manually check isGrounded (gravity may not move an actor by a full pixel every frame)
+        // manually check isGrounded (gravity may not move an actor by a full texel every frame)
         if (!isXDirection) {
             checkIsGrounded(solids);
         }

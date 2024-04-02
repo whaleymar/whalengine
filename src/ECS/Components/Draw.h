@@ -10,7 +10,6 @@ namespace whal {
 struct Draw {
     Draw(s32 depth_ = 0);
 
-    std::array<float, 30> vertices;  // will hard code until i need something different
     u32 nVertices = 6;
     Vao vao;
     Vbo vbo;
@@ -19,6 +18,12 @@ struct Draw {
     Vector2i atlasPositionTexels = {0, 0};
     Vector2i frameSizeTexels = {8, 8};
     bool isUVUpdateNeeded = false;
+
+    std::array<float, 30> getVertices() const { return mVertices; }
+    void updateVertices();
+
+private:
+    std::array<float, 30> mVertices;  // will hard code until i need something different
 };
 
 }  // namespace whal

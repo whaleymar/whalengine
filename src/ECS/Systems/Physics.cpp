@@ -10,6 +10,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/Deltatime.h"
 #include "Util/MathUtil.h"
+#include "Util/Print.h"
 
 namespace whal {
 
@@ -56,10 +57,10 @@ void PhysicsSystem::update() {
             impulse.e[1] += vel.residualImpulse.y();
         }
 
-        // velocity currently in pixels per second
+        // TODO deltatime + rounding == imprecise speeds
         Vector2f totalVelocity = vel.stable + impulse;
-        f32 moveX = totalVelocity.x() * dt * PIXELS_PER_TEXEL * TEXELS_PER_TILE;
-        f32 moveY = totalVelocity.y() * dt * PIXELS_PER_TEXEL * TEXELS_PER_TILE;
+        f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE;
+        f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE;
         vel.residualImpulse = impulse * (1 - IMPULSE_DAMPING_FACTOR);
         vel.impulse = {0, 0};
         vel.total = totalVelocity;

@@ -8,7 +8,7 @@
 
 namespace whal {
 
-constexpr f32 CHECKPOINT_DISTANCE_THRESHOLD = 1.0;  // this is pretty big because velocity is currently in pixels/sec
+constexpr f32 CHECKPOINT_DISTANCE_THRESHOLD = 1.0;  // in texels
 
 void PathControllerSystem::update() {
     for (auto& [entityid, entity] : getEntities()) {
