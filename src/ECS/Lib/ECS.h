@@ -63,16 +63,20 @@ public:
     template <typename T>
     bool has() const;
 
+    Expected<Entity> copy() const;
+
     void kill();
 
 private:
     EntityID mId = 0;
 };
 
+// methods run in a loop by component manager need to be virtual
 class IComponentArray {
 public:
     virtual ~IComponentArray() = default;
     virtual void entityDestroyed(Entity entity) = 0;
+    virtual void copyComponent(Entity prefab, Entity dest) = 0;
 };
 
 // maintains dense component data
@@ -126,12 +130,18 @@ public:
         return mComponentTable.at(ix);
     }
 
-    // TODO does this need to be virtual?
     void entityDestroyed(const Entity entity) override {
         if (mEntityToIndex.find(entity.id()) == mEntityToIndex.end()) {
             return;
         }
         removeData(entity);
+    }
+
+    void copyComponent(const Entity prefab, Entity dest) override {
+        auto cmpOpt = tryGetData(prefab);
+        if (cmpOpt) {
+            addData(dest, **cmpOpt);
+        }
     }
 
 private:
@@ -245,6 +255,12 @@ public:
     void entityDestroyed(const Entity entity) {
         for (auto const& componentArray : mComponentArrays) {
             componentArray->entityDestroyed(entity);
+        }
+    }
+
+    void copyComponents(const Entity prefab, Entity dest) {
+        for (auto const& componentArray : mComponentArrays) {
+            componentArray->copyComponent(prefab, dest);
         }
     }
 
@@ -392,6 +408,8 @@ public:
     Expected<Entity> entity() const;
     void kill(Entity entity) const;
 
+    Expected<Entity> copy(Entity entity) const;
+
     // COMPONENT
     template <typename T>
     void addComponent(const Entity entity, T component) {
@@ -444,6 +462,7 @@ public:
         return mSystemManager->registerSystem<T>();
     }
 
+    // todo delete (double check not needed)
     template <typename T>
     void setSystemPattern(Pattern pattern) const {
         mSystemManager->setPattern<T>(pattern);

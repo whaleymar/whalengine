@@ -18,4 +18,19 @@ void ECS::kill(Entity entity) const {
     mComponentManager->entityDestroyed(entity);
 }
 
+Expected<Entity> ECS::copy(Entity prefab) const {
+    // this is probably quite slow
+    Expected<Entity> newEntity = entity();
+    if (!newEntity.isExpected()) {
+        return newEntity;
+    }
+    mComponentManager->copyComponents(prefab, newEntity.value());
+
+    auto pattern = mEntityManager->getPattern(prefab);
+    mEntityManager->setPattern(newEntity.value(), pattern);
+    mSystemManager->entityPatternChanged(newEntity.value(), pattern);
+
+    return newEntity;
+}
+
 }  // namespace whal::ecs
