@@ -2,16 +2,17 @@
 
 namespace whal {
 
-PathControl::PathControl(f32 moveSpeed_, std::vector<Position> checkPoints_) : moveSpeed(moveSpeed_), checkpoints(checkPoints_) {}
+PathControl::PathControl(f32 moveSpeed_, std::vector<Position> checkPoints_, f32 waitTime_)
+    : moveSpeed(moveSpeed_), checkpoints(checkPoints_), waitTime(waitTime_), curWaitTime(waitTime_) {}
 
 Position PathControl::getTarget() const {
-    return checkpoints[target];
+    return checkpoints[curTarget];
 }
 
 void PathControl::step() {
-    target++;
-    if (target == checkpoints.size()) {
-        target = 0;
+    curTarget++;
+    if (curTarget == checkpoints.size()) {
+        curTarget = 0;
     }
 }
 

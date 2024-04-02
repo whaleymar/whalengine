@@ -21,6 +21,7 @@ struct Draw {
 
     std::array<float, 30> getVertices() const { return mVertices; }
     void updateVertices();
+    void setFrameSize(s32, s32);
 
 private:
     std::array<float, 30> mVertices;  // will hard code until i need something different

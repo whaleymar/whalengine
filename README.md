@@ -13,6 +13,7 @@ A WIP 2D game engine written in C++ with OpenGL and GLFW, backed by a simple Ent
 - Follow
 - Light 
 - lifetime
+- collision callback
 
 ## Entity Prefabs
 - particle
@@ -25,11 +26,11 @@ A WIP 2D game engine written in C++ with OpenGL and GLFW, backed by a simple Ent
 - Scenes
 - loading entity from file
 
+## Debug
+- draw colliders
+
 ## Misc
 - only store xy coord in vertices
 - square vertices with 4 vertices not 6
 - ECS lib todos
-
-
-## TOP PRIORITY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-- entity copying (prefabs)
+- Velocity numbers are a little off

@@ -17,15 +17,18 @@ namespace whal {
 void GraphicsSystem::update(){};
 
 void GraphicsSystem::drawEntities(ShaderProgram program) {
-    static const Vector2i OFFSET = Vector2i(WINDOW_WIDTH_TEXELS / 2, WINDOW_HEIGHT_TEXELS / 2);  // puts (0,0) at bottom left of screen
-    static const Vector2f HALF_TILE_OFFSET = Vector2f(TILE_LEN_PIXELS / 2, -TILE_LEN_PIXELS / 2);
+    // this puts (0,0) at the bottom left of the screen
+    static const Vector2i OFFSET = Vector2i(WINDOW_WIDTH_TEXELS / 2, WINDOW_HEIGHT_TEXELS / 2);
+
     program.useProgram();
     // TODO sort by depth
     for (auto const& [entityid, entity] : getEntities()) {
         Position& pos = entity.get<Position>();
         Draw& draw = entity.get<Draw>();
 
-        Vector2f floatPos = toFloatVec(pos.e - OFFSET) * PIXELS_PER_TEXEL - HALF_TILE_OFFSET;
+        // position is the center, but openGL expects position of the top left corner
+        Vector2f drawOffset = toFloatVec(draw.frameSizeTexels) * Vector2f(-0.5, 0.5);
+        Vector2f floatPos = (toFloatVec(pos.e - OFFSET) + drawOffset) * PIXELS_PER_TEXEL;
         glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
 
         draw.vao.bind();

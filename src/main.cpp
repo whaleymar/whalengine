@@ -27,6 +27,7 @@
 #include "Systems/Frametracker.h"
 #include "Systems/InputHandler.h"
 
+#include "Util/Print.h"
 #include "Util/Vector.h"
 
 using namespace whal;
@@ -48,23 +49,37 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
 
     auto s_TPT = static_cast<s32>(TEXELS_PER_TILE);
     auto entity = ecs.entity().value();
-    entity.add<Position>(Position({16, 5 * s_TPT}));
+    entity.add<Position>(Position({16, 3 * s_TPT}));
     entity.add<Velocity>();
-    entity.add<Draw>();
+    s32 width = 8;
+    s32 height = 8;
+    auto customDraw = Draw();
+    customDraw.setFrameSize(width, height);
+    entity.add<Draw>(customDraw);
     entity.add<PlayerControlRB>();
-    // entity.add<PlayerControlFree>(PlayerControlFree(1));
+    // entity.add<PlayerControlFree>();
 
-    s32 halflen = Draw().frameSizeTexels.x() / 2;
-    entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), halflen, halflen));
+    entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), width / 2, height / 2));
 
+    s32 widthTileHL = 8 / 2;
+    s32 heightTileHL = 8 / 2;
     whal::ecs::Entity block;
     for (s32 i = 0; i < 15; i++) {
         block = ecs.entity().value();
-        s32 y = i == 0 ? 1 : 0;
+        s32 y = i == 0 || i == 14 ? 1 : 0;
         block.add<Position>(Position({s_TPT * i, s_TPT * (1 + y)}));
         block.add<Velocity>();
         block.add<Draw>();
-        block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), halflen, halflen));
+        block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
+    }
+
+    for (s32 i = 0; i < 15; i++) {
+        block = ecs.entity().value();
+        s32 y = i == 0 || i == 14 ? 3 : 4;
+        block.add<Position>(Position({s_TPT * i, s_TPT * (1 + y)}));
+        block.add<Velocity>();
+        block.add<Draw>();
+        block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
     }
 
     // copy example:

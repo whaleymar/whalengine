@@ -13,6 +13,11 @@ Draw::Draw(s32 depth_) : depth(depth_) {
     updateVertices();
 }
 
+void Draw::setFrameSize(s32 frameSizeX, s32 frameSizeY) {
+    frameSizeTexels = {frameSizeX, frameSizeY};
+    updateVertices();
+}
+
 void Draw::updateVertices() {
     const f32 width = getPixelSize(frameSizeTexels.x(), scale.x());
     const f32 height = getPixelSize(frameSizeTexels.y(), scale.y());
