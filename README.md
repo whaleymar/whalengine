@@ -33,4 +33,3 @@ A WIP 2D game engine written in C++ with OpenGL and GLFW, backed by a simple Ent
 - only store xy coord in vertices
 - square vertices with 4 vertices not 6
 - ECS lib todos
-- Velocity numbers are a little off

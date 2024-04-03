@@ -27,6 +27,7 @@ void GraphicsSystem::drawEntities(ShaderProgram program) {
         Draw& draw = entity.get<Draw>();
 
         // position is the center, but openGL expects position of the top left corner
+        // TODO clamp to texel grid
         Vector2f drawOffset = toFloatVec(draw.frameSizeTexels) * Vector2f(-0.5, 0.5);
         Vector2f floatPos = (toFloatVec(pos.e - OFFSET) + drawOffset);
         glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);

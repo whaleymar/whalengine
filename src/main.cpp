@@ -47,9 +47,8 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
     auto solidBodyMgr = ecs.registerSystem<SolidBodyManager>();
 
-    auto PPTile = static_cast<s32>(TEXELS_PER_TILE * PIXELS_PER_TEXEL);
     auto entity = ecs.entity().value();
-    entity.add<Position>(Position({40 * PPTile, 5 * PPTile}));
+    entity.add<Position>(Position::tiles(40, 5));
     entity.add<Velocity>();
     s32 width = 8;
     s32 height = 8;
@@ -69,7 +68,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     whal::ecs::Entity block;
     for (s32 i = 0; i < 50; i++) {
         block = ecs.entity().value();
-        block.add<Position>(Position({PPTile * i, PPTile}));
+        block.add<Position>(Position::tiles(i, 1));
         block.add<Velocity>();
         block.add<Draw>();
         block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
@@ -80,7 +79,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
             continue;
         }
         block = ecs.entity().value();
-        block.add<Position>(Position({PPTile * i, PPTile * 4}));
+        block.add<Position>(Position::tiles(i, 4));
         block.add<Velocity>();
         block.add<Draw>();
         block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
@@ -103,8 +102,8 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), widthTileHL, heightTileHL));
 
     auto pathControl = PathControl(10, {}, 2);
-    pathControl.checkpoints.push_back(Position({0, 90 * PIXELS_PER_TEXEL}));
-    pathControl.checkpoints.push_back(Position({0, 2 * PIXELS_PER_TEXEL}));
+    pathControl.checkpoints.push_back(Position::texels(0, 90));
+    pathControl.checkpoints.push_back(Position::texels(0, 5));
     entity2.add<PathControl>(pathControl);
 
     auto& input = Input::getInstance();
