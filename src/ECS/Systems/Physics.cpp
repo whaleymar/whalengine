@@ -59,8 +59,8 @@ void PhysicsSystem::update() {
 
         // TODO deltatime + rounding == imprecise speeds that look choppy. need to carry remainders TODO
         Vector2f totalVelocity = vel.stable + impulse;
-        f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE;
-        f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE;
+        f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
+        f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
         vel.residualImpulse = impulse * (1 - IMPULSE_DAMPING_FACTOR);
         vel.impulse = {0, 0};
         vel.total = totalVelocity;
@@ -117,7 +117,6 @@ void PhysicsSystem::update() {
         Position& pos = entity.get<Position>();
         RigidBody& rb = entity.get<RigidBody>();
         pos.e = rb.collider.getCollider().getPosition();
-        print(pos.e.x(), pos.e.y());
     }
 }
 

@@ -9,7 +9,7 @@
 
 namespace whal {
 
-constexpr f32 CHECKPOINT_DISTANCE_THRESHOLD = 1.0;  // in texels
+constexpr f32 CHECKPOINT_DISTANCE_THRESHOLD = 5;  // in pixels
 
 void PathControllerSystem::update() {
     f32 dt = Deltatime::getInstance().get();
@@ -22,17 +22,21 @@ void PathControllerSystem::update() {
         // scale checkpoint threshold with speed
         f32 speed = entity.get<Velocity>().stable.len();
         f32 epsilon = speed > 0 ? CHECKPOINT_DISTANCE_THRESHOLD * speed : CHECKPOINT_DISTANCE_THRESHOLD;
-        if (delta.len() < epsilon) {
-            if (path.curWaitTime <= 0) {
+        if (path.isWaiting || delta.len() < epsilon) {
+            if (path.isWaiting && path.curWaitTime <= 0) {
                 path.step();
-                entity.set<Velocity>(Velocity());
                 path.isVelocityUpdateNeeded = true;
+                path.isWaiting = false;
                 path.curWaitTime = path.waitTime;
-            } else {
+            } else if (path.isWaiting) {
                 path.curWaitTime -= dt;
+            } else {
+                entity.set<Velocity>(Velocity());
+                path.isWaiting = true;
             }
         } else if (path.isVelocityUpdateNeeded) {
             entity.set<Velocity>(Velocity(delta.norm() * path.moveSpeed));
+            path.isVelocityUpdateNeeded = false;
         }
     }
 }

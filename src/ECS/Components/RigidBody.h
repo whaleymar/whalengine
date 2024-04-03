@@ -10,7 +10,7 @@ struct RigidBody {
     RigidBody(Vector2f center_, s32 halfx, s32 halfy);
 
     ActorCollider collider;
-    f32 jumpInitialVelocity = 15.5;
+    f32 jumpInitialVelocity = 20.5;
     bool isJumping = false;
     f32 jumpSecondsRemaining = 0;
     f32 jumpSecondsMax = 1.25;

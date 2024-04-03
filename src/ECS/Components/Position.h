@@ -4,7 +4,7 @@
 
 namespace whal {
 
-// entity position in texels
+// entity position in pixels
 struct Position {
     Vector2i e;
 };

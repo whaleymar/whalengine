@@ -18,7 +18,7 @@ void GraphicsSystem::update(){};
 
 void GraphicsSystem::drawEntities(ShaderProgram program) {
     // this puts (0,0) at the bottom left of the screen
-    static const Vector2i OFFSET = Vector2i(WINDOW_WIDTH_TEXELS / 2, WINDOW_HEIGHT_TEXELS / 2);
+    static const Vector2i OFFSET = Vector2i(WINDOW_WIDTH_PIXELS / 2, WINDOW_HEIGHT_PIXELS / 2);
 
     program.useProgram();
     // TODO sort by depth
@@ -28,7 +28,7 @@ void GraphicsSystem::drawEntities(ShaderProgram program) {
 
         // position is the center, but openGL expects position of the top left corner
         Vector2f drawOffset = toFloatVec(draw.frameSizeTexels) * Vector2f(-0.5, 0.5);
-        Vector2f floatPos = (toFloatVec(pos.e - OFFSET) + drawOffset) * PIXELS_PER_TEXEL;
+        Vector2f floatPos = (toFloatVec(pos.e - OFFSET) + drawOffset);
         glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
 
         draw.vao.bind();

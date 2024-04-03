@@ -47,9 +47,9 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
     auto solidBodyMgr = ecs.registerSystem<SolidBodyManager>();
 
-    auto s_TPT = static_cast<s32>(TEXELS_PER_TILE);
+    auto PPTile = static_cast<s32>(TEXELS_PER_TILE * PIXELS_PER_TEXEL);
     auto entity = ecs.entity().value();
-    entity.add<Position>(Position({16, 3 * s_TPT}));
+    entity.add<Position>(Position({40 * PPTile, 5 * PPTile}));
     entity.add<Velocity>();
     s32 width = 8;
     s32 height = 8;
@@ -59,24 +59,28 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     entity.add<PlayerControlRB>();
     // entity.add<PlayerControlFree>();
 
-    entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), width / 2, height / 2));
+    auto halfLenX = PIXELS_PER_TEXEL * width / 2;
+    auto halfLenY = PIXELS_PER_TEXEL * height / 2;
+    entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), halfLenX, halfLenY));
+    print(halfLenX, halfLenY);
 
-    s32 widthTileHL = 8 / 2;
-    s32 heightTileHL = 8 / 2;
+    s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
+    s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
     whal::ecs::Entity block;
-    for (s32 i = 0; i < 15; i++) {
+    for (s32 i = 0; i < 50; i++) {
         block = ecs.entity().value();
-        s32 y = i == 0 || i == 14 ? 1 : 0;
-        block.add<Position>(Position({s_TPT * i, s_TPT * (1 + y)}));
+        block.add<Position>(Position({PPTile * i, PPTile}));
         block.add<Velocity>();
         block.add<Draw>();
         block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
     }
 
-    for (s32 i = 0; i < 15; i++) {
+    for (s32 i = 0; i < 50; i++) {
+        if (i % 7 < 4) {
+            continue;
+        }
         block = ecs.entity().value();
-        s32 y = i == 0 || i == 14 ? 3 : 4;
-        block.add<Position>(Position({s_TPT * i, s_TPT * (1 + y)}));
+        block.add<Position>(Position({PPTile * i, PPTile * 4}));
         block.add<Velocity>();
         block.add<Draw>();
         block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
@@ -91,19 +95,17 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     //     print(dupeEntity.error());
     // }
 
-    // auto entity2 = ecs.entity().value();
-    // entity2.add<Position>(Position({0, 0}));
-    // entity2.add<Velocity>();
-    // entity2.add<Draw>();
+    auto entity2 = ecs.entity().value();
+    entity2.add<Position>(Position({0, 0}));
+    entity2.add<Velocity>();
+    entity2.add<Draw>();
     // entity2.add<PlayerControlFree>();
-    // entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), halflen, halflen));
+    entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), widthTileHL, heightTileHL));
 
-    // auto pathControl = PathControl(1);
-    // pathControl.checkpoints.push_back(Position({320, 0}));
-    // pathControl.checkpoints.push_back(Position({320, 180}));
-    // pathControl.checkpoints.push_back(Position({0, 180}));
-    // pathControl.checkpoints.push_back(Position({0, 0}));
-    // entity2.add<PathControl>(pathControl);
+    auto pathControl = PathControl(10, {}, 2);
+    pathControl.checkpoints.push_back(Position({0, 90 * PIXELS_PER_TEXEL}));
+    pathControl.checkpoints.push_back(Position({0, 2 * PIXELS_PER_TEXEL}));
+    entity2.add<PathControl>(pathControl);
 
     auto& input = Input::getInstance();
     while (!glfwWindowShouldClose(window)) {

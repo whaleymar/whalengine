@@ -26,6 +26,7 @@ struct PathControl {
 
     u64 curTarget = 0;
     f32 curWaitTime = 0;
+    bool isWaiting = false;
     bool isVelocityUpdateNeeded = true;
 
     Position getTarget() const;
