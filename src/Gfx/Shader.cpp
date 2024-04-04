@@ -73,7 +73,10 @@ void ShaderProgram::onWindowResize() {
     // Adjust camera projection
     useProgram();
 
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<f32>(WINDOW_WIDTH_PIXELS), static_cast<f32>(WINDOW_HEIGHT_PIXELS), 0.0f, -1.0f, 1.0f);
+    f32 fWinWidth = static_cast<f32>(WINDOW_WIDTH_PIXELS);
+    f32 fWinHeight = static_cast<f32>(WINDOW_HEIGHT_PIXELS);
+
+    glm::mat4 projection = glm::ortho(0.0f, fWinWidth, fWinHeight, 0.0f, -1.0f, 1.0f);
     projectionUniform = glGetUniformLocation(mHandle, "projection");
     glUniformMatrix4fv(projectionUniform, 1, false, glm::value_ptr(projection));
 }

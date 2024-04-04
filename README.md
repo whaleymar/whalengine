@@ -16,7 +16,11 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 
 ## Entity Prefabs
 - particle
-- solid tile
+    - draw, position, velocity, lifetime
+- static solid tile
+    - draw, position, solidbody
+- player
+- camera
 
 ## Errors
 - image lib has exceptions
@@ -37,6 +41,7 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 ## Misc
 - only store xy coord in vertices
 - square vertices with 4 vertices not 6
+- give vertices a color component (+ isVerticesUpdateNeeded in Draw component)
 - ECS lib tasks
 - make this an actual framework 
     - move stuff in main.cpp into game class

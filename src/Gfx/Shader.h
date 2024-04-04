@@ -23,6 +23,8 @@ public:
     u32 drawOffsetUniform;
     u32 textureUniform;
     u32 millis;
+
+    // dependent on screen size:
     u32 projectionUniform;
 };
 

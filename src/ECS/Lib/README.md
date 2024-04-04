@@ -4,7 +4,8 @@ This code is heavily based on this writeup: https://austinmorlan.com/posts/entit
 The main changes are:
 
 1. Does not rely on RTTI to make unique IDs for components/systems. Uses compile-time type IDs instead
-2. Single header (plus some cpp files) for a more Flecs-like API
+2. Single header (plus some cpp files) for an improved API
+3. Systems now have virtual onAdd and onDelete functions, which makes it easier to interact with non-ECS systems that interact w/ components. Logic for non-trivial component destructors should go in the onDelete function of a single-component system.
 
 ## Constraints
 
