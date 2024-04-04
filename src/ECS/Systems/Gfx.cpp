@@ -1,6 +1,5 @@
 #include "ECS/Systems/Gfx.h"
 
-// #include "Gfx/GfxUtil.h"
 #include "Gfx/Shader.h"
 #include "Util/Vector.h"
 
@@ -34,7 +33,7 @@ void GraphicsSystem::drawEntities(ShaderProgram program) {
         draw.vbo.buffer(vertices.data(), vertices.size() * sizeof(float));
 
         updateShaderVars(program);
-        glDrawArrays(GL_TRIANGLES, 0, draw.nVertices);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, draw.nVertices);
     }
 }
 

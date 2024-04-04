@@ -34,4 +34,8 @@ void CollisionManager::clearSolids() {
     mSolids.clear();
 }
 
+void CollisionManager::setDebug(bool debug) {
+    mIsDebugActive = debug;
+}
+
 }  // namespace whal

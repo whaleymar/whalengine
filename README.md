@@ -39,8 +39,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - draw colliders
 
 ## Misc
-- only store xy coord in vertices
-- square vertices with 4 vertices not 6
 - give vertices a color component (+ isVerticesUpdateNeeded in Draw component)
 - ECS lib tasks
 - make this an actual framework 

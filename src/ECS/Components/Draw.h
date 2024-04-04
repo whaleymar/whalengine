@@ -1,30 +1,29 @@
 #pragma once
 
-#include <array>
-
 #include "Gfx/VertexObject.h"
 #include "Util/Vector.h"
 
 namespace whal {
 
+// hard coded as rectangles until I need something else
 struct Draw {
     Draw(s32 depth_ = 0);
 
-    u32 nVertices = 6;
+    u32 nVertices = N_VERTS_RECT;
     Vao vao;
     Vbo vbo;
     s32 depth;
     Vector2f scale = {1, 1};
-    Vector2i atlasPositionTexels = {0, 0};
+    Vector2i atlasPositionTexels = {0, 0};  // dont think i want sprite component, but need sprites to be optional. nullable sprite struct member?
     Vector2i frameSizeTexels = {8, 8};
-    bool isUVUpdateNeeded = false;
+    bool isVertsUpdateNeeded = false;
 
-    std::array<float, 30> getVertices() const { return mVertices; }
+    VertArrayRect getVertices() const { return mVertices; }
     void updateVertices();
     void setFrameSize(s32, s32);
 
 private:
-    std::array<float, 30> mVertices;  // will hard code until i need something different
+    VertArrayRect mVertices;
 };
 
 }  // namespace whal

@@ -5,8 +5,6 @@
 #include "Gfx/IUseOpenGLHandle.h"
 #include "Util/Expected.h"
 
-#define STRIDE_SIZE 5
-
 namespace whal {
 
 class ShaderProgram;

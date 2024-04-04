@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Gfx/GfxUtil.h"
+#include "Gfx/VertexObject.h"
 #include "Util/FileIO.h"
 
 #define VERTEX_SHADER_PATH "shader/vertex.glsl"

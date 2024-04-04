@@ -23,6 +23,7 @@
 // #include "Gfx/Texture.h"
 #include "Gfx/GfxUtil.h"
 
+#include "Systems/DebugCollisionViewer.h"
 #include "Systems/Deltatime.h"
 #include "Systems/Frametracker.h"
 #include "Systems/InputHandler.h"
@@ -47,21 +48,20 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
     auto solidBodyMgr = ecs.registerSystem<SolidBodyManager>();
 
-    auto entity = ecs.entity().value();
-    entity.add<Position>(Position::tiles(40, 5));
-    entity.add<Velocity>();
+    auto player = ecs.entity().value();
+    player.add<Position>(Position::tiles(40, 5));
+    player.add<Velocity>();
     s32 width = 8;
     s32 height = 8;
     auto customDraw = Draw();
     customDraw.setFrameSize(width, height);
-    entity.add<Draw>(customDraw);
-    entity.add<PlayerControlRB>();
+    player.add<Draw>(customDraw);
+    player.add<PlayerControlRB>();
     // entity.add<PlayerControlFree>();
 
     auto halfLenX = PIXELS_PER_TEXEL * width / 2;
     auto halfLenY = PIXELS_PER_TEXEL * height / 2;
-    entity.add<RigidBody>(RigidBody(toFloatVec(entity.get<Position>().e), halfLenX, halfLenY));
-    print(halfLenX, halfLenY);
+    player.add<RigidBody>(RigidBody(toFloatVec(player.get<Position>().e), halfLenX, halfLenY));
 
     s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
@@ -106,7 +106,11 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     pathControl.checkpoints.push_back(Position::texels(0, 5));
     entity2.add<PathControl>(pathControl);
 
+    // messing with debug stuff
+    DebugCollisionViewer debugCollision;
+
     auto& input = Input::getInstance();
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // GL_FILL to go back to normal
     while (!glfwWindowShouldClose(window)) {
         // check inputs
 
@@ -123,6 +127,8 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
         pathSystem->update();
         physicsSystem->update();
         rigidBodyMgr->update();
+
+        debugCollision.draw(program, player);
 
         // std::cout << Deltatime::getInstance().get() << std::endl;
         // if (Frametracker::getInstance().getFrame() == 0) {
