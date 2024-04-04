@@ -13,7 +13,7 @@
 #include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
-#include "ECS/Systems/CollisionManagerSystem.h"
+#include "ECS/Systems/CollisionManager.h"
 #include "ECS/Systems/Controller.h"
 #include "ECS/Systems/Gfx.h"
 #include "ECS/Systems/PathController.h"

@@ -1,13 +1,12 @@
 # unnamed engine
-A WIP 2D game engine written in C++ with OpenGL and GLFW, backed by a simple Entity Component System
+A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple Entity Component System
 
 # To Do 
 ## Systems
-- animation
-- sound
-- lighting
-- textures (part of drawing)
-    - stitch textures into atlas at startup (or with script)
+- sound\*
+- lighting\*
+- textures (part of Gfx System)\*\*
+- animation (part of Gfx System)
 
 ## Components
 - Follow
@@ -24,7 +23,13 @@ A WIP 2D game engine written in C++ with OpenGL and GLFW, backed by a simple Ent
 
 ## Non-ECS Systems
 - Scenes
-- loading entity from file
+    - hot reloading
+- chunk loading/unloading
+- loading entity/map from file
+    - definitely figure out level editor first
+- text rendering\*\*
+- PNG parser 
+- Level editor\*\*
 
 ## Debug
 - draw colliders
@@ -32,4 +37,16 @@ A WIP 2D game engine written in C++ with OpenGL and GLFW, backed by a simple Ent
 ## Misc
 - only store xy coord in vertices
 - square vertices with 4 vertices not 6
-- ECS lib todos
+- ECS lib tasks
+- make this an actual framework 
+    - move stuff in main.cpp into game class
+- dynamically load shaders
+
+# Tools 
+- crunch: CLI texture packer, https://github.com/ChevyRay/crunch
+- BMFont: Bitmap Font Generator from truetype, https://www.angelcode.com/products/bmfont/
+- Ogmo Editor 3 / Tiled: Level Editor, https://ogmo-editor-3.github.io/ ; https://doc.mapeditor.org/en/stable/manual/layers/
+
+
+\* = unsure how this will fit into ECS / may have non-ECS component
+\*\* = see tools

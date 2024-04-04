@@ -1,4 +1,4 @@
-#include "CollisionManagerSystem.h"
+#include "CollisionManager.h"
 
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/SolidBody.h"
