@@ -5,7 +5,7 @@
 
 namespace whal {
 
-enum class InputType { LEFT, RIGHT, UP, DOWN, JUMP, PAUSE };
+enum class InputType { LEFT, RIGHT, UP, DOWN, JUMP, PAUSE, DEBUG };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
@@ -28,6 +28,7 @@ public:
     bool isDown() const { return mIsDown; }
     bool isJump() const { return mIsJump; }
     bool isPause() const { return mIsPause; }
+    bool isDebug() const { return mIsDebug; }
 
     bool isJumpUsed() const { return mIsJumpUsed; }
 
@@ -44,6 +45,7 @@ private:
     bool mIsDown = false;
     bool mIsJump = false;
     bool mIsPause = false;
+    bool mIsDebug = false;
 
     bool mIsJumpUsed = false;
 };

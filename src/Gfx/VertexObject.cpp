@@ -53,6 +53,7 @@ f32 depthToFloat(Depth depth) {
 }
 
 VertArrayRect MakeRectVertices(f32 pixelWidth, f32 pixelHeight) {
+    // TODO depth arg
     // clang-format off
 	return {
 		pixelWidth, pixelHeight, 0.0, 1.0, 0.0,// top right

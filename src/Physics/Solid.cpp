@@ -7,7 +7,6 @@
 #include "Physics/Collision/AABB.h"
 #include "Physics/CollisionManager.h"
 #include "Systems/Deltatime.h"
-#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
@@ -56,7 +55,6 @@ void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, 
             toMove = solidEdge - actorEdge;
             actor->moveDirection(isXDirection, toMove, &ActorCollider::squish);
             f32 momentum = toMove / dt;
-            // print(toMove, dt);
             actor->setMomentum(momentum, isXDirection);
         } else if (std::find(riding.begin(), riding.end(), actor) != riding.end()) {
             // I might change this for solids moving down faster than gravity TODO

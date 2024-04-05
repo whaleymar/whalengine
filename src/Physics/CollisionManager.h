@@ -22,8 +22,6 @@ public:
     void remove(SolidCollider* solid);
     void clearActors();
     void clearSolids();
-    void setDebug(bool debug);
-    bool isDebugActive() const { return mIsDebugActive; }
 
 private:
     CollisionManager() = default;
@@ -33,7 +31,8 @@ private:
 
     std::vector<ActorCollider*> mActors{};
     std::vector<SolidCollider*> mSolids{};
-    bool mIsDebugActive = false;
 };
+
+void drawColliders();
 
 }  // namespace whal

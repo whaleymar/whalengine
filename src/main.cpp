@@ -3,10 +3,7 @@
 #include <GLFW/glfw3.h>  // always include after glad
 // clang-format on
 
-#include <iostream>
-
 #include "ECS/Components/Draw.h"
-#include "ECS/Components/PathControl.h"
 #include "ECS/Components/PlayerControl.h"
 #include "ECS/Components/Position.h"
 #include "ECS/Components/RigidBody.h"
@@ -19,11 +16,11 @@
 #include "ECS/Systems/PathController.h"
 #include "ECS/Systems/Physics.h"
 
-#include "Gfx/Shader.h"
+#include "Gfx/GLResourceManager.h"
 // #include "Gfx/Texture.h"
 #include "Gfx/GfxUtil.h"
 
-#include "Systems/DebugCollisionViewer.h"
+#include "Physics/CollisionManager.h"
 #include "Systems/Deltatime.h"
 #include "Systems/Frametracker.h"
 #include "Systems/InputHandler.h"
@@ -33,7 +30,7 @@
 
 using namespace whal;
 
-void MainLoop(GLFWwindow* window, ShaderProgram program) {
+void MainLoop(GLFWwindow* window) {
     // Texture mainTexture;
     // mainTexture.loadAtlas("data/sprites.png");
 
@@ -51,7 +48,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     auto player = ecs.entity().value();
     player.add<Position>(Position::tiles(40, 5));
     player.add<Velocity>();
-    s32 width = 8;
+    s32 width = 16;
     s32 height = 8;
     auto customDraw = Draw();
     customDraw.setFrameSize(width, height);
@@ -59,7 +56,7 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     player.add<PlayerControlRB>();
     // entity.add<PlayerControlFree>();
 
-    auto halfLenX = PIXELS_PER_TEXEL * width / 2;
+    auto halfLenX = PIXELS_PER_TEXEL * width / 4;
     auto halfLenY = PIXELS_PER_TEXEL * height / 2;
     player.add<RigidBody>(RigidBody(toFloatVec(player.get<Position>().e), halfLenX, halfLenY));
 
@@ -95,19 +92,16 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
     // }
 
     auto entity2 = ecs.entity().value();
-    entity2.add<Position>(Position({0, 0}));
+    entity2.add<Position>(Position::texels(0, 16));
     entity2.add<Velocity>();
     entity2.add<Draw>();
     // entity2.add<PlayerControlFree>();
     entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), widthTileHL, heightTileHL));
 
-    auto pathControl = PathControl(10, {}, 2);
-    pathControl.checkpoints.push_back(Position::texels(0, 90));
-    pathControl.checkpoints.push_back(Position::texels(0, 5));
-    entity2.add<PathControl>(pathControl);
-
-    // messing with debug stuff
-    DebugCollisionViewer debugCollision;
+    // auto pathControl = PathControl(10, {}, 2);
+    // pathControl.checkpoints.push_back(Position::texels(0, 90));
+    // pathControl.checkpoints.push_back(Position::texels(0, 5));
+    // entity2.add<PathControl>(pathControl);
 
     auto& input = Input::getInstance();
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // GL_FILL to go back to normal
@@ -128,17 +122,14 @@ void MainLoop(GLFWwindow* window, ShaderProgram program) {
         physicsSystem->update();
         rigidBodyMgr->update();
 
-        debugCollision.draw(program, player);
-
-        // std::cout << Deltatime::getInstance().get() << std::endl;
-        // if (Frametracker::getInstance().getFrame() == 0) {
-        // };  //     std::cout << Frametracker::getInstance().getFPS() << std::endl;
-
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // mainTexture.bind();
 
-        graphicsSystem->drawEntities(program);
+        graphicsSystem->drawEntities();
+        if (input.isDebug()) {
+            drawColliders();
+        }
 
         // Swap the screen buffers
         glfwSwapBuffers(window);
@@ -155,7 +146,7 @@ int main() {
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH_PIXELS, WINDOW_HEIGHT_PIXELS, WINDOW_TITLE, NULL, NULL);
     glfwMakeContextCurrent(window);
     if (window == NULL) {
-        std::cout << "Failed to create GLFW window" << std::endl;
+        print("Failed to create GLFW window");
         glfwTerminate();
         return -1;
     }
@@ -164,16 +155,22 @@ int main() {
 
     int version = gladLoadGL(glfwGetProcAddress);
     if (version == 0) {
-        std::cout << "Failed to initialize OpenGL context" << std::endl;
+        print("Failed to initialize OpenGL context");
         return -1;
     }
 
-    std::cout << "Loaded OpenGL " << GLAD_VERSION_MAJOR(version) << "." << GLAD_VERSION_MINOR(version) << std::endl;
+    print<Format({"", "\n"})>("Loaded OpenGL ", GLAD_VERSION_MAJOR(version), ".", GLAD_VERSION_MINOR(version));
 
     // Load Shaders
-    auto program = InitShaders();
-    if (!program.isExpected()) {
-        std::cout << "Failed to initialize shaders. Got error:\n" << program.error() << std::endl;
+    auto err = createAndRegisterShader(VERTEX_SHADER_PATH, FRAG_SPRITE_SHADER_PATH, SHNAME_SPRITE);
+    if (err) {
+        print("Failed to register shader. Got error:\n", *err);
+        return -1;
+    }
+
+    err = createAndRegisterShader(VERTEX_SHADER_PATH, FRAG_OUTLINE_SHADER_PATH, SHNAME_DEBUG);
+    if (err) {
+        print("Failed to register shader. Got error:\n", *err);
         return -1;
     }
 
@@ -181,7 +178,7 @@ int main() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    MainLoop(window, *program);
+    MainLoop(window);
 
     // clear resources
     glfwTerminate();

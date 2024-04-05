@@ -9,7 +9,7 @@ namespace whal {
 
 class ShaderProgram;
 
-Expected<ShaderProgram> InitShaders();
+Expected<ShaderProgram> createShader(const char* vertexPath, const char* fragmentPath);
 
 class ShaderProgram : public IUseOpenGLHandle {
 public:

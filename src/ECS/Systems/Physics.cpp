@@ -57,7 +57,6 @@ void PhysicsSystem::update() {
             impulse.e[1] += vel.residualImpulse.y();
         }
 
-        // TODO deltatime + rounding == imprecise speeds that look choppy. need to carry remainders TODO
         Vector2f totalVelocity = vel.stable + impulse;
         f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
         f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;

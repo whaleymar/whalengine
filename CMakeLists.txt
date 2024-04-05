@@ -3,7 +3,7 @@ project(engine CXX C)
 cmake_policy(SET CMP0079 NEW)
 
 add_subdirectory(lib/glm) # needs to be here to avoid recursive variable-setting
-add_subdirectory(lib/LibNerve)
+# add_subdirectory(lib/LibNerve)
 add_subdirectory(lib/glad)
 add_subdirectory(lib/glfw)
 
@@ -22,7 +22,7 @@ add_executable(engine ${SOURCES_BASE})
 target_include_directories(engine
     PUBLIC src
     PUBLIC "${PROJECT_SOURCE_DIR}/lib/glad/include"
-    PUBLIC "${PROJECT_SOURCE_DIR}/lib/LibNerve/Include"
+    # PUBLIC "${PROJECT_SOURCE_DIR}/lib/LibNerve/Include"
     )
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -41,7 +41,7 @@ include_directories(lib)
 target_link_libraries(engine glad)
 target_link_libraries(engine glfw)
 target_link_libraries(engine glm)
-target_link_libraries(engine Nerve)
+# target_link_libraries(engine Nerve)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(engine OpenGL::GL)

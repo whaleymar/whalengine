@@ -44,6 +44,8 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - make this an actual framework 
     - move stuff in main.cpp into game class
 - dynamically load shaders
+- cmake flag for debug build vs release 
+    - do ifdef debug to disable debug shaders, vaos, etc.
 
 # Tools 
 - crunch: CLI texture packer, https://github.com/ChevyRay/crunch

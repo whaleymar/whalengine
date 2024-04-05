@@ -12,23 +12,20 @@
 #include "Gfx/VertexObject.h"
 #include "Util/FileIO.h"
 
-#define VERTEX_SHADER_PATH "shader/vertex.glsl"
-#define FRAG_SHADER_PATH "shader/fragment.glsl"
-
 namespace whal {
 
 static constexpr int LOG_LENGTH = 512;
 
-Expected<ShaderProgram> InitShaders() {
+Expected<ShaderProgram> createShader(const char* vertexPath, const char* fragmentPath) {
     Shader vertexShader(true);
     Shader fragmentShader(false);
 
-    std::optional<Error> error = vertexShader.compile(VERTEX_SHADER_PATH);
+    std::optional<Error> error = vertexShader.compile(vertexPath);
     if (error) {
         return Expected<ShaderProgram>(*error);
     }
 
-    error = fragmentShader.compile(FRAG_SHADER_PATH);
+    error = fragmentShader.compile(fragmentPath);
     if (error) {
         return Expected<ShaderProgram>(*error);
     }

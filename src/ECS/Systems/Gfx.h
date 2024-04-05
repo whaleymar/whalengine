@@ -7,12 +7,10 @@ namespace whal {
 struct Position;
 struct Draw;
 
-class ShaderProgram;
-
 class GraphicsSystem : public ecs::ISystem<Position, Draw> {
 public:
     void update() override;
-    void drawEntities(ShaderProgram program);
+    void drawEntities();
 };
 
 }  // namespace whal

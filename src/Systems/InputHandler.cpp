@@ -31,7 +31,11 @@ void Input::set(InputType input) {
         break;
 
     case InputType::PAUSE:
-        mIsPause = true;
+        mIsPause = mIsPause != true;
+        break;
+
+    case InputType::DEBUG:
+        mIsDebug = mIsDebug != true;
         break;
     }
 }
@@ -58,8 +62,7 @@ void Input::reset(InputType input) {
         mIsJump = false;
         break;
 
-    case InputType::PAUSE:
-        mIsPause = false;
+    default:
         break;
     }
 }
@@ -75,6 +78,7 @@ void Input::loadMappings() const {
     KeyMap.insert({GLFW_KEY_S, InputType::DOWN});
     KeyMap.insert({GLFW_KEY_SPACE, InputType::JUMP});
     KeyMap.insert({GLFW_KEY_ESCAPE, InputType::PAUSE});
+    KeyMap.insert({GLFW_KEY_0, InputType::DEBUG});
 }
 
 void Input::useJump() {
