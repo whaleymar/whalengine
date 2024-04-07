@@ -127,9 +127,11 @@ void MainLoop(GLFWwindow* window) {
         // mainTexture.bind();
 
         graphicsSystem->drawEntities();
+#ifndef NDEBUG
         if (input.isDebug()) {
             drawColliders();
         }
+#endif
 
         // Swap the screen buffers
         glfwSwapBuffers(window);
