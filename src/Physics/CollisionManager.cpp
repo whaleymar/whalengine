@@ -42,6 +42,7 @@ void CollisionManager::clearSolids() {
     mSolids.clear();
 }
 
+#ifndef NDEBUG
 void drawCollider(ShaderProgram program, const IUseCollision* collider) {
     const AABB& aabb = collider->getCollider();
 
@@ -67,5 +68,6 @@ void drawColliders() {
         drawCollider(program, collider);
     }
 }
+#endif
 
 }  // namespace whal

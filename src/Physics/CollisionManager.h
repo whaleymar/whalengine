@@ -33,6 +33,8 @@ private:
     std::vector<SolidCollider*> mSolids{};
 };
 
+#ifndef NDEBUG
 void drawColliders();
+#endif
 
 }  // namespace whal

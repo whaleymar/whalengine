@@ -334,8 +334,11 @@ public:
     std::shared_ptr<T> registerSystem() {
         static_assert(is_base_of_template<ISystem, T>::value, "Cannot register class which doesn't inherit ISystem");
         const SystemId id = getSystemID<T>();
+
+#ifndef NDEBUG  // avoid unused variable warning
         auto it = std::find(mSystemIDs.begin(), mSystemIDs.end(), id);
         assert(it == mSystemIDs.end());  // msg: system already registered
+#endif
 
         mSystemIDs.push_back(id);
         auto system = std::make_shared<T>();

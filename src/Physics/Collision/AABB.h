@@ -1,10 +1,13 @@
 #pragma once
 
 #include <optional>
-#include "Gfx/VertexObject.h"
 #include "Physics/Collision/HitInfo.h"
 #include "Physics/Collision/Segment.h"
 #include "Util/Vector.h"
+
+#ifndef NDEBUG
+#include "Gfx/VertexObject.h"
+#endif
 
 namespace whal {
 
@@ -12,9 +15,10 @@ struct AABB {
     Vector2i mCenter;
     Vector2i mHalf;
 
-    // TODO check debug compile flag
+#ifndef NDEBUG
     Vao vao;
     Vbo vbo;
+#endif
 
     AABB(Vector2i half);
     AABB(Vector2i center, Vector2i half);
