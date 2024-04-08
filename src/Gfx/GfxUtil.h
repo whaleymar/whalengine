@@ -33,8 +33,14 @@ static constexpr f32 WINDOW_HEIGHT_TILES = WINDOW_HEIGHT_TEXELS / TEXELS_PER_TIL
 static const char* VERTEX_SHADER_PATH = "shader/vertex.glsl";
 static const char* FRAG_SPRITE_SHADER_PATH = "shader/sprite-frag.glsl";
 static const char* FRAG_OUTLINE_SHADER_PATH = "shader/outline-frag.glsl";
+static const char* FRAG_COLOR_SHADER_PATH = "shader/coloronly-frag.glsl";
 
 static const char* SHNAME_SPRITE = "sprite";
 static const char* SHNAME_DEBUG = "debug";
+static const char* SHNAME_COLOR = "color";
+
+static const char* SPRITE_TEXTURE_PATH = "data/sprite/atlas0.png";
+
+static const char* TEXNAME_SPRITE = "sprite";
 
 }  // namespace whal

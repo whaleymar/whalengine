@@ -17,7 +17,6 @@
 #include "ECS/Systems/Physics.h"
 
 #include "Gfx/GLResourceManager.h"
-// #include "Gfx/Texture.h"
 #include "Gfx/GfxUtil.h"
 
 #include "Physics/CollisionManager.h"
@@ -31,28 +30,26 @@
 using namespace whal;
 
 void MainLoop(GLFWwindow* window) {
-    // Texture mainTexture;
-    // mainTexture.loadAtlas("data/sprites.png");
-
     auto& ecs = ecs::ECS::getInstance();
     auto controlSystemRB = ecs.registerSystem<ControllerSystemRB>();
     auto controlSystemFree = ecs.registerSystem<ControllerSystemFree>();
     auto pathSystem = ecs.registerSystem<PathControllerSystem>();
     auto physicsSystem = ecs.registerSystem<PhysicsSystem>();
-    auto graphicsSystem = ecs.registerSystem<GraphicsSystem>();
 
-    // single-component systems for syncing the global collision manager:
+    // single-component systems for running psuedo-destructors:
     auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
     auto solidBodyMgr = ecs.registerSystem<SolidBodyManager>();
+    auto spriteSystem = ecs.registerSystem<SpriteSystem>();
+    auto drawSystem = ecs.registerSystem<DrawSystem>();
 
     auto player = ecs.entity().value();
-    player.add<Position>(Position::tiles(40, 5));
+    player.add<Position>(Position::tiles(15, 10));
     player.add<Velocity>();
     s32 width = 16;
-    s32 height = 8;
-    auto customDraw = Draw();
-    customDraw.setFrameSize(width, height);
-    player.add<Draw>(customDraw);
+    s32 height = 16;
+    auto playerDraw = Sprite();
+    playerDraw.setFrameSize(width, height);
+    player.add<Sprite>(playerDraw);
     player.add<PlayerControlRB>();
     // entity.add<PlayerControlFree>();
 
@@ -62,34 +59,27 @@ void MainLoop(GLFWwindow* window) {
 
     s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
+    whal::ecs::Entity blockPrefab = ecs.entity().value();
+    blockPrefab.add<Position>();
+    blockPrefab.add<Velocity>();
+    blockPrefab.add<Draw>();
+    blockPrefab.add<SolidBody>();
+
     whal::ecs::Entity block;
     for (s32 i = 0; i < 50; i++) {
-        block = ecs.entity().value();
-        block.add<Position>(Position::tiles(i, 1));
-        block.add<Velocity>();
-        block.add<Draw>();
-        block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
+        block = blockPrefab.copy().value();
+        block.set(Position::tiles(i, 1));
+        block.set(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
     }
 
     for (s32 i = 0; i < 50; i++) {
         if (i % 7 < 4) {
             continue;
         }
-        block = ecs.entity().value();
-        block.add<Position>(Position::tiles(i, 4));
-        block.add<Velocity>();
-        block.add<Draw>();
-        block.add<SolidBody>(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
+        block = blockPrefab.copy().value();
+        block.set(Position::tiles(i, 4));
+        block.set(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
     }
-
-    // copy example:
-    // auto dupeEntity = block.copy();
-    // if (dupeEntity.isExpected()) {
-    //     whal::ecs::Entity eVal = dupeEntity.value();
-    //     eVal.add<PlayerControlFree>();
-    // } else {
-    //     print(dupeEntity.error());
-    // }
 
     auto entity2 = ecs.entity().value();
     entity2.add<Position>(Position::texels(0, 16));
@@ -124,9 +114,9 @@ void MainLoop(GLFWwindow* window) {
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // mainTexture.bind();
 
-        graphicsSystem->drawEntities();
+        spriteSystem->drawEntities();
+        drawSystem->drawEntities();
 #ifndef NDEBUG
         if (input.isDebug()) {
             drawColliders();
@@ -173,6 +163,18 @@ int main() {
     err = createAndRegisterShader(VERTEX_SHADER_PATH, FRAG_OUTLINE_SHADER_PATH, SHNAME_DEBUG);
     if (err) {
         print("Failed to register shader. Got error:\n", *err);
+        return -1;
+    }
+
+    err = createAndRegisterShader(VERTEX_SHADER_PATH, FRAG_COLOR_SHADER_PATH, SHNAME_COLOR);
+    if (err) {
+        print("Failed to register shader. Got error:\n", *err);
+        return -1;
+    }
+
+    err = createAndRegisterTexture(SPRITE_TEXTURE_PATH, TEXNAME_SPRITE);
+    if (err) {
+        print("Failed to register", TEXNAME_SPRITE, "texture. Got error:\n", *err);
         return -1;
     }
 

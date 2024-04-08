@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Gfx/Shader.h"
+#include "Gfx/Texture.h"
 #include "Util/Expected.h"
 
 namespace whal {
@@ -17,7 +18,10 @@ public:
     }
 
     std::optional<Error> registerProgram(ShaderProgram program, const char* name);
-    ShaderProgram getProgram(const char* name);
+    const ShaderProgram getProgram(const char* name) const;
+
+    std::optional<Error> registerTexture(Texture texture, const char* name);
+    const Texture& getTexture(const char* name);
 
 private:
     GLResourceManager() = default;
@@ -26,11 +30,16 @@ private:
     void operator=(const GLResourceManager&) = delete;
 
     s32 getProgramIndex(std::string name) const;
+    s32 getTextureIndex(std::string name) const;
 
     std::vector<ShaderProgram> mShaders;
     std::vector<std::string> mShaderNames;
+
+    std::vector<Texture> mTextures;
+    std::vector<std::string> mTextureNames;
 };
 
 std::optional<Error> createAndRegisterShader(const char* vertexPath, const char* fragmentPath, const char* shaderName);
+std::optional<Error> createAndRegisterTexture(const char* atlasPath, const char* textureName);
 
 }  // namespace whal

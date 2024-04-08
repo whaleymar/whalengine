@@ -4,6 +4,11 @@
 
 namespace whal {
 
+void SpriteManager::onRemove(ecs::Entity entity) {
+    entity.get<Sprite>().vao.free();
+    entity.get<Sprite>().vbo.free();
+}
+
 void DrawManager::onRemove(ecs::Entity entity) {
     entity.get<Draw>().vao.free();
     entity.get<Draw>().vbo.free();

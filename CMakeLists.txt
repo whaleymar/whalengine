@@ -24,6 +24,7 @@ set_target_properties(engine PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 target_include_directories(engine
     PUBLIC src
     PUBLIC "${PROJECT_SOURCE_DIR}/lib/glad/include"
+    PUBLIC "${PROJECT_SOURCE_DIR}/lib/stb"
     # PUBLIC "${PROJECT_SOURCE_DIR}/lib/LibNerve/Include"
     )
 

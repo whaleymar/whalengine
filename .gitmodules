@@ -11,3 +11,6 @@
 [submodule "lib/LibNerve"]
 	path = lib/LibNerve
 	url = https://github.com/fruityloops1/LibNerve.git
+[submodule "lib/crunch"]
+	path = lib/crunch
+	url = https://github.com/Nebulaxin/crunch.git

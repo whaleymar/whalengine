@@ -10,7 +10,6 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/Deltatime.h"
 #include "Util/MathUtil.h"
-#include "Util/Print.h"
 
 namespace whal {
 

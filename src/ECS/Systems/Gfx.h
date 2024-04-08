@@ -5,9 +5,16 @@
 namespace whal {
 
 struct Position;
+struct Sprite;
 struct Draw;
 
-class GraphicsSystem : public ecs::ISystem<Position, Draw> {
+class SpriteSystem : public ecs::ISystem<Position, Sprite> {
+public:
+    void update() override;
+    void drawEntities();
+};
+
+class DrawSystem : public ecs::ISystem<Position, Draw> {
 public:
     void update() override;
     void drawEntities();

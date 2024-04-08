@@ -44,7 +44,6 @@ enum class Depth {
 
 f32 depthToFloat(Depth depth);
 
-VertArrayRect MakeRectVertices(f32 pixelWidth, f32 pixelHeight);
-VertArrayRect MakeLineVertices(Vector2f pixelPosStart, Vector2f pixelPosEnd, f32 thickness);
+VertArrayRect MakeRectVertices(f32 pixelWidth, f32 pixelHeight, f32 minU = 0.0, f32 maxU = 1.0, f32 minV = 0.0, f32 maxV = 1.0);
 
 }  // namespace whal

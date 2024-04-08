@@ -15,13 +15,40 @@
 
 namespace whal {
 
-void GraphicsSystem::update(){};
+void SpriteSystem::update(){};
 
-void GraphicsSystem::drawEntities() {
+void SpriteSystem::drawEntities() {
     auto program = GLResourceManager::getInstance().getProgram(SHNAME_SPRITE);
+    GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).bind();
     program.useProgram();
     // TODO sort by depth
     for (auto const& [entityid, entity] : getEntities()) {
+        Position& pos = entity.get<Position>();
+        Sprite& draw = entity.get<Sprite>();
+
+        // position is the center, but openGL expects position of the top left corner
+        // TODO clamp to texel grid
+        Vector2f drawOffset = toFloatVec(draw.frameSizeTexels * PIXELS_PER_TEXEL) * Vector2f(-0.5, 0.5);
+        Vector2f floatPos = (toFloatVec(pos.e) + drawOffset);
+        glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
+
+        draw.vao.bind();
+        auto vertices = draw.getVertices();
+        draw.vbo.buffer(vertices.data(), vertices.size() * sizeof(float));
+
+        updateShaderVars(program);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, draw.nVertices);
+    }
+}
+
+void DrawSystem::update(){};
+
+void DrawSystem::drawEntities() {
+    auto program = GLResourceManager::getInstance().getProgram(SHNAME_COLOR);
+    program.useProgram();
+    // TODO sort by depth
+    for (auto const& [entityid, entity] : getEntities()) {
+        // TODO abstract this loop
         Position& pos = entity.get<Position>();
         Draw& draw = entity.get<Draw>();
 

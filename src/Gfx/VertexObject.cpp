@@ -52,59 +52,15 @@ f32 depthToFloat(Depth depth) {
     }
 }
 
-VertArrayRect MakeRectVertices(f32 pixelWidth, f32 pixelHeight) {
+VertArrayRect MakeRectVertices(f32 pixelWidth, f32 pixelHeight, f32 minU, f32 maxU, f32 minV, f32 maxV) {
     // TODO depth arg
     // clang-format off
 	return {
-		pixelWidth, pixelHeight, 0.0, 1.0, 0.0,// top right
-		0.0, pixelHeight, 0.0, 0.0, 0.0,       // top left
-		pixelWidth, 0.0, 0.0, 1.0, 1.0,        // bottom right
-		0.0, 0.0, 0.0, 0.0, 1.0,               // bottom left
+		pixelWidth, pixelHeight, 0.0, maxU, minV,// top right
+		0.0, pixelHeight, 0.0, minU, minV,       // top left
+		pixelWidth, 0.0, 0.0, maxU, maxV,        // bottom right
+		0.0, 0.0, 0.0, minU, maxV,               // bottom left
 	};
-    // clang-format on
-}
-
-VertArrayRect MakeLineVertices(Vector2f pixelPosStart, Vector2f pixelPosEnd, f32 thickness) {
-    // Vector2f delta = pixelPosStart - pixelPosEnd;
-    // f32 norm = 1/delta.len();
-    // f32 dx = delta.x() * norm;
-    // f32 dy = delta.y() * norm;
-    // f32 dx = delta.x();
-    // f32 dy = delta.y();
-    //
-    // dx *= (thickness / 2.0);
-    // dy *= (thickness / 2.0);
-    //
-    // f32 x1 = pixelPosStart.x() + dx + dy;
-    // f32 y1 = pixelPosStart.y() + dy - dx;
-    // f32 x2 = pixelPosStart.x() + dx - dy;
-    // f32 y2 = pixelPosStart.y() + dy + dx;
-    //
-    // f32 x3 = pixelPosStart.x() - dx + dy;
-    // f32 y3 = pixelPosStart.y() - dy - dx;
-    // f32 x4 = pixelPosStart.x() - dx - dy;
-    // f32 y4 = pixelPosStart.y() - dy + dx;
-    //
-    f32 depth = depthToFloat(Depth::Debug);
-
-    // // clang-format off
-    // return {
-    //     x2, y2, depth, 0.0, 0.0,
-    //     x4, y4, depth, 0.0, 0.0,
-    //     x1, y1, depth, 0.0, 0.0,
-    //     x3, y3, depth, 0.0, 0.0
-    // };
-    // // clang-format on
-
-    pixelPosStart += Vector::unitfLeft;
-
-    // clang-format off
-    return {
-        pixelPosEnd.x() + thickness, pixelPosEnd.y() , depth, 0.0, 0.0, // TR
-        pixelPosStart.x(), pixelPosEnd.y(), depth, 0.0, 0.0, //TL
-        pixelPosEnd.x() + thickness, pixelPosStart.y(), depth, 0.0, 0.0, // BR
-        pixelPosStart.x(), pixelPosStart.y(), depth, 0.0, 0.0  // BL
-    };
     // clang-format on
 }
 
