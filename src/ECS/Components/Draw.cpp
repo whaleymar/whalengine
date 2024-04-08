@@ -25,17 +25,17 @@ void Sprite::updateVertices() {
     const f32 width = getPixelSize(frameSizeTexels.x(), scale.x());
     const f32 height = getPixelSize(frameSizeTexels.y(), scale.y());
 
-    Vector2f sheetSize = toFloatVec(GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getSize());
+    Vector2f sheetSize = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getSize();
     f32 scaleX = 1 / sheetSize.x();
     f32 scaleY = 1 / sheetSize.y();
 
-    Vector2f pixelOffset = toFloatVec(atlasPositionTexels) * PIXELS_PER_TEXEL;
-    f32 xMin = pixelOffset.x() * scaleX;
-    f32 xMax = (pixelOffset.x() + frameSizeTexels.x() * PIXELS_PER_TEXEL) * scaleX;
-    f32 yMin = pixelOffset.y() * scaleY;
-    f32 yMax = (pixelOffset.y() + frameSizeTexels.y() * PIXELS_PER_TEXEL) * scaleY;
+    Vector2f texelOffset = toFloatVec(atlasPositionTexels);
+    f32 xMin = texelOffset.x() * scaleX;
+    f32 xMax = (texelOffset.x() + frameSizeTexels.x()) * scaleX;
+    f32 yMin = texelOffset.y() * scaleY;
+    f32 yMax = (texelOffset.y() + frameSizeTexels.y()) * scaleY;
 
-    mVertices = MakeRectVertices(width, height, xMin, xMax, yMin, yMax);
+    mVertices = MakeRectVertices(width, height, xMin, xMax, yMax, yMin);
 }
 
 Draw::Draw(s32 depth_) : depth(depth_) {

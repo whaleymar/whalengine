@@ -4,7 +4,7 @@
 #include "stb/stb_image.h"
 
 Image::Image(const char* path) : mPath(path) {
-    mData = stbi_load(path, &mWidth, &mHeight, &mHeight, 0);
+    mData = stbi_load(path, &mWidth, &mHeight, &mNChannels, 0);
 }
 
 Image::~Image() {

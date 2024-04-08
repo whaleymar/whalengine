@@ -12,6 +12,7 @@
 #include "ECS/Lib/ECS.h"
 #include "ECS/Systems/CollisionManager.h"
 #include "ECS/Systems/Controller.h"
+#include "ECS/Systems/DrawManager.h"
 #include "ECS/Systems/Gfx.h"
 #include "ECS/Systems/PathController.h"
 #include "ECS/Systems/Physics.h"
@@ -35,12 +36,14 @@ void MainLoop(GLFWwindow* window) {
     auto controlSystemFree = ecs.registerSystem<ControllerSystemFree>();
     auto pathSystem = ecs.registerSystem<PathControllerSystem>();
     auto physicsSystem = ecs.registerSystem<PhysicsSystem>();
+    auto spriteSystem = ecs.registerSystem<SpriteSystem>();
+    auto drawSystem = ecs.registerSystem<DrawSystem>();
 
     // single-component systems for running psuedo-destructors:
     auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
     auto solidBodyMgr = ecs.registerSystem<SolidBodyManager>();
-    auto spriteSystem = ecs.registerSystem<SpriteSystem>();
-    auto drawSystem = ecs.registerSystem<DrawSystem>();
+    auto spriteMgr = ecs.registerSystem<SpriteManager>();
+    auto drawMgr = ecs.registerSystem<DrawManager>();
 
     auto player = ecs.entity().value();
     player.add<Position>(Position::tiles(15, 10));
@@ -110,7 +113,7 @@ void MainLoop(GLFWwindow* window) {
         controlSystemFree->update();
         pathSystem->update();
         physicsSystem->update();
-        rigidBodyMgr->update();
+        rigidBodyMgr->update();  // this doesn't need to run every frame
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

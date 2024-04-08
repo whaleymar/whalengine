@@ -2,10 +2,8 @@
 
 #include <GL/gl.h>
 #include <format>
-#include <memory>
 
 #include "Util/FileIO.h"
-#include "Util/Image.h"
 
 namespace whal {
 
@@ -24,7 +22,8 @@ std::optional<Error> Texture::loadAtlas(const char* texturePath) {
         return Error(std::format("%s does not exist", texturePath));
     }
 
-    mAtlas = TextureAtlas(texturePath);
+    Image img(texturePath);
+    mAtlas = TextureAtlas(texturePath, img);
 
     bind();
 
@@ -36,15 +35,14 @@ std::optional<Error> Texture::loadAtlas(const char* texturePath) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    auto size = getSize();
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x(), size.y(), 0, GL_RGBA, GL_UNSIGNED_BYTE, mAtlas->getImageData());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.getData());
 
     mIsValid = true;
 
     return std::nullopt;
 }
 
-Vector2i Texture::getSize() const {
+Vector2f Texture::getSize() const {
     return mAtlas->getSize();
 }
 
@@ -56,18 +54,15 @@ bool Texture::isValid() const {
     return mAtlas != std::nullopt;
 }
 
-TextureAtlas::TextureAtlas(const char* filename) : mImage(std::make_unique<Image>(filename)) {
+TextureAtlas::TextureAtlas(const char* filename, Image& img) {
+    mSize = {static_cast<f32>(img.width()), static_cast<f32>(img.height())};
     // TODO
     mIsTrimEnabled = false;
     mIsRotateEnabled = false;
 }
 
-Vector2i TextureAtlas::getSize() const {
-    return {mImage->width(), mImage->height()};
-}
-
-const u8* TextureAtlas::getImageData() const {
-    return mImage->getData();
+Vector2f TextureAtlas::getSize() const {
+    return mSize;
 }
 
 }  // namespace whal

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+// #include <memory>
 #include <optional>
 
 #include "Gfx/IUseOpenGLHandle.h"
@@ -12,13 +12,11 @@ namespace whal {
 
 class TextureAtlas {
 public:
-    TextureAtlas(const char* filename);
-
-    Vector2i getSize() const;
-    const u8* getImageData() const;
+    TextureAtlas(const char* filename, Image& img);
+    Vector2f getSize() const;
 
 private:
-    std::unique_ptr<Image> mImage;
+    Vector2f mSize;
     bool mIsTrimEnabled;
     bool mIsRotateEnabled;
 };
@@ -29,7 +27,7 @@ public:
     // ~Texture(); // TODO free handles?
 
     std::optional<Error> loadAtlas(const char* texturePath);
-    Vector2i getSize() const;
+    Vector2f getSize() const;
     void bind() const;
     bool isValid() const;
 
