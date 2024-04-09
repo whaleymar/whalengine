@@ -18,26 +18,29 @@ namespace whal {
 void SpriteSystem::update(){};
 
 void SpriteSystem::drawEntities() {
-    auto program = GLResourceManager::getInstance().getProgram(SHNAME_SPRITE);
+    auto program = GLResourceManager::getInstance().getProgram(SHNAME_SPRITE_RGB);
     GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).bind();
     program.useProgram();
     // TODO sort by depth
     for (auto const& [entityid, entity] : getEntities()) {
         Position& pos = entity.get<Position>();
-        Sprite& draw = entity.get<Sprite>();
+        Sprite& sprite = entity.get<Sprite>();
+        if (sprite.isVertsUpdateNeeded) {
+            sprite.updateVertices();
+        }
 
         // position is the center, but openGL expects position of the top left corner
         // TODO clamp to texel grid
-        Vector2f drawOffset = toFloatVec(draw.frameSizeTexels * PIXELS_PER_TEXEL) * Vector2f(-0.5, 0.5);
+        Vector2f drawOffset = toFloatVec(sprite.frameSizeTexels * PIXELS_PER_TEXEL) * Vector2f(-0.5, 0.5);
         Vector2f floatPos = (toFloatVec(pos.e) + drawOffset);
         glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
 
-        draw.vao.bind();
-        auto vertices = draw.getVertices();
-        draw.vbo.buffer(vertices.data(), vertices.size() * sizeof(float));
+        sprite.vao.bind();
+        auto vertices = sprite.getVertices();
+        sprite.vbo.buffer(vertices.data(), vertices.size() * sizeof(float));
 
         updateShaderVars(program);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, draw.nVertices);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, sprite.nVertices);
     }
 }
 

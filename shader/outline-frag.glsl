@@ -1,12 +1,12 @@
 #version 330
 
-uniform sampler2D texture1;
-
+in vec3 fragColor;
 in vec2 fragTexCoord;
 
 out vec4 outputColor;
 
 float inborder(vec2 vec) {
+    // TODO i think i need to normalize based on entity size. Lines have varying thickness
     float width = 0.05;
     float maxV = 1. - width;
     float minV = width;
@@ -18,5 +18,5 @@ float inborder(vec2 vec) {
 
 void main() {
     float d = inborder(fragTexCoord);
-    outputColor =vec4(1., 0., 0., d); 
+    outputColor = vec4(fragColor, d);
 }

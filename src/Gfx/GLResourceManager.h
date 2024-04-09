@@ -39,7 +39,7 @@ private:
     std::vector<std::string> mTextureNames;
 };
 
-std::optional<Error> createAndRegisterShader(const char* vertexPath, const char* fragmentPath, const char* shaderName);
+std::optional<Error> createAndRegisterShader(const char* vertexPath, const char* fragmentPath, const char* shaderName, VertexInfo vInfo);
 std::optional<Error> createAndRegisterTexture(const char* atlasPath, const char* textureName);
 
 }  // namespace whal

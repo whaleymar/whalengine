@@ -4,8 +4,7 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 # To Do 
 
 ## Current Goal: Textures and Animations
-- static sprite entities
-- dynamic color values
+- set sprite based on atlas metadata
 - animation system
 
 ## Systems

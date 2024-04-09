@@ -50,7 +50,7 @@ void drawCollider(ShaderProgram program, const IUseCollision* collider) {
     glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
 
     aabb.vao.bind();
-    auto vertices = MakeRectVertices(aabb.mHalf.x() * 2, aabb.mHalf.y() * 2);
+    auto vertices = MakeRectVerticesRGBUV(aabb.mHalf.x() * 2, aabb.mHalf.y() * 2, Depth::Debug, Color::RED);
     aabb.vbo.buffer(vertices.data(), vertices.size() * sizeof(float));
 
     updateShaderVars(program);

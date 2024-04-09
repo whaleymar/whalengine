@@ -17,6 +17,7 @@
 #include "ECS/Systems/PathController.h"
 #include "ECS/Systems/Physics.h"
 
+#include "Gfx/Color.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 
@@ -52,6 +53,7 @@ void MainLoop(GLFWwindow* window) {
     s32 height = 16;
     auto playerDraw = Sprite();
     playerDraw.setFrameSize(width, height);
+    // playerDraw.setColor(Color::EMERALD);
     player.add<Sprite>(playerDraw);
     player.add<PlayerControlRB>();
     // entity.add<PlayerControlFree>();
@@ -65,7 +67,7 @@ void MainLoop(GLFWwindow* window) {
     whal::ecs::Entity blockPrefab = ecs.entity().value();
     blockPrefab.add<Position>();
     blockPrefab.add<Velocity>();
-    blockPrefab.add<Draw>();
+    blockPrefab.add<Draw>(Draw(Depth::Player, Color::MAGENTA));
     blockPrefab.add<SolidBody>();
 
     whal::ecs::Entity block;
@@ -157,19 +159,25 @@ int main() {
     print<Format({"", "\n"})>("Loaded OpenGL ", GLAD_VERSION_MAJOR(version), ".", GLAD_VERSION_MINOR(version));
 
     // Load Shaders
-    auto err = createAndRegisterShader(VERTEX_SHADER_PATH, FRAG_SPRITE_SHADER_PATH, SHNAME_SPRITE);
+    auto err = createAndRegisterShader(VERTEX_RGBUV_SHADER_PATH, FRAG_SPRITE_RGB_SHADER_PATH, SHNAME_SPRITE_RGB, VertexInfo::RGBUV);
     if (err) {
         print("Failed to register shader. Got error:\n", *err);
         return -1;
     }
 
-    err = createAndRegisterShader(VERTEX_SHADER_PATH, FRAG_OUTLINE_SHADER_PATH, SHNAME_DEBUG);
+    err = createAndRegisterShader(VERTEX_UV_SHADER_PATH, FRAG_SPRITE_SHADER_PATH, SHNAME_SPRITE, VertexInfo::UV);
     if (err) {
         print("Failed to register shader. Got error:\n", *err);
         return -1;
     }
 
-    err = createAndRegisterShader(VERTEX_SHADER_PATH, FRAG_COLOR_SHADER_PATH, SHNAME_COLOR);
+    err = createAndRegisterShader(VERTEX_RGBUV_SHADER_PATH, FRAG_OUTLINE_SHADER_PATH, SHNAME_DEBUG, VertexInfo::RGBUV);
+    if (err) {
+        print("Failed to register shader. Got error:\n", *err);
+        return -1;
+    }
+
+    err = createAndRegisterShader(VERTEX_RGB_SHADER_PATH, FRAG_COLOR_SHADER_PATH, SHNAME_COLOR, VertexInfo::RGB);
     if (err) {
         print("Failed to register shader. Got error:\n", *err);
         return -1;

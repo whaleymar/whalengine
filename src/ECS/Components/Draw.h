@@ -9,39 +9,42 @@ class Texture;
 
 // hard coded as rectangles until I need something else
 struct Sprite {
-    Sprite(s32 depth_ = 0, Vector2i atlasPositionTexels_ = {0, 0});
+    Sprite(Depth depth_ = Depth::Player, Vector2i atlasPositionTexels_ = {0, 0}, RGB rgb = Color::WHITE);
 
     u32 nVertices = N_VERTS_RECT;
     Vao vao;
     Vbo vbo;
-    s32 depth;
+    Depth depth;
     Vector2i atlasPositionTexels = {0, 0};
     Vector2f scale = {1, 1};
     Vector2i frameSizeTexels = {8, 8};
-    bool isVertsUpdateNeeded = false;  // anim or scale changed
+    RGB color;
+    bool isVertsUpdateNeeded = false;  // anim, size, color, and/or scale changed
 
-    VertArrayRect getVertices() const { return mVertices; }
+    VertArrayRectRGBUV getVertices() const { return mVertices; }
     void updateVertices();
-    void setFrameSize(s32, s32);
+    void setFrameSize(s32 x, s32 y);
+    void setColor(RGB rgb);
 
 private:
-    VertArrayRect mVertices;
+    VertArrayRectRGBUV mVertices;
 };
 
 struct Draw {
-    Draw(s32 depth_ = 0);
+    Draw(Depth depth_ = Depth::Player, RGB color_ = Color::WHITE);
     u32 nVertices = N_VERTS_RECT;
     Vao vao;
     Vbo vbo;
-    s32 depth;
+    Depth depth;
+    RGB color;
     Vector2i frameSizeTexels = {8, 8};
 
-    VertArrayRect getVertices() const { return mVertices; }
+    VertArrayRectRGB getVertices() const { return mVertices; }
     void updateVertices();
     void setFrameSize(s32, s32);
 
 private:
-    VertArrayRect mVertices;
+    VertArrayRectRGB mVertices;
 };
 
 }  // namespace whal

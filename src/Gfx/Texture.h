@@ -1,6 +1,5 @@
 #pragma once
 
-// #include <memory>
 #include <optional>
 
 #include "Gfx/IUseOpenGLHandle.h"
@@ -24,7 +23,6 @@ private:
 class Texture : public IUseOpenGLHandle {
 public:
     Texture();
-    // ~Texture(); // TODO free handles?
 
     std::optional<Error> loadAtlas(const char* texturePath);
     Vector2f getSize() const;

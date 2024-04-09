@@ -30,11 +30,16 @@ static constexpr f32 WINDOW_HEIGHT_TEXELS = WINDOW_HEIGHT_PIXELS / PIXELS_PER_TE
 static constexpr f32 WINDOW_WIDTH_TILES = WINDOW_WIDTH_TEXELS / TEXELS_PER_TILE;
 static constexpr f32 WINDOW_HEIGHT_TILES = WINDOW_HEIGHT_TEXELS / TEXELS_PER_TILE;
 
-static const char* VERTEX_SHADER_PATH = "shader/vertex.glsl";
+static const char* VERTEX_UV_SHADER_PATH = "shader/vertex-uv.glsl";
+static const char* VERTEX_RGB_SHADER_PATH = "shader/vertex-rgb.glsl";
+static const char* VERTEX_RGBUV_SHADER_PATH = "shader/vertex-rgbuv.glsl";
 static const char* FRAG_SPRITE_SHADER_PATH = "shader/sprite-frag.glsl";
+static const char* FRAG_SPRITE_RGB_SHADER_PATH = "shader/sprite-rgb-frag.glsl";
 static const char* FRAG_OUTLINE_SHADER_PATH = "shader/outline-frag.glsl";
 static const char* FRAG_COLOR_SHADER_PATH = "shader/coloronly-frag.glsl";
 
+// TODO do an enum
+static const char* SHNAME_SPRITE_RGB = "spritergb";
 static const char* SHNAME_SPRITE = "sprite";
 static const char* SHNAME_DEBUG = "debug";
 static const char* SHNAME_COLOR = "color";

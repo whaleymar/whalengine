@@ -52,8 +52,8 @@ s32 GLResourceManager::getTextureIndex(std::string name) const {
     return -1;
 }
 
-std::optional<Error> createAndRegisterShader(const char* vertexPath, const char* fragmentPath, const char* shaderName) {
-    Expected<ShaderProgram> program = createShader(vertexPath, fragmentPath);
+std::optional<Error> createAndRegisterShader(const char* vertexPath, const char* fragmentPath, const char* shaderName, VertexInfo vInfo) {
+    Expected<ShaderProgram> program = createShader(vertexPath, fragmentPath, vInfo);
     if (!program.isExpected()) {
         return program.error();
     }

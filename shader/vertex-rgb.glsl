@@ -3,12 +3,11 @@
 uniform mat4 projection;
 
 uniform vec2 offset;
-uniform vec2 halfScreen;
 
 in vec3 vert;
-in vec2 vertTexCoord;
+in vec3 vertColor;
 
-out vec2 fragTexCoord;
+out vec3 fragColor;
 
 void main() {
     // idk why i need to flip the y coord
@@ -16,5 +15,6 @@ void main() {
     vec4 totalOffset = projection * vec4(offset.x, -1.*offset.y, 0., 0.) + vec4(0., -2., 0., 0.);
     gl_Position = projection * vec4(vert.xy, 0., 1.) + totalOffset;
 
-    fragTexCoord = vertTexCoord;
+    fragColor = vertColor;
 }
+
