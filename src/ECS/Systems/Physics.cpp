@@ -65,6 +65,7 @@ void PhysicsSystem::update() {
 
         // I can split this into separate systems if this gets slow
         if (rb) {
+            bool wasGrounded = rb.value()->collider.isGrounded();
             rb.value()->collider.setGrounded(false);
 
             // no callback needed when actor moves into solid
@@ -85,9 +86,17 @@ void PhysicsSystem::update() {
                     // a little lower than 0 while applying reduced gravity
                     rb.value()->isJumping = false;
                 }
+
+                if (wasGrounded && !rb.value()->isJumping) {
+                    rb.value()->coyoteSecondsRemaining = rb.value()->coyoteTimeSecondsMax;
+                } else if (rb.value()->coyoteSecondsRemaining > 0) {
+                    rb.value()->coyoteSecondsRemaining -= dt;
+                }
+
                 applyGravity(vel, dt, rb.value()->isJumping);
+
                 if (isMomentumStored) {
-                    vel.stable += rb.value()->collider.getMomentum() * dt;
+                    vel.stable += rb.value()->collider.getMomentum() * dt;  // TODO scaling by dt feels wrong
                     rb.value()->collider.resetMomentum();
                 }
 

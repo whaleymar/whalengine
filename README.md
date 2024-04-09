@@ -10,7 +10,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 ## Systems
 - sound\*
 - lighting\*
-- textures (part of Gfx System)\*\*
 - animation (part of Gfx System)
 
 ## Components
@@ -27,17 +26,17 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - player
 - camera
 
-## Errors
-- image lib has exceptions
+## Physics
+- jump corner correction
+- end jump if head bonk
 
 ## Non-ECS Systems
-- Scenes
-    - hot reloading
 - chunk loading/unloading
 - loading entity/map from file
     - definitely figure out level editor first
+    - Scenes
+        - hot reloading
 - text rendering\*\*
-- PNG parser 
 - Level editor\*\*
 
 ## Misc
