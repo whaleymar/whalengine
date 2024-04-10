@@ -10,7 +10,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 ## Systems
 - sound\*
 - lighting\*
-- animation (part of Gfx System)
 
 ## Components
 - Follow

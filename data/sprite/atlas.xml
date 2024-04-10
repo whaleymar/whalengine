@@ -2,8 +2,11 @@
 	<trim>false</trim>
 	<rotate>false</trim>
 	<tex n="atlas0">
-		<img n="actor/grant-run" x="0" y="0" w="64" h="16" />
-		<img n="tile/purpledirt" x="65" y="0" w="8" h="8" />
-		<img n="tile/dirtblock" x="74" y="0" w="8" h="8" />
+		<img n="actor/player-run4" x="0" y="0" w="16" h="16" />
+		<img n="actor/player-run3" x="0" y="17" w="16" h="16" />
+		<img n="actor/player-run2" x="0" y="34" w="16" h="16" />
+		<img n="actor/player-run1" x="0" y="17" w="16" h="16" />
+		<img n="tile/purpledirt" x="0" y="51" w="8" h="8" />
+		<img n="tile/dirtblock" x="0" y="60" w="8" h="8" />
 	</tex>
 </atlas>

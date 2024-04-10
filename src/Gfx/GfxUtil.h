@@ -45,6 +45,7 @@ static const char* SHNAME_DEBUG = "debug";
 static const char* SHNAME_COLOR = "color";
 
 static const char* SPRITE_TEXTURE_PATH = "data/sprite/atlas0.png";
+static const char* ATLAS_METADATA_PATH = "data/sprite/atlas.xml";
 
 static const char* TEXNAME_SPRITE = "sprite";
 

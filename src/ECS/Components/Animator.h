@@ -12,25 +12,48 @@ class Entity;
 
 struct Animator;
 struct Animation;
+struct Frame;
 
-using AnimLogic = bool (*)(Animator& anim, ecs::Entity entity);
+using AnimBrain = bool (*)(Animator& animator, ecs::Entity entity);
 
+bool basicAnimation(Animator& animator, ecs::Entity entity);
+
+/*
+ * the animator controls which animation an entity is using and handles frame-advancing
+ * it contains a list of animations + a "brain" function which handles state changes
+ *
+ * constraint: all animations have the same dimensions
+ */
 struct Animator {
-    Vector2i currentPositionTexels = {0, 0};
-    f32 fps = 4.0;
-    std::vector<Animation> animations;
-    // TODO design decision: require animation frames to be adjacent to each other? Base everything off of a root position + offsets?
-    // should be based on tool i use to stitch textures
+    Animator() = default;
+    Animator(std::vector<Animation> animations_);
 
-    // a "brain" function takes an animator + entity and chooses when to change frames
-    AnimLogic* brain = nullptr;
+    std::vector<Animation> animations;
+    s32 curAnimIx = 0;
+    AnimBrain brain = &basicAnimation;
+
+    Frame getFrame() const;
 };
 
+// an animation is a sequence of same-sized frames
 struct Animation {
+    Animation();
+    Animation(const char* name, std::vector<Frame> frames);
+
+    void next();
+    Frame getFrame() const;
+
     const char* name;
-    const s32 nFrames;
-    Vector2i rootAtlasPositionPixels;
-    Vector2i dimensionsPixels;
+    s32 nFrames;
+    f32 secondsPerFrame = 0.25;
+    std::vector<Frame> frames;
+    s32 curFrameIx = 0;
+    f32 curFrameDuration = 0.0;
+};
+
+struct Frame {
+    Vector2i atlasPositionTexels;
+    Vector2i dimensionsTexels;
 };
 
 }  // namespace whal

@@ -25,6 +25,7 @@ target_include_directories(engine
     PUBLIC src
     PUBLIC "${PROJECT_SOURCE_DIR}/lib/glad/include"
     PUBLIC "${PROJECT_SOURCE_DIR}/lib/stb"
+    PUBLIC "${PROJECT_SOURCE_DIR}/lib/RapidXML"
     # PUBLIC "${PROJECT_SOURCE_DIR}/lib/LibNerve/Include"
     )
 

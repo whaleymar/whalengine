@@ -4,12 +4,13 @@
 // clang-format on
 
 #include "ECS/Components/Draw.h"
-#include "ECS/Components/PlayerControl.h"
 #include "ECS/Components/Position.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Velocity.h"
+#include "ECS/Entities/Player.h"
 #include "ECS/Lib/ECS.h"
+#include "ECS/Systems/Animation.h"
 #include "ECS/Systems/CollisionManager.h"
 #include "ECS/Systems/Controller.h"
 #include "ECS/Systems/DrawManager.h"
@@ -39,6 +40,7 @@ void MainLoop(GLFWwindow* window) {
     auto physicsSystem = ecs.registerSystem<PhysicsSystem>();
     auto spriteSystem = ecs.registerSystem<SpriteSystem>();
     auto drawSystem = ecs.registerSystem<DrawSystem>();
+    auto animationSystem = ecs.registerSystem<AnimationSystem>();
 
     // single-component systems for running psuedo-destructors:
     auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
@@ -46,17 +48,9 @@ void MainLoop(GLFWwindow* window) {
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
     auto drawMgr = ecs.registerSystem<DrawManager>();
 
-    auto player = ecs.entity().value();
-    player.add<Position>(Position::tiles(15, 10));
-    player.add<Velocity>();
+    auto player = createPlayer();
     s32 width = 16;
     s32 height = 16;
-    auto playerDraw = Sprite();
-    playerDraw.setFrameSize(width, height);
-    // playerDraw.setColor(Color::EMERALD);
-    player.add<Sprite>(playerDraw);
-    player.add<PlayerControlRB>();
-    // entity.add<PlayerControlFree>();
 
     auto halfLenX = PIXELS_PER_TEXEL * width / 4;
     auto halfLenY = PIXELS_PER_TEXEL * height / 2;
@@ -120,6 +114,7 @@ void MainLoop(GLFWwindow* window) {
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        animationSystem->update();
         spriteSystem->drawEntities();
         drawSystem->drawEntities();
 #ifndef NDEBUG

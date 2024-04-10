@@ -15,7 +15,8 @@ void AnimationSystem::update() {
         auto& draw = entity.get<Sprite>();
 
         if ((*anim.brain)(anim, entity)) {
-            draw.atlasPositionTexels = anim.currentPositionTexels;
+            const Frame frame = anim.getFrame();
+            draw.atlasPositionTexels = frame.atlasPositionTexels;
             draw.isVertsUpdateNeeded = true;
         }
     }
