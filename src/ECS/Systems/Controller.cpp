@@ -12,6 +12,7 @@ namespace whal {
 void ControllerSystemRB::update() {
     auto& input = Input::getInstance();
     f32 dt = Deltatime::getInstance().get();
+    bool isJumpUsed = false;
     for (auto& [entityid, entity] : getEntities()) {
         Velocity& vel = entity.get<Velocity>();
         RigidBody& rb = entity.get<RigidBody>();
@@ -28,7 +29,7 @@ void ControllerSystemRB::update() {
         if (input.isJump()) {
             if ((rb.collider.isGrounded() || rb.coyoteSecondsRemaining > 0) && !input.isJumpUsed()) {
                 rb.isJumping = true;
-                input.useJump();
+                isJumpUsed = true;
 
                 if (vel.stable.y() < 0) {
                     vel.stable.e[1] = 0;
@@ -54,6 +55,11 @@ void ControllerSystemRB::update() {
         impulseX *= control.moveSpeed;
 
         vel.impulse += Vector2f(impulseX, impulseY);
+    }
+    if (isJumpUsed) {
+        // use jump after all entities have processed inputs
+        // so multiple entities can jump
+        input.useJump();
     }
 }
 

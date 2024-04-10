@@ -5,7 +5,8 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 
 ## Current Goal: Textures and Animations
 - set sprite based on atlas metadata
-- animation system
+- player animation brain
+- reorganize animation code
 
 ## Systems
 - sound\*
@@ -39,7 +40,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - Level editor\*\*
 
 ## Misc
-- give vertices a color component (+ isVerticesUpdateNeeded in Draw component)
 - ECS lib tasks
 - make this an actual framework 
     - move stuff in main.cpp into game class

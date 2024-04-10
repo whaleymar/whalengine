@@ -1,6 +1,7 @@
 #include "Animator.h"
 
 #include "ECS/Lib/ECS.h"
+#include "Gfx/Texture.h"
 #include "Systems/Deltatime.h"
 
 namespace whal {

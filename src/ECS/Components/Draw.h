@@ -8,6 +8,7 @@ namespace whal {
 class Texture;
 
 // hard coded as rectangles until I need something else
+// TODO take Frame instead of Vector2i for atlasPositionTexels_ (gives frame size too)
 struct Sprite {
     Sprite(Depth depth_ = Depth::Player, Vector2i atlasPositionTexels_ = {0, 0}, RGB rgb = Color::WHITE);
 
@@ -30,6 +31,7 @@ private:
     VertArrayRectRGBUV mVertices;
 };
 
+// TODO take frameSizeTexels in constructor
 struct Draw {
     Draw(Depth depth_ = Depth::Player, RGB color_ = Color::WHITE);
     u32 nVertices = N_VERTS_RECT;

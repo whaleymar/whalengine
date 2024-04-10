@@ -51,9 +51,4 @@ struct Animation {
     f32 curFrameDuration = 0.0;
 };
 
-struct Frame {
-    Vector2i atlasPositionTexels;
-    Vector2i dimensionsTexels;
-};
-
 }  // namespace whal

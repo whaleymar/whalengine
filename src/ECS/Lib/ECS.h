@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "Util/Expected.h"
+#include "Util/Print.h"
 #include "Util/Traits.h"
 #include "Util/Types.h"
 
@@ -252,6 +253,7 @@ public:
         return getComponentArray<T>(ix)->getData(entity);
     }
 
+    // TODO cpp file (next 2 funcs)
     void entityDestroyed(const Entity entity) {
         for (auto const& componentArray : mComponentArrays) {
             componentArray->entityDestroyed(entity);
@@ -517,5 +519,22 @@ template <typename T>
 bool Entity::has() const {
     return ECS::getInstance().hasComponent<T>(*this);
 }
+
+#define DEFINE_PREFAB_FACTORY(func)                                                                                                                  \
+    Expected<ecs::Entity> create##func() {                                                                                                           \
+        static ecs::Entity prefab;                                                                                                                   \
+        static bool isCached = false;                                                                                                                \
+        if (!isCached) {                                                                                                                             \
+            Expected<ecs::Entity> expected = func();                                                                                                 \
+            if (!expected.isExpected()) {                                                                                                            \
+                print("Failed to initialize prefab for function: ", func);                                                                           \
+                std::abort();                                                                                                                        \
+            }                                                                                                                                        \
+            prefab = expected.value();                                                                                                               \
+            isCached = true;                                                                                                                         \
+            return expected;                                                                                                                         \
+        }                                                                                                                                            \
+        return prefab.copy();                                                                                                                        \
+    }
 
 }  // namespace whal::ecs

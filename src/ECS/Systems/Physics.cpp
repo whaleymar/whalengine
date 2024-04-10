@@ -16,7 +16,9 @@ namespace whal {
 constexpr f32 GRAVITY = -35;
 constexpr f32 TERMINAL_VELOCITY_Y = -15;
 
-constexpr f32 FRICTION = 0.25;
+constexpr f32 FRICTION_GROUND = 0.5;
+constexpr f32 FRICTION_AIR = 0.2;
+constexpr f32 FRICTION_SECONDS_INV = 3.0;  // inverse of # secs for entity to lose (100 * FRICTION)% of their speed
 constexpr f32 IMPULSE_DAMPING_FACTOR = 0.25;
 
 constexpr f32 JUMP_PEAK_GRAVITY_MULT = 0.5;
@@ -32,8 +34,12 @@ void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
     velocity.stable.e[1] = newVelY;
 }
 
-void applyFriction(Vector2f& velocity, f32 dt) {
-    velocity.e[0] *= (1 - FRICTION * dt);
+void applyFrictionGround(Vector2f& velocity, f32 dt) {
+    velocity.e[0] *= (1 - dt * FRICTION_GROUND * FRICTION_SECONDS_INV);
+}
+
+void applyFrictionAir(Vector2f& velocity, f32 dt) {
+    velocity.e[0] *= (1 - dt * FRICTION_AIR * FRICTION_SECONDS_INV);
 }
 
 void PhysicsSystem::update() {
@@ -75,7 +81,11 @@ void PhysicsSystem::update() {
 
             // friction
             if (vel.stable.x()) {
-                applyFriction(vel.stable, dt);
+                if (rb.value()->collider.isGrounded()) {
+                    applyFrictionGround(vel.stable, dt);
+                } else {
+                    applyFrictionAir(vel.stable, dt);
+                }
             }
 
             // gravity and momentum

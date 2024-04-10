@@ -3,6 +3,7 @@
 #include "ECS/Components/Animator.h"
 #include "ECS/Components/Draw.h"
 #include "ECS/Lib/ECS.h"
+#include "Gfx/Texture.h"
 
 namespace whal {
 

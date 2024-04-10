@@ -11,8 +11,10 @@
 
 namespace whal {
 
-// TODO i want to forward declare Frame but that's not working well. Causing a lot of stuff to recompile when I edit animator. Maybe move Frame
-// somewhere else
+struct Frame {
+    Vector2i atlasPositionTexels;
+    Vector2i dimensionsTexels;
+};
 
 class TextureAtlas {
 public:

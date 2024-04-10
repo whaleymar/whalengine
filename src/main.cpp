@@ -5,7 +5,6 @@
 
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Position.h"
-#include "ECS/Components/RigidBody.h"
 #include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Entities/Player.h"
@@ -48,13 +47,17 @@ void MainLoop(GLFWwindow* window) {
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
     auto drawMgr = ecs.registerSystem<DrawManager>();
 
-    auto player = createPlayer();
-    s32 width = 16;
-    s32 height = 16;
-
-    auto halfLenX = PIXELS_PER_TEXEL * width / 4;
-    auto halfLenY = PIXELS_PER_TEXEL * height / 2;
-    player.add<RigidBody>(RigidBody(toFloatVec(player.get<Position>().e), halfLenX, halfLenY));
+    auto player = createPlayerPrefab();
+    if (!player.isExpected()) {
+        print("failed to create player due to ", player.error());
+    }
+    auto playerCopyExpected = createPlayerPrefab();
+    if (!playerCopyExpected.isExpected()) {
+        print(playerCopyExpected.error());
+    } else {
+        auto playerCopy = playerCopyExpected.value();
+        playerCopy.set(Velocity(Vector2f(5.0, 0.0)));
+    }
 
     s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
