@@ -1,5 +1,7 @@
 #include "Animator.h"
 
+#include <cstring>
+
 #include "ECS/Lib/ECS.h"
 #include "Gfx/Texture.h"
 #include "Systems/Deltatime.h"
@@ -7,33 +9,58 @@
 namespace whal {
 
 bool basicAnimation(Animator& animator, ecs::Entity entity) {
-    Animation& anim = animator.animations[0];
+    Animation& anim = animator.getAnimation();
 
-    anim.curFrameDuration += Deltatime::getInstance().get();
-    if (anim.curFrameDuration >= anim.secondsPerFrame) {
-        anim.next();
+    animator.curFrameDuration += Deltatime::getInstance().get();
+    if (animator.curFrameDuration >= anim.secondsPerFrame) {
+        animator.nextFrame();
         return true;
     }
     return false;
 }
 
-Animator::Animator(std::vector<Animation> animations_) : animations(animations_) {}
+Animator::Animator(std::vector<Animation> animations_, AnimBrain brain_) : animations(animations_), brain(brain_) {}
 
 Frame Animator::getFrame() const {
-    return animations[curAnimIx].getFrame();
+    return animations[curAnimIx].getFrame(curFrameIx);
 }
 
-Animation::Animation() : name(""), nFrames(0), frames({}){};
+Animation& Animator::getAnimation() {
+    return animations[curAnimIx];
+}
 
-Animation::Animation(const char* name_, std::vector<Frame> frames_) : name(name_), nFrames(frames_.size()), frames(frames_) {}
+void Animator::setAnimation(const char* name) {
+    s32 i = 0;
+    for (auto& animation : animations) {
+        if (strcmp(animation.name, name) == 0) {
+            curAnimIx = i;
+            return;
+        }
+        i++;
+    }
+}
 
-void Animation::next() {
-    curFrameIx = (curFrameIx + 1) % nFrames;
+void Animator::nextFrame() {
+    curFrameIx = (curFrameIx + 1) % getAnimation().getFrameCount();
     curFrameDuration = 0.0;
 }
 
-Frame Animation::getFrame() const {
-    return frames[curFrameIx];
+void Animator::resetAnimation() {
+    curFrameIx = 0;
+    curFrameDuration = 0;
+}
+
+Animation::Animation() : name(""), frames({}){};
+
+Animation::Animation(const char* name_, std::vector<Frame> frames_, f32 secondsPerFrame_)
+    : name(name_), frames(frames_), secondsPerFrame(secondsPerFrame_) {}
+
+Frame Animation::getFrame(s32 ix) const {
+    return frames[ix];
+}
+
+s32 Animation::getFrameCount() const {
+    return frames.size();
 }
 
 }  // namespace whal

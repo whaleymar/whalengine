@@ -12,7 +12,8 @@ enum Facing : u8 {
 // entity position in pixels
 struct Position {
     Vector2i e;
-    Facing facing = Facing::Left;
+    Facing facing = Facing::Left;  // left is default; draw calls flipped if facing right
+    bool isDirectionChanged = false;
 
     static Position texels(s32 x, s32 y);
     static Position tiles(s32 x, s32 y);

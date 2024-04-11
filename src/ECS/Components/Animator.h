@@ -26,29 +26,32 @@ bool basicAnimation(Animator& animator, ecs::Entity entity);
  */
 struct Animator {
     Animator() = default;
-    Animator(std::vector<Animation> animations_);
+    Animator(std::vector<Animation> animations_, AnimBrain brain_);
 
     std::vector<Animation> animations;
-    s32 curAnimIx = 0;
     AnimBrain brain = &basicAnimation;
+    s32 curAnimIx = 0;
+    s32 curFrameIx = 0;
+    f32 curFrameDuration = 0.0;
 
     Frame getFrame() const;
+    Animation& getAnimation();
+    void setAnimation(const char* name);
+    void nextFrame();
+    void resetAnimation();
 };
 
 // an animation is a sequence of same-sized frames
 struct Animation {
     Animation();
-    Animation(const char* name, std::vector<Frame> frames);
+    Animation(const char* name, std::vector<Frame> frames, f32 secondsPerFrame = 0.25);
 
-    void next();
-    Frame getFrame() const;
+    Frame getFrame(s32 ix) const;
+    s32 getFrameCount() const;
 
     const char* name;
-    s32 nFrames;
-    f32 secondsPerFrame = 0.25;
     std::vector<Frame> frames;
-    s32 curFrameIx = 0;
-    f32 curFrameDuration = 0.0;
+    f32 secondsPerFrame = 0.25;
 };
 
 }  // namespace whal

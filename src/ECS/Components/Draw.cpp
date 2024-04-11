@@ -27,7 +27,7 @@ void Sprite::setColor(RGB rgb) {
     isVertsUpdateNeeded = true;
 }
 
-void Sprite::updateVertices() {
+void Sprite::updateVertices(bool isFlipX) {
     const f32 width = getPixelSize(frameSizeTexels.x(), scale.x());
     const f32 height = getPixelSize(frameSizeTexels.y(), scale.y());
 
@@ -41,7 +41,11 @@ void Sprite::updateVertices() {
     f32 yMin = texelOffset.y() * scaleY;
     f32 yMax = (texelOffset.y() + frameSizeTexels.y()) * scaleY;
 
-    mVertices = MakeRectVerticesRGBUV(width, height, depth, color, xMin, xMax, yMax, yMin);
+    if (isFlipX) {
+        mVertices = MakeRectVerticesRGBUV(width, height, depth, color, xMax, xMin, yMax, yMin);
+    } else {
+        mVertices = MakeRectVerticesRGBUV(width, height, depth, color, xMin, xMax, yMax, yMin);
+    }
     isVertsUpdateNeeded = false;
 }
 

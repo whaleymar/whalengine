@@ -4,9 +4,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 # To Do 
 
 ## Current Goal: Textures and Animations
-- player animation brain
-- basic sprite transformations (flip, mostly)
-
 - next goal: organize main.cpp to use prefabs
 - next goal: clean up some todos
 
@@ -34,6 +31,10 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - end jump if head bonk
 - jump sometimes still happens after landing 
 - ramp up to full run speed
+
+# Animation 
+- needs cleanup + some light optimization (remove frequent string comparisons)
+- something to prevent syncing
 
 ## Non-ECS Systems
 - chunk loading/unloading

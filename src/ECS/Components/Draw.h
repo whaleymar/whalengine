@@ -24,7 +24,7 @@ struct Sprite {
     bool isVertsUpdateNeeded = false;  // anim, size, color, and/or scale changed
 
     VertArrayRectRGBUV getVertices() const { return mVertices; }
-    void updateVertices();
+    void updateVertices(bool flipX = false);
     void setFrameSize(s32 x, s32 y);
     void setColor(RGB rgb);
 

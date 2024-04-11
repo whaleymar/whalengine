@@ -18,7 +18,6 @@ constexpr f32 TERMINAL_VELOCITY_Y = -15;
 
 constexpr f32 FRICTION_GROUND = 5.0;
 constexpr f32 FRICTION_AIR = 2.0;
-// constexpr f32 IMPULSE_DAMPING_FACTOR = 0.25;
 constexpr f32 FRICTION_IMPULSE = 10.0;
 constexpr f32 MOVE_EPSILON = 0.1;
 
@@ -35,24 +34,19 @@ void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
     velocity.stable.e[1] = newVelY;
 }
 
-void applyFrictionGround(Vector2f& velocity, f32 dt) {
+void applyFriction(Vector2f& velocity, f32 frictionMultiplier) {
     if (abs(velocity.e[0]) < MOVE_EPSILON) {
         velocity.e[0] = 0.0;
     } else {
-        velocity.e[0] /= (1 + (FRICTION_GROUND * dt));
-    }
-}
-
-void applyFrictionAir(Vector2f& velocity, f32 dt) {
-    if (abs(velocity.e[0]) < MOVE_EPSILON) {
-        velocity.e[0] = 0.0;
-    } else {
-        velocity.e[0] /= (1 + (FRICTION_AIR * dt));
+        velocity.e[0] *= frictionMultiplier;
     }
 }
 
 void PhysicsSystem::update() {
     f32 dt = Deltatime::getInstance().get();
+    f32 frictionRatioGround = 1.0 / (1.0 + (FRICTION_GROUND * dt));
+    f32 frictionRatioAir = 1.0 / (1.0 + (FRICTION_AIR * dt));
+    f32 frictionRatioImpulse = 1.0 / (1.0 + (FRICTION_IMPULSE * dt));
     std::vector<ecs::Entity> needsPositionUpdateRB;
     for (auto& [entityid, entity] : getEntities()) {
         Position& pos = entity.get<Position>();
@@ -76,15 +70,16 @@ void PhysicsSystem::update() {
         Vector2f totalVelocity = vel.stable + impulse;
         f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
         f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
-        // vel.residualImpulse = impulse * (1 - IMPULSE_DAMPING_FACTOR);
-        vel.residualImpulse = impulse * (1.0 / (1.0 + (FRICTION_IMPULSE * dt)));
+        vel.residualImpulse = impulse * frictionRatioImpulse;
         vel.impulse = {0, 0};
         vel.total = totalVelocity;
 
-        if (moveX > 0) {
+        if (moveX > 0 && pos.facing != Facing::Right) {
             pos.facing = Facing::Right;
-        } else if (moveX < 0) {
+            pos.isDirectionChanged = true;
+        } else if (moveX < 0 && pos.facing != Facing::Left) {
             pos.facing = Facing::Left;
+            pos.isDirectionChanged = true;
         }
 
         // I can split this into separate systems if this gets slow
@@ -100,9 +95,9 @@ void PhysicsSystem::update() {
             // friction
             if (vel.stable.x()) {
                 if (rb.value()->collider.isGrounded()) {
-                    applyFrictionGround(vel.stable, dt);
+                    applyFriction(vel.stable, frictionRatioGround);
                 } else {
-                    applyFrictionAir(vel.stable, dt);
+                    applyFriction(vel.stable, frictionRatioAir);
                 }
             }
 

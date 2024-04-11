@@ -2,6 +2,7 @@
 
 #include "ECS/Components/Animator.h"
 #include "ECS/Components/Draw.h"
+#include "ECS/Components/Position.h"
 #include "ECS/Lib/ECS.h"
 #include "Gfx/Texture.h"
 
@@ -19,6 +20,12 @@ void AnimationSystem::update() {
             const Frame frame = anim.getFrame();
             draw.atlasPositionTexels = frame.atlasPositionTexels;
             draw.isVertsUpdateNeeded = true;
+        } else {
+            auto& pos = entity.get<Position>();
+            if (pos.isDirectionChanged) {
+                draw.isVertsUpdateNeeded = true;
+                pos.isDirectionChanged = false;
+            }
         }
     }
 }

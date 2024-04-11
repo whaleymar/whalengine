@@ -26,7 +26,7 @@ void SpriteSystem::drawEntities() {
         Position& pos = entity.get<Position>();
         Sprite& sprite = entity.get<Sprite>();
         if (sprite.isVertsUpdateNeeded) {
-            sprite.updateVertices();
+            sprite.updateVertices(pos.facing != Facing::Left);
         }
 
         // position is the center, but openGL expects position of the top left corner
