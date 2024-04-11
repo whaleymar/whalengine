@@ -18,6 +18,18 @@ namespace whal {
 //
 // this way, the only thing stored in code is animation names. Changing # of frames and file names is trivial
 
+namespace PlayerAnim {
+
+const char* IDLE = "actor/player-idle";
+const char* RUN = "actor/player-run";
+
+// bool animBrain(Animator& animator, ecs::Entity entity) {
+//     const char* curAnim = animator.animations[animator.curAnimIx].name;
+//
+// }
+
+}  // namespace PlayerAnim
+
 Expected<ecs::Entity> createPlayer() {
     auto& ecs = ecs::ECS::getInstance();
 
@@ -32,18 +44,14 @@ Expected<ecs::Entity> createPlayer() {
     // player.add<PlayerControlFree>();
 
     // graphics
-    s32 width = 16;
-    s32 height = 16;
-    auto playerDraw = Sprite();
-    playerDraw.setFrameSize(width, height);
-    // playerDraw.setColor(Color::EMERALD);
-    player.add<Sprite>(playerDraw);
-
     Animator animator;
-    AnimInfo animInfo = {{"actor/player-run", 4}};  // TODO read from file
+    AnimInfo animInfo = {{PlayerAnim::RUN, 4}};  // TODO read from file
     loadAnimations(animator, animInfo);
     player.add(animator);
+    player.add(Sprite(Depth::Player, animator.getFrame()));
 
+    s32 width = 16;
+    s32 height = 16;
     auto halfLenX = PIXELS_PER_TEXEL * width / 4;
     auto halfLenY = PIXELS_PER_TEXEL * height / 2;
     player.add<RigidBody>(RigidBody(toFloatVec(player.get<Position>().e), halfLenX, halfLenY));

@@ -16,10 +16,11 @@ namespace whal {
 constexpr f32 GRAVITY = -35;
 constexpr f32 TERMINAL_VELOCITY_Y = -15;
 
-constexpr f32 FRICTION_GROUND = 0.5;
-constexpr f32 FRICTION_AIR = 0.2;
-constexpr f32 FRICTION_SECONDS_INV = 3.0;  // inverse of # secs for entity to lose (100 * FRICTION)% of their speed
-constexpr f32 IMPULSE_DAMPING_FACTOR = 0.25;
+constexpr f32 FRICTION_GROUND = 5.0;
+constexpr f32 FRICTION_AIR = 2.0;
+// constexpr f32 IMPULSE_DAMPING_FACTOR = 0.25;
+constexpr f32 FRICTION_IMPULSE = 10.0;
+constexpr f32 MOVE_EPSILON = 0.1;
 
 constexpr f32 JUMP_PEAK_GRAVITY_MULT = 0.5;
 constexpr f32 JUMP_PEAK_SPEED_MAX = -3.5;  // once Y velocity is below this, no longer considered "jumping"
@@ -35,11 +36,19 @@ void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
 }
 
 void applyFrictionGround(Vector2f& velocity, f32 dt) {
-    velocity.e[0] *= (1 - dt * FRICTION_GROUND * FRICTION_SECONDS_INV);
+    if (abs(velocity.e[0]) < MOVE_EPSILON) {
+        velocity.e[0] = 0.0;
+    } else {
+        velocity.e[0] /= (1 + (FRICTION_GROUND * dt));
+    }
 }
 
 void applyFrictionAir(Vector2f& velocity, f32 dt) {
-    velocity.e[0] *= (1 - dt * FRICTION_AIR * FRICTION_SECONDS_INV);
+    if (abs(velocity.e[0]) < MOVE_EPSILON) {
+        velocity.e[0] = 0.0;
+    } else {
+        velocity.e[0] /= (1 + (FRICTION_AIR * dt));
+    }
 }
 
 void PhysicsSystem::update() {
@@ -57,19 +66,26 @@ void PhysicsSystem::update() {
 
         // if impulse ends, use residual
         Vector2f impulse = vel.impulse;
-        if (!impulse.x() && vel.residualImpulse.x()) {
+        if (!impulse.x() && abs(vel.residualImpulse.x()) >= MOVE_EPSILON) {
             impulse.e[0] += vel.residualImpulse.x();
         }
-        if (!impulse.y() && vel.residualImpulse.y()) {
+        if (!impulse.y() && abs(vel.residualImpulse.y()) >= MOVE_EPSILON) {
             impulse.e[1] += vel.residualImpulse.y();
         }
 
         Vector2f totalVelocity = vel.stable + impulse;
         f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
         f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
-        vel.residualImpulse = impulse * (1 - IMPULSE_DAMPING_FACTOR);
+        // vel.residualImpulse = impulse * (1 - IMPULSE_DAMPING_FACTOR);
+        vel.residualImpulse = impulse * (1.0 / (1.0 + (FRICTION_IMPULSE * dt)));
         vel.impulse = {0, 0};
         vel.total = totalVelocity;
+
+        if (moveX > 0) {
+            pos.facing = Facing::Right;
+        } else if (moveX < 0) {
+            pos.facing = Facing::Left;
+        }
 
         // I can split this into separate systems if this gets slow
         if (rb) {

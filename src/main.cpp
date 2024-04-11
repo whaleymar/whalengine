@@ -27,6 +27,7 @@
 #include "Systems/Frametracker.h"
 #include "Systems/InputHandler.h"
 
+#include "Util/MathUtil.h"
 #include "Util/Print.h"
 #include "Util/Vector.h"
 
@@ -95,6 +96,10 @@ void MainLoop(GLFWwindow* window) {
     // pathControl.checkpoints.push_back(Position::texels(0, 90));
     // pathControl.checkpoints.push_back(Position::texels(0, 5));
     // entity2.add<PathControl>(pathControl);
+
+    // for (f32 i = 0.0; i < 0.0015; i += 0.0001) {
+    //     print(i, isNearZero(i, (f32)0.0005));
+    // }
 
     auto& input = Input::getInstance();
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // GL_FILL to go back to normal

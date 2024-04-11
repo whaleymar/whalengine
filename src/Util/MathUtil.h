@@ -4,8 +4,6 @@
 #include <concepts>
 #include "Util/Types.h"
 
-#define EPSILON 0.001
-
 namespace whal {
 
 template <class T>
@@ -38,10 +36,14 @@ inline SignedNumber auto sign(SignedNumber auto const number) {
     return number < 0 ? -1 : 1;
 }
 
-// this might be broken
+// these are not working
 template <std::floating_point T>
-inline bool isNearZero(const T value, const T epsilon = EPSILON) {
-    return abs(value) < EPSILON;
+inline bool isNearZero(const T value, const T epsilon = 0.001) {
+    return abs(value) < epsilon;
+}
+
+inline bool isNearZerof(const f32 value, const f32 epsilon) {
+    return abs(value) < epsilon;
 }
 
 // inline Number auto lerp(Number auto n1, Number auto n2, f32 t) {

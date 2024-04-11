@@ -5,6 +5,7 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 
 ## Current Goal: Textures and Animations
 - player animation brain
+- basic sprite transformations (flip, mostly)
 
 - next goal: organize main.cpp to use prefabs
 - next goal: clean up some todos
@@ -26,6 +27,7 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
     - draw, position, solidbody
 - player
 - camera
+- death plane
 
 ## Physics
 - jump corner correction
@@ -50,6 +52,7 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 ## Bugs
 - deleting player after cloning makes clone's debug collider draw location wrong (but collision works fine) -> because the componentarray data gets moved to mainting density
     - can't hold on to component pointers outside of the ECS, need to completely rethink CollisionManager
+- isNearZero not working
 
 # Tools Used
 - crunch: CLI texture packer, https://github.com/ChevyRay/crunch
