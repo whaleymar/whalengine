@@ -12,7 +12,8 @@ constexpr f32 getPixelSize(const s32 frameSize, const f32 scale) {
     return static_cast<f32>(frameSize) * PIXELS_PER_TEXEL * scale;
 }
 
-Sprite::Sprite(Depth depth_, Vector2i atlasPositionTexels_, RGB rgb) : depth(depth_), atlasPositionTexels(atlasPositionTexels_), color(rgb) {
+Sprite::Sprite(Depth depth_, Frame frame, RGB rgb)
+    : depth(depth_), atlasPositionTexels(frame.atlasPositionTexels), frameSizeTexels(frame.dimensionsTexels), color(rgb) {
     updateVertices();
 }
 

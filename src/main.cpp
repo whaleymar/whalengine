@@ -5,6 +5,7 @@
 
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Position.h"
+#include "ECS/Components/RigidBody.h"
 #include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Entities/Player.h"
@@ -47,18 +48,24 @@ void MainLoop(GLFWwindow* window) {
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
     auto drawMgr = ecs.registerSystem<DrawManager>();
 
-    auto player = createPlayerPrefab();
-    auto playerCopy = createPlayerPrefab();
-    playerCopy.set(Velocity(Vector2f(5.0, 0.0)));
-    playerCopy.get<Sprite>().setColor(Color::EMERALD);
-    // player.kill();
+    auto player = createPlayer();
+    auto playerCopyExpected = createPlayer();
+
+    // player.value().kill();  // deleting here makes the collision box wrong! see bug in readme
+    if (playerCopyExpected.isExpected()) {
+        auto playerCopy = playerCopyExpected.value();
+        playerCopy.set(Velocity(Vector2f(5.0, 0.0)));
+        playerCopy.get<Sprite>().setColor(Color::EMERALD);
+    }
 
     s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
     whal::ecs::Entity blockPrefab = ecs.entity().value();
     blockPrefab.add<Position>();
     blockPrefab.add<Velocity>();
-    blockPrefab.add<Draw>(Draw(Depth::Player, Color::MAGENTA));
+    // blockPrefab.add<Draw>(Draw(Depth::Player, Color::MAGENTA));
+    blockPrefab.add(
+        Sprite(Depth::Player, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/dirtblock").value(), Color::MAGENTA));
     blockPrefab.add<SolidBody>();
 
     whal::ecs::Entity block;

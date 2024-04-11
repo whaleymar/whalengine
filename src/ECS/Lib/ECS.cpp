@@ -13,16 +13,13 @@ Expected<Entity> ECS::entity() const {
 }
 
 void ECS::kill(Entity entity) const {
-    mSystemManager->entityDestroyed(entity);  // this goes first so onDelete can fetch components
+    mSystemManager->entityDestroyed(entity);  // this goes first so onDelete can fetch components before they're deallocated
     mEntityManager->destroyEntity(entity);
     mComponentManager->entityDestroyed(entity);
 }
 
 Expected<Entity> ECS::copy(Entity prefab) const {
     // this is probably quite slow
-    if (!prefab.isAlive()) {
-        return Error("Cannot copy deleted entity");
-    }
     Expected<Entity> newEntity = entity();
     if (!newEntity.isExpected()) {
         return newEntity;

@@ -3,19 +3,14 @@
 
 namespace whal::ecs {
 
-Entity::Entity(EntityID id) : mId(id), mIsAlive(true){};
+Entity::Entity(EntityID id) : mId(id){};
 
 Expected<Entity> Entity::copy() const {
     return ECS::getInstance().copy(*this);
 }
 
-void Entity::kill() {
+void Entity::kill() const {
     ECS::getInstance().kill(*this);
-    mIsAlive = false;
-}
-
-bool Entity::isAlive() const {
-    return mIsAlive;
 }
 
 }  // namespace whal::ecs

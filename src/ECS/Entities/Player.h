@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Util/Expected.h"
+
 namespace whal {
 
 namespace ecs {
 class Entity;
 }
 
-ecs::Entity createPlayerPrefab();
+Expected<ecs::Entity> createPlayer();
 
 }  // namespace whal

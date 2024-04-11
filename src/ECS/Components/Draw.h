@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Gfx/Texture.h"
 #include "Gfx/VertexObject.h"
 #include "Util/Vector.h"
 
@@ -10,15 +11,15 @@ class Texture;
 // hard coded as rectangles until I need something else
 // TODO take Frame instead of Vector2i for atlasPositionTexels_ (gives frame size too)
 struct Sprite {
-    Sprite(Depth depth_ = Depth::Player, Vector2i atlasPositionTexels_ = {0, 0}, RGB rgb = Color::WHITE);
+    Sprite(Depth depth_ = Depth::Player, Frame frame = {}, RGB rgb = Color::WHITE);
 
     u32 nVertices = N_VERTS_RECT;
     Vao vao;
     Vbo vbo;
     Depth depth;
-    Vector2i atlasPositionTexels = {0, 0};
+    Vector2i atlasPositionTexels;
     Vector2f scale = {1, 1};
-    Vector2i frameSizeTexels = {8, 8};
+    Vector2i frameSizeTexels;
     RGB color;
     bool isVertsUpdateNeeded = false;  // anim, size, color, and/or scale changed
 

@@ -18,7 +18,7 @@ namespace whal {
 //
 // this way, the only thing stored in code is animation names. Changing # of frames and file names is trivial
 
-Expected<ecs::Entity> PlayerPrefab() {
+Expected<ecs::Entity> createPlayer() {
     auto& ecs = ecs::ECS::getInstance();
 
     auto expected = ecs.entity();
@@ -29,7 +29,7 @@ Expected<ecs::Entity> PlayerPrefab() {
     player.add<Position>(Position::tiles(15, 10));
     player.add<Velocity>();
     player.add<PlayerControlRB>();
-    // entity.add<PlayerControlFree>();
+    // player.add<PlayerControlFree>();
 
     // graphics
     s32 width = 16;
@@ -50,7 +50,5 @@ Expected<ecs::Entity> PlayerPrefab() {
 
     return player;
 }
-
-DEFINE_PREFAB_FACTORY(PlayerPrefab);
 
 }  // namespace whal
