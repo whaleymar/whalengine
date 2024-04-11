@@ -48,16 +48,10 @@ void MainLoop(GLFWwindow* window) {
     auto drawMgr = ecs.registerSystem<DrawManager>();
 
     auto player = createPlayerPrefab();
-    if (!player.isExpected()) {
-        print("failed to create player due to ", player.error());
-    }
-    auto playerCopyExpected = createPlayerPrefab();
-    if (!playerCopyExpected.isExpected()) {
-        print(playerCopyExpected.error());
-    } else {
-        auto playerCopy = playerCopyExpected.value();
-        playerCopy.set(Velocity(Vector2f(5.0, 0.0)));
-    }
+    auto playerCopy = createPlayerPrefab();
+    playerCopy.set(Velocity(Vector2f(5.0, 0.0)));
+    playerCopy.get<Sprite>().setColor(Color::EMERALD);
+    // player.kill();
 
     s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;

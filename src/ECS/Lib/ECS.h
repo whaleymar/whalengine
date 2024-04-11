@@ -67,9 +67,11 @@ public:
     Expected<Entity> copy() const;
 
     void kill();
+    bool isAlive() const;
 
 private:
     EntityID mId = 0;
+    bool mIsAlive = false;
 };
 
 // methods run in a loop by component manager need to be virtual
@@ -520,21 +522,27 @@ bool Entity::has() const {
     return ECS::getInstance().hasComponent<T>(*this);
 }
 
+// func returns Expected<ecs::Entity>
+// prefabs still exist as regular entities in the ECS. A new one is created if the original dies
 #define DEFINE_PREFAB_FACTORY(func)                                                                                                                  \
-    Expected<ecs::Entity> create##func() {                                                                                                           \
+    ecs::Entity create##func() {                                                                                                                     \
         static ecs::Entity prefab;                                                                                                                   \
         static bool isCached = false;                                                                                                                \
-        if (!isCached) {                                                                                                                             \
+        if (!(isCached && prefab.isAlive())) {                                                                                                       \
             Expected<ecs::Entity> expected = func();                                                                                                 \
             if (!expected.isExpected()) {                                                                                                            \
-                print("Failed to initialize prefab for function: ", func);                                                                           \
+                print("Failed to initialize prefab for function: ", func, "\nDue to: ", expected.error());                                           \
                 std::abort();                                                                                                                        \
             }                                                                                                                                        \
             prefab = expected.value();                                                                                                               \
             isCached = true;                                                                                                                         \
-            return expected;                                                                                                                         \
+            return prefab;                                                                                                                           \
         }                                                                                                                                            \
-        return prefab.copy();                                                                                                                        \
+        Expected<ecs::Entity> copy = prefab.copy();                                                                                                  \
+        if (!copy.isExpected()) {                                                                                                                    \
+            print("Failed to copy entity: ", func, "\nDue to: ", copy.error());                                                                      \
+        }                                                                                                                                            \
+        return copy.value();                                                                                                                         \
     }
 
 }  // namespace whal::ecs

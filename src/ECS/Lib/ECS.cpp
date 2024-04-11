@@ -20,6 +20,9 @@ void ECS::kill(Entity entity) const {
 
 Expected<Entity> ECS::copy(Entity prefab) const {
     // this is probably quite slow
+    if (!prefab.isAlive()) {
+        return Error("Cannot copy deleted entity");
+    }
     Expected<Entity> newEntity = entity();
     if (!newEntity.isExpected()) {
         return newEntity;

@@ -8,6 +8,9 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - player animation brain
 - reorganize animation code
 
+- next goal: organize main.cpp to use prefabs
+- next goal: clean up some todos
+
 ## Systems
 - sound\*
 - lighting\*
@@ -29,6 +32,8 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 ## Physics
 - jump corner correction
 - end jump if head bonk
+- jump sometimes still happens after landing 
+- ramp up to full run speed
 
 ## Non-ECS Systems
 - chunk loading/unloading
@@ -44,10 +49,10 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - make this an actual framework 
     - move stuff in main.cpp into game class
 
-# Tools 
+# Tools Used
 - crunch: CLI texture packer, https://github.com/ChevyRay/crunch
-- BMFont: Bitmap Font Generator from truetype, https://www.angelcode.com/products/bmfont/
-- Ogmo Editor 3 / Tiled: Level Editor, https://ogmo-editor-3.github.io/ ; https://doc.mapeditor.org/en/stable/manual/layers/
+- (tentative) BMFont: Bitmap Font Generator from truetype, https://www.angelcode.com/products/bmfont/
+- (tentative) Ogmo Editor 3 / Tiled: Level Editor, https://ogmo-editor-3.github.io/ ; https://doc.mapeditor.org/en/stable/manual/layers/
 
 
 \* = unsure how this will fit into ECS / may have non-ECS component

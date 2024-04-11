@@ -52,6 +52,8 @@ void PhysicsSystem::update() {
 
         // TODO? update collider position to match position component before moving?
         // only necessary if i change position outside of PhysicsSystem
+        //
+        // -> I think i should do it. teleporting entities will be a pain otherwise
 
         // if impulse ends, use residual
         Vector2f impulse = vel.impulse;

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Util/Vector.h"
+#include "Util/Types.h"
 
 namespace whal {
 
