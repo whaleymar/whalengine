@@ -4,8 +4,7 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 # To Do 
 
 ## Current Goal: Textures and Animations
-- next goal: organize main.cpp to use prefabs
-- next goal: clean up some todos
+- next goal: clean up bugs && some todos
 
 ## Systems
 - sound\*
@@ -15,13 +14,11 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - Follow
 - Light 
 - lifetime
-- collision callback
+- collision callback (move object, kill player, play animation, etc.)
 
 ## Entity Prefabs
 - particle
     - draw, position, velocity, lifetime
-- static solid tile
-    - draw, position, solidbody
 - player
 - camera
 - death plane
@@ -51,9 +48,10 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
     - move stuff in main.cpp into game class
 
 ## Bugs
-- deleting player after cloning makes clone's debug collider draw location wrong (but collision works fine) -> because the componentarray data gets moved to mainting density
+- deleting player after cloning makes clone's debug collider draw location wrong (but collision works fine) -> because the componentarray data gets moved to maintain density
     - can't hold on to component pointers outside of the ECS, need to completely rethink CollisionManager
 - isNearZero not working
+- cppcheck issues
 
 # Tools Used
 - crunch: CLI texture packer, https://github.com/ChevyRay/crunch

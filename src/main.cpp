@@ -3,12 +3,6 @@
 #include <GLFW/glfw3.h>  // always include after glad
 // clang-format on
 
-#include "ECS/Components/Draw.h"
-#include "ECS/Components/Position.h"
-#include "ECS/Components/RigidBody.h"
-#include "ECS/Components/SolidBody.h"
-#include "ECS/Components/Velocity.h"
-#include "ECS/Entities/Player.h"
 #include "ECS/Lib/ECS.h"
 #include "ECS/Systems/Animation.h"
 #include "ECS/Systems/CollisionManager.h"
@@ -18,7 +12,6 @@
 #include "ECS/Systems/PathController.h"
 #include "ECS/Systems/Physics.h"
 
-#include "Gfx/Color.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 
@@ -27,9 +20,9 @@
 #include "Systems/Frametracker.h"
 #include "Systems/InputHandler.h"
 
-#include "Util/MathUtil.h"
 #include "Util/Print.h"
-#include "Util/Vector.h"
+
+#include "Game/DebugScene.h"
 
 using namespace whal;
 
@@ -49,57 +42,12 @@ void MainLoop(GLFWwindow* window) {
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
     auto drawMgr = ecs.registerSystem<DrawManager>();
 
-    auto player = createPlayer();
-    auto playerCopyExpected = createPlayer();
-
-    // player.value().kill();  // deleting here makes the collision box wrong! see bug in readme
-    if (playerCopyExpected.isExpected()) {
-        auto playerCopy = playerCopyExpected.value();
-        playerCopy.set(Velocity(Vector2f(5.0, 0.0)));
-        playerCopy.get<Sprite>().setColor(Color::EMERALD);
+    // load scene
+    auto err = loadDebugScene();
+    if (err) {
+        print("Error loading debug scene: ", err);
+        return;
     }
-
-    s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
-    s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
-    whal::ecs::Entity blockPrefab = ecs.entity().value();
-    blockPrefab.add<Position>();
-    blockPrefab.add<Velocity>();
-    // blockPrefab.add<Draw>(Draw(Depth::Player, Color::MAGENTA));
-    blockPrefab.add(
-        Sprite(Depth::Player, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/dirtblock").value(), Color::MAGENTA));
-    blockPrefab.add<SolidBody>();
-
-    whal::ecs::Entity block;
-    for (s32 i = 0; i < 50; i++) {
-        block = blockPrefab.copy().value();
-        block.set(Position::tiles(i, 1));
-        block.set(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
-    }
-
-    for (s32 i = 0; i < 50; i++) {
-        if (i % 7 < 4) {
-            continue;
-        }
-        block = blockPrefab.copy().value();
-        block.set(Position::tiles(i, 4));
-        block.set(SolidBody(toFloatVec(block.get<Position>().e), widthTileHL, heightTileHL));
-    }
-
-    auto entity2 = ecs.entity().value();
-    entity2.add<Position>(Position::texels(0, 16));
-    entity2.add<Velocity>();
-    entity2.add<Draw>();
-    // entity2.add<PlayerControlFree>();
-    entity2.add<SolidBody>(SolidBody(toFloatVec(entity2.get<Position>().e), widthTileHL, heightTileHL));
-
-    // auto pathControl = PathControl(10, {}, 2);
-    // pathControl.checkpoints.push_back(Position::texels(0, 90));
-    // pathControl.checkpoints.push_back(Position::texels(0, 5));
-    // entity2.add<PathControl>(pathControl);
-
-    // for (f32 i = 0.0; i < 0.0015; i += 0.0001) {
-    //     print(i, isNearZero(i, (f32)0.0005));
-    // }
 
     auto& input = Input::getInstance();
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // GL_FILL to go back to normal

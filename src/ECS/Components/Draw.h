@@ -9,7 +9,6 @@ namespace whal {
 class Texture;
 
 // hard coded as rectangles until I need something else
-// TODO take Frame instead of Vector2i for atlasPositionTexels_ (gives frame size too)
 struct Sprite {
     Sprite(Depth depth_ = Depth::Player, Frame frame = {}, RGB rgb = Color::WHITE);
 
@@ -19,7 +18,7 @@ struct Sprite {
     Depth depth;
     Vector2i atlasPositionTexels;
     Vector2f scale = {1, 1};
-    Vector2i frameSizeTexels;
+    Vector2i frameSizeTexels = {8, 8};
     RGB color;
     bool isVertsUpdateNeeded = false;  // anim, size, color, and/or scale changed
 
