@@ -18,10 +18,7 @@ void ControllerSystemRB::update() {
         Velocity& vel = entity.get<Velocity>();
         RigidBody& rb = entity.get<RigidBody>();
 
-        // TESTING
-        //
-        //
-
+#ifndef NDEBUG
         auto sprite = entity.tryGet<Sprite>();
         if (sprite) {
             bool changed = false;
@@ -45,11 +42,7 @@ void ControllerSystemRB::update() {
                 sprite.value()->isVertsUpdateNeeded = true;
             }
         }
-
-        // END TEST
-        //
-        //
-        //
+#endif
 
         f32 impulseX = 0;
         if (input.isLeft()) {

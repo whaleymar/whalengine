@@ -32,10 +32,12 @@ public:
 
     bool isJumpUsed() const { return mIsJumpUsed; }
 
+#ifndef NDEBUG
     bool isShrinkX() const { return mIsShrinkX; }
     bool isShrinkY() const { return mIsShrinkY; }
     bool isGrowX() const { return mIsGrowX; }
     bool isGrowY() const { return mIsGrowY; }
+#endif
 
     inline static std::unordered_map<int, InputType> KeyMap;
 
@@ -54,10 +56,12 @@ private:
 
     bool mIsJumpUsed = false;
 
+#ifndef NDEBUG
     bool mIsShrinkX = false;
     bool mIsShrinkY = false;
     bool mIsGrowX = false;
     bool mIsGrowY = false;
+#endif
 };
 
 }  // namespace whal

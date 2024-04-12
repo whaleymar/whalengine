@@ -50,11 +50,12 @@ bool trySetAnimation(Animator& animator, const char* animName) {
 bool brain(Animator& animator, ecs::Entity entity) {
     auto& rb = entity.get<RigidBody>();
     auto& vel = entity.get<Velocity>();
-    // auto& sprite = entity.get<Sprite>();
+    auto& sprite = entity.get<Sprite>();
+    // f32 frameCompletion = animator.curFrameDuration/animator.getAnimation().secondsPerFrame;
+    // idea: duration of current animation, use that for stretch and squish, not frame
     if (vel.total.x() != 0) {
         if (rb.collider.isGrounded()) {
             if (trySetAnimation(animator, RUN)) {
-                // sprite.scale = {0.5, 2.0};
                 return true;
             }
         } else {
@@ -70,7 +71,6 @@ bool brain(Animator& animator, ecs::Entity entity) {
         }
     } else {
         if (trySetAnimation(animator, IDLE)) {
-            // sprite.scale = {1.0, 1.0};
             return true;
         }
     }
@@ -110,9 +110,6 @@ Expected<ecs::Entity> createPlayer() {
     constexpr s32 halfLenX = PIXELS_PER_TEXEL * width / 4;
     constexpr s32 halfLenY = PIXELS_PER_TEXEL * height / 2;
     player.add<RigidBody>(RigidBody(toFloatVec(position.e) + Vector2f(0, halfLenY), halfLenX, halfLenY));
-    // player.add<RigidBody>(RigidBody(toFloatVec(position.e) + Vector2f(0, 0), halfLenX, halfLenY));
-
-    // print(position.e.x(), position.e.y(), sprite.frameSizeTexels.x(), sprite.frameSizeTexels.y());
 
     return player;
 }

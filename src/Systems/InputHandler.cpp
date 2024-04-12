@@ -38,6 +38,7 @@ void Input::set(InputType input) {
         mIsDebug = mIsDebug != true;
         break;
 
+#ifndef NDEBUG
     case InputType::SHRINKX:
         mIsShrinkX = true;
         break;
@@ -53,6 +54,7 @@ void Input::set(InputType input) {
     case InputType::GROWY:
         mIsGrowY = true;
         break;
+#endif
     }
 }
 
@@ -77,6 +79,8 @@ void Input::reset(InputType input) {
     case InputType::JUMP:
         mIsJump = false;
         break;
+
+#ifndef NDEBUG
     case InputType::SHRINKX:
         mIsShrinkX = false;
         break;
@@ -92,6 +96,7 @@ void Input::reset(InputType input) {
     case InputType::GROWY:
         mIsGrowY = false;
         break;
+#endif
 
     default:
         break;
@@ -111,10 +116,12 @@ void Input::loadMappings() const {
     KeyMap.insert({GLFW_KEY_ESCAPE, InputType::PAUSE});
     KeyMap.insert({GLFW_KEY_0, InputType::DEBUG});
 
+#ifndef NDEBUG
     KeyMap.insert({GLFW_KEY_LEFT, InputType::SHRINKX});
     KeyMap.insert({GLFW_KEY_RIGHT, InputType::GROWX});
     KeyMap.insert({GLFW_KEY_DOWN, InputType::SHRINKY});
     KeyMap.insert({GLFW_KEY_UP, InputType::GROWY});
+#endif
 }
 
 void Input::useJump() {

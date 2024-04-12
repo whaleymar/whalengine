@@ -45,7 +45,7 @@ void SpriteSystem::drawEntities() {
             sprite.updateVertices(pos.facing != Facing::Left);
         }
 
-        // position is the center, but openGL expects position of the top left corner
+        // position is the bottom-middle of the vao, but openGL expects position of the top left corner
         // TODO clamp to texel grid
         // f32 height = static_cast<f32>(sprite.frameSizeTexels.x() * PIXELS_PER_TEXEL) * sprite.scale.y();
         Vector2f drawOffset = toFloatVec(sprite.frameSizeTexels * PIXELS_PER_TEXEL) * sprite.scale * Vector2f(-0.5, 1.0);
@@ -70,7 +70,7 @@ void DrawSystem::drawEntities() {
         Position& pos = entity.get<Position>();
         Draw& draw = entity.get<Draw>();
 
-        // position is the center, but openGL expects position of the top left corner
+        // position is the bottom-middle of the vao, but openGL expects position of the top left corner
         // TODO clamp to texel grid
         Vector2f drawOffset = toFloatVec(draw.frameSizeTexels * PIXELS_PER_TEXEL) * Vector2f(-0.5, 1.0);
         Vector2f floatPos = (toFloatVec(pos.e) + drawOffset);
