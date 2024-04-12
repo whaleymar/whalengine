@@ -50,11 +50,11 @@ bool trySetAnimation(Animator& animator, const char* animName) {
 bool brain(Animator& animator, ecs::Entity entity) {
     auto& rb = entity.get<RigidBody>();
     auto& vel = entity.get<Velocity>();
-    auto& sprite = entity.get<Sprite>();
+    // auto& sprite = entity.get<Sprite>();
     if (vel.total.x() != 0) {
         if (rb.collider.isGrounded()) {
             if (trySetAnimation(animator, RUN)) {
-                sprite.scale = {0.5, 2.0};
+                // sprite.scale = {0.5, 2.0};
                 return true;
             }
         } else {
@@ -70,7 +70,7 @@ bool brain(Animator& animator, ecs::Entity entity) {
         }
     } else {
         if (trySetAnimation(animator, IDLE)) {
-            sprite.scale = {1.0, 1.0};
+            // sprite.scale = {1.0, 1.0};
             return true;
         }
     }
@@ -89,7 +89,8 @@ Expected<ecs::Entity> createPlayer() {
         return expected;
     }
     auto player = expected.value();
-    player.add<Position>(Position::tiles(15, 10));
+    Position position = Position::tiles(15, 10);
+    player.add(position);
     player.add<Velocity>();
     player.add<PlayerControlRB>();
     // player.add<PlayerControlFree>();
@@ -100,13 +101,18 @@ Expected<ecs::Entity> createPlayer() {
     loadAnimations(animator, animInfo);
     animator.brain = &PlayerAnim::brain;
     player.add(animator);
-    player.add(Sprite(Depth::Player, animator.getFrame()));
 
-    s32 width = 16;
-    s32 height = 16;
-    auto halfLenX = PIXELS_PER_TEXEL * width / 4;
-    auto halfLenY = PIXELS_PER_TEXEL * height / 2;
-    player.add<RigidBody>(RigidBody(toFloatVec(player.get<Position>().e), halfLenX, halfLenY));
+    Sprite sprite = Sprite(Depth::Player, animator.getFrame());
+    player.add(sprite);
+
+    constexpr s32 width = 16;
+    constexpr s32 height = 16;
+    constexpr s32 halfLenX = PIXELS_PER_TEXEL * width / 4;
+    constexpr s32 halfLenY = PIXELS_PER_TEXEL * height / 2;
+    player.add<RigidBody>(RigidBody(toFloatVec(position.e) + Vector2f(0, halfLenY), halfLenX, halfLenY));
+    // player.add<RigidBody>(RigidBody(toFloatVec(position.e) + Vector2f(0, 0), halfLenX, halfLenY));
+
+    // print(position.e.x(), position.e.y(), sprite.frameSizeTexels.x(), sprite.frameSizeTexels.y());
 
     return player;
 }

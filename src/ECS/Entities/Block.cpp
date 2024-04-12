@@ -23,7 +23,7 @@ Expected<ecs::Entity> createBlock(Position position) {
 
     const s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     const s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
-    block.add(SolidBody(toFloatVec(position.e), widthTileHL, heightTileHL));
+    block.add(SolidBody(toFloatVec(position.e) + Vector2f(0, heightTileHL), widthTileHL, heightTileHL));
 
     return block;
 }
@@ -42,7 +42,7 @@ Expected<ecs::Entity> createBlock(Position position, Draw draw) {
 
     const s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     const s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
-    block.add(SolidBody(toFloatVec(position.e), widthTileHL, heightTileHL));
+    block.add(SolidBody(toFloatVec(position.e) + Vector2f(0, heightTileHL), widthTileHL, heightTileHL));
 
     return block;
 }
@@ -57,11 +57,11 @@ Expected<ecs::Entity> createBlock(Position position, Sprite sprite) {
     auto block = expected.value();
 
     block.add(position);
-    block.add<Sprite>(sprite);
+    block.add(sprite);
 
     const s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     const s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
-    block.add(SolidBody(toFloatVec(position.e), widthTileHL, heightTileHL));
+    block.add(SolidBody(toFloatVec(position.e) + Vector2f(0, heightTileHL), widthTileHL, heightTileHL));
 
     return block;
 }

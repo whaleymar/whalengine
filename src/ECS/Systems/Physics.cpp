@@ -146,7 +146,7 @@ void PhysicsSystem::update() {
     for (auto& entity : needsPositionUpdateRB) {
         Position& pos = entity.get<Position>();
         RigidBody& rb = entity.get<RigidBody>();
-        pos.e = rb.collider.getCollider().getPosition();
+        pos.e = {rb.collider.getCollider().getPosition().x(), static_cast<s32>(rb.collider.getCollider().bottom())};
     }
 }
 

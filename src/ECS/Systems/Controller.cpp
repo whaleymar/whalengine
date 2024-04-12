@@ -1,5 +1,6 @@
 #include "Controller.h"
 
+#include "ECS/Components/Draw.h"
 #include "ECS/Components/PlayerControl.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Velocity.h"
@@ -16,6 +17,39 @@ void ControllerSystemRB::update() {
     for (auto& [entityid, entity] : getEntities()) {
         Velocity& vel = entity.get<Velocity>();
         RigidBody& rb = entity.get<RigidBody>();
+
+        // TESTING
+        //
+        //
+
+        auto sprite = entity.tryGet<Sprite>();
+        if (sprite) {
+            bool changed = false;
+            if (input.isShrinkX()) {
+                sprite.value()->scale.e[0] -= 0.1;
+                changed = true;
+            }
+            if (input.isShrinkY()) {
+                sprite.value()->scale.e[1] -= 0.1;
+                changed = true;
+            }
+            if (input.isGrowX()) {
+                sprite.value()->scale.e[0] += 0.1;
+                changed = true;
+            }
+            if (input.isGrowY()) {
+                sprite.value()->scale.e[1] += 0.1;
+                changed = true;
+            }
+            if (changed) {
+                sprite.value()->isVertsUpdateNeeded = true;
+            }
+        }
+
+        // END TEST
+        //
+        //
+        //
 
         f32 impulseX = 0;
         if (input.isLeft()) {
