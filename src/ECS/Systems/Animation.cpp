@@ -14,16 +14,18 @@ void AnimationSystem::update() {
         if (anim.brain == nullptr) {
             continue;
         }
-        auto& draw = entity.get<Sprite>();
+        auto& sprite = entity.get<Sprite>();
 
         if ((*anim.brain)(anim, entity)) {
+            // frame changed
             const Frame frame = anim.getFrame();
-            draw.atlasPositionTexels = frame.atlasPositionTexels;
-            draw.isVertsUpdateNeeded = true;
+            sprite.atlasPositionTexels = frame.atlasPositionTexels;
+            sprite.isVertsUpdateNeeded = true;
         } else {
+            // frame unchanged
             auto& pos = entity.get<Position>();
             if (pos.isDirectionChanged) {
-                draw.isVertsUpdateNeeded = true;
+                sprite.isVertsUpdateNeeded = true;
                 pos.isDirectionChanged = false;
             }
         }

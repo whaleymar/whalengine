@@ -19,6 +19,8 @@ namespace whal {
 // "actor/player-idle", "2", "1.0"
 //
 // this way, the only thing stored in code is animation names. Changing # of frames and file names is trivial
+//
+// per-frame duration could also be interesting, for a key-frame-like effect
 
 namespace PlayerAnim {
 
@@ -48,9 +50,11 @@ bool trySetAnimation(Animator& animator, const char* animName) {
 bool brain(Animator& animator, ecs::Entity entity) {
     auto& rb = entity.get<RigidBody>();
     auto& vel = entity.get<Velocity>();
+    auto& sprite = entity.get<Sprite>();
     if (vel.total.x() != 0) {
         if (rb.collider.isGrounded()) {
             if (trySetAnimation(animator, RUN)) {
+                sprite.scale = {0.5, 2.0};
                 return true;
             }
         } else {
@@ -66,6 +70,7 @@ bool brain(Animator& animator, ecs::Entity entity) {
         }
     } else {
         if (trySetAnimation(animator, IDLE)) {
+            sprite.scale = {1.0, 1.0};
             return true;
         }
     }

@@ -52,6 +52,7 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
     - can't hold on to component pointers outside of the ECS, need to completely rethink CollisionManager
 - isNearZero not working
 - cppcheck issues
+- depth test broken for Draw components (low priority)
 
 ## Research
 - things i might want to reconsider in the future -- ctrl+f for "RESEARCH" 
