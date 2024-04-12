@@ -103,7 +103,6 @@ std::optional<Error> TextureAtlas::init() {
     doc.parse<parse_no_entity_translation>(&xmldata[0]);
     xml_node<>* atlasNode = doc.first_node("atlas");
     if (!atlasNode) {
-        // TODO error could not find root node
         return Error("Could not find 'atlas' root node");
     }
     xml_node<>* trimNode = atlasNode->first_node("trim");

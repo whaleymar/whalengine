@@ -45,7 +45,7 @@ void MainLoop(GLFWwindow* window) {
     // load scene
     auto err = loadDebugScene();
     if (err) {
-        print("Error loading debug scene: ", err);
+        print("Error loading debug scene: ", err.value());
         return;
     }
 
@@ -72,8 +72,10 @@ void MainLoop(GLFWwindow* window) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         animationSystem->update();
-        spriteSystem->drawEntities();
+
+        // draw opaque objects, then objects with transparency (sprites) in order from farthest to closest
         drawSystem->drawEntities();
+        spriteSystem->drawEntities();
 #ifndef NDEBUG
         if (input.isDebug()) {
             drawColliders();
@@ -143,6 +145,7 @@ int main() {
 
     // glViewport(0, 0, WINDOW_WIDTH_PIXELS, WINDOW_HEIGHT_PIXELS); idk what this does
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    // glEnable(GL_DEPTH_TEST);  // not working right
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     MainLoop(window);

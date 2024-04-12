@@ -46,7 +46,24 @@ enum class Depth {
     Debug
 };
 
-constexpr f32 depthToFloat(Depth depth);
+inline constexpr f32 depthToFloat(Depth depth) {
+    switch (depth) {
+    case Depth::BackgroundFar:
+        return -0.9;
+    case Depth::BackgroundMid:
+        return -0.8;
+    case Depth::BackgroundNear:
+        return -0.7;
+    case Depth::BackgroundNoParallax:
+        return -0.1;
+    case Depth::Player:
+        return 0.0;
+    case Depth::Foreground:
+        return 0.1;
+    case Depth::Debug:
+        return 0.9;
+    }
+}
 
 VertArrayRect MakeRectVertices(f32 pixelWidth, f32 pixelHeight, Depth depth);
 VertArrayRectUV MakeRectVerticesUV(f32 pixelWidth, f32 pixelHeight, Depth depth, f32 minU = 0.0, f32 maxU = 1.0, f32 minV = 0.0, f32 maxV = 1.0);

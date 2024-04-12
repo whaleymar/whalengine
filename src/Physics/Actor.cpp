@@ -17,7 +17,7 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
 }
 
 void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback) {
-    // TODO doesn't handle colliding with other actors
+    // RESEARCH doesn't handle colliding with other actors
     s32 toMove = std::round(amount);
     auto& solids = CollisionManager::getInstance().getAllSolids();
 

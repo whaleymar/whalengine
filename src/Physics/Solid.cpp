@@ -57,7 +57,7 @@ void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, 
             f32 momentum = toMove / dt;
             actor->setMomentum(momentum, isXDirection);
         } else if (std::find(riding.begin(), riding.end(), actor) != riding.end()) {
-            // I might change this for solids moving down faster than gravity TODO
+            // I might change this for solids moving down faster than gravity RESEARCH
             actor->moveDirection(isXDirection, toMove, nullptr);
             f32 momentum = toMove / dt;
             actor->setMomentum(momentum, isXDirection);

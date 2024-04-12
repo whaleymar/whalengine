@@ -2,6 +2,7 @@
 
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Position.h"
+#include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Entities/Block.h"
 #include "ECS/Entities/Player.h"
@@ -40,6 +41,18 @@ std::optional<Error> loadDebugScene() {
         createBlock(
             Position::tiles(i, y),
             Sprite(Depth::Player, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/dirtblock").value(), Color::MAGENTA));
+    }
+
+    for (s32 i = 10; i < 15; i++) {
+        Depth d = i % 2 == 0 ? Depth::Foreground : Depth::BackgroundNoParallax;
+        auto invisBlock =
+            createBlock(Position::tiles(i, 2),
+                        Sprite(d, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/dirtblock").value(), Color::EMERALD))
+                .value();
+        invisBlock.remove<SolidBody>();
+        auto invisBlock2 = createBlock(Position::tiles(i - 5, 2), Draw(d, Color::EMERALD)).value();
+        // invisBlock.remove<SolidBody>(); // TODO after collision manager reword, check that deleting here actually removes the solidBody
+        invisBlock2.remove<SolidBody>();
     }
 
     // auto pathControl = PathControl(10, {}, 2);

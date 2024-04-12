@@ -33,25 +33,6 @@ void Vbo::free() {
     glDeleteBuffers(1, &mHandle);
 }
 
-constexpr f32 depthToFloat(Depth depth) {
-    switch (depth) {
-    case Depth::BackgroundFar:
-        return -0.9;
-    case Depth::BackgroundMid:
-        return -0.8;
-    case Depth::BackgroundNear:
-        return -0.7;
-    case Depth::BackgroundNoParallax:
-        return -0.1;
-    case Depth::Player:
-        return 0.0;
-    case Depth::Foreground:
-        return 0.1;
-    case Depth::Debug:
-        return 0.9;
-    }
-}
-
 VertArrayRect MakeRectVertices(f32 pixelWidth, f32 pixelHeight, Depth depth) {
     f32 fdepth = depthToFloat(depth);
     // clang-format off

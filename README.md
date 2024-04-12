@@ -53,6 +53,9 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - isNearZero not working
 - cppcheck issues
 
+## Research
+- things i might want to reconsider in the future -- ctrl+f for "RESEARCH" 
+
 # Tools Used
 - crunch: CLI texture packer, https://github.com/ChevyRay/crunch
 - (tentative) BMFont: Bitmap Font Generator from truetype, https://www.angelcode.com/products/bmfont/

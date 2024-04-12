@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "Util/Expected.h"
-#include "Util/Print.h"
 #include "Util/Traits.h"
 #include "Util/Types.h"
 
@@ -106,11 +105,13 @@ public:
         // maintain density of entities
         const u32 removeIx = mEntityToIndex[entity.id()];
         const u32 lastIx = --mSize;
-        mComponentTable[removeIx] = mComponentTable[lastIx];
+        if (removeIx != lastIx) {
+            mComponentTable[removeIx] = mComponentTable[lastIx];
 
-        Entity lastEntity = mIndexToEntity[lastIx];
-        mEntityToIndex[lastEntity.id()] = removeIx;
-        mIndexToEntity[removeIx] = lastEntity.id();
+            Entity lastEntity = mIndexToEntity[lastIx];
+            mEntityToIndex[lastEntity.id()] = removeIx;
+            mIndexToEntity[removeIx] = lastEntity.id();
+        }
 
         mEntityToIndex.erase(entity.id());
         mIndexToEntity.erase(lastIx);
@@ -382,8 +383,8 @@ public:
                 mSystems[i]->mEntities.insert({entity.id(), entity});
                 mSystems[i]->onAdd(entity);
             } else if (ix != mSystems[i]->mEntities.end()) {
-                mSystems[i]->mEntities.erase(entity.id());
                 mSystems[i]->onRemove(entity);
+                mSystems[i]->mEntities.erase(entity.id());
             }
         }
     }
@@ -433,12 +434,11 @@ public:
 
     template <typename T>
     void removeComponent(const Entity entity) {
-        mComponentManager->removeComponent<T>(entity);
-
         auto pattern = mEntityManager->getPattern(entity);
         pattern.set(mComponentManager->getComponentType<T>(), false);
         mEntityManager->setPattern(entity, pattern);
         mSystemManager->entityPatternChanged(entity, pattern);
+        mComponentManager->removeComponent<T>(entity);
     }
 
     template <typename T>
