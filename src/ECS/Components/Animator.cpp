@@ -5,13 +5,16 @@
 #include "ECS/Lib/ECS.h"
 #include "Gfx/Texture.h"
 #include "Systems/Deltatime.h"
+#include "Util/Print.h"
 
 namespace whal {
 
 bool basicAnimation(Animator& animator, ecs::Entity entity) {
     Animation& anim = animator.getAnimation();
 
-    animator.curFrameDuration += Deltatime::getInstance().get();
+    f32 dt = Deltatime::getInstance().get();
+    animator.curFrameDuration += dt;
+    animator.curAnimDuration += dt;
     if (animator.curFrameDuration >= anim.secondsPerFrame) {
         animator.nextFrame();
         return true;
@@ -29,15 +32,23 @@ Animation& Animator::getAnimation() {
     return animations[curAnimIx];
 }
 
-void Animator::setAnimation(const char* name) {
-    s32 i = 0;
-    for (auto& animation : animations) {
+// TODO switch to enums for comparisons in this func + animator setter
+bool Animator::setAnimation(const char* name) {
+    if (strcmp(getAnimation().name, name) == 0) {
+        return false;
+    }
+
+    for (size_t i = 0; i < animations.size(); i++) {
+        auto& animation = animations[i];
         if (strcmp(animation.name, name) == 0) {
             curAnimIx = i;
-            return;
+            resetAnimation();
+            print("set animation:", name);
+            return true;
         }
-        i++;
     }
+    print("failed to set animation:", name);
+    return false;  // return error?
 }
 
 void Animator::nextFrame() {
@@ -46,6 +57,7 @@ void Animator::nextFrame() {
 }
 
 void Animator::resetAnimation() {
+    curAnimDuration = 0;
     curFrameIx = 0;
     curFrameDuration = 0;
 }

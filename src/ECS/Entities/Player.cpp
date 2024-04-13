@@ -1,4 +1,3 @@
-#include <cstring>
 #include "ECS/Components/AnimUtil.h"
 #include "ECS/Components/Animator.h"
 #include "ECS/Components/Draw.h"
@@ -7,6 +6,8 @@
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
+#include "Systems/Deltatime.h"
+#include "Util/MathUtil.h"
 
 #include "Gfx/GfxUtil.h"
 
@@ -26,16 +27,8 @@ namespace PlayerAnim {
 
 const char* IDLE = "actor/player-idle";
 const char* RUN = "actor/player-run";
-
-// TODO switch to enums for comparisons in this func + animator setter
-bool trySetAnimation(Animator& animator, const char* animName) {
-    if (strcmp(animator.getAnimation().name, animName) != 0) {
-        animator.setAnimation(animName);
-        animator.resetAnimation();
-        return true;
-    }
-    return false;
-}
+const char* JUMP = "actor/player-jump";
+const char* FALL = "actor/player-fall";
 
 // interesting concept to try:
 // *transition animations*
@@ -53,25 +46,33 @@ bool brain(Animator& animator, ecs::Entity entity) {
     auto& sprite = entity.get<Sprite>();
     // f32 frameCompletion = animator.curFrameDuration/animator.getAnimation().secondsPerFrame;
     // idea: duration of current animation, use that for stretch and squish, not frame
-    if (vel.total.x() != 0) {
-        if (rb.collider.isGrounded()) {
-            if (trySetAnimation(animator, RUN)) {
+
+    f32 unsquishStep = Deltatime::getInstance().get() * 1.75;
+    sprite.scale = {approach(sprite.scale.x(), 1.0, unsquishStep), approach(sprite.scale.y(), 1.0, unsquishStep)};
+    sprite.isVertsUpdateNeeded = true;
+    if (rb.collider.isGrounded()) {
+        if (rb.isLanding) {
+            sprite.scale = {1.2, 0.8};  // TODO base on landing speed
+        }
+        if (vel.total.x() != 0) {
+            if (animator.setAnimation(RUN)) {
                 return true;
             }
         } else {
-            if (rb.isJumping) {
-                if (trySetAnimation(animator, IDLE)) {  // TODO jumping
-                    return true;
-                }
-            } else {
-                if (trySetAnimation(animator, IDLE)) {  // TODO falling
-                    return true;
-                }
+            if (animator.setAnimation(IDLE)) {
+                return true;
             }
         }
     } else {
-        if (trySetAnimation(animator, IDLE)) {
-            return true;
+        if (rb.isJumping) {
+            if (animator.setAnimation(JUMP)) {
+                sprite.scale = {0.8, 1.2};
+                return true;
+            }
+        } else {
+            if (animator.setAnimation(FALL)) {
+                return true;
+            }
         }
     }
 
@@ -97,7 +98,12 @@ Expected<ecs::Entity> createPlayer() {
 
     // graphics
     Animator animator;
-    AnimInfo animInfo = {{PlayerAnim::RUN, 4, 0.25}, {PlayerAnim::IDLE, 2, 1.0}};  // TODO read from file
+    AnimInfo animInfo = {
+        {PlayerAnim::RUN, 4, 0.25},
+        {PlayerAnim::IDLE, 2, 1.0},
+        {PlayerAnim::JUMP, 1, 1.0},
+        {PlayerAnim::FALL, 1, 1.0},
+    };  // TODO read from file
     loadAnimations(animator, animInfo);
     animator.brain = &PlayerAnim::brain;
     player.add(animator);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <concepts>
 #include "Util/Types.h"
@@ -50,6 +51,13 @@ inline bool isNearZerof(const f32 value, const f32 epsilon) {
 // return (1-t) * n1 + t * n2;
 inline f32 lerp(const f32 n1, const f32 n2, const f32 t) {
     return std::lerp(n1, n2, t);
+}
+
+inline f32 approach(const f32 val, const f32 target, const f32 move) {
+    if (val <= target) {
+        return std::min(val + move, target);
+    }
+    return std::max(val - move, target);
 }
 
 }  // namespace whal

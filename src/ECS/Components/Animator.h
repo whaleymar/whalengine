@@ -31,12 +31,13 @@ struct Animator {
     std::vector<Animation> animations;
     AnimBrain brain = &basicAnimation;
     s32 curAnimIx = 0;
+    s32 curAnimDuration = 0.0;
     s32 curFrameIx = 0;
     f32 curFrameDuration = 0.0;
 
     Frame getFrame() const;
     Animation& getAnimation();
-    void setAnimation(const char* name);
+    bool setAnimation(const char* name);
     void nextFrame();
     void resetAnimation();
 };

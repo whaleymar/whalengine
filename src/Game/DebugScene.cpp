@@ -16,16 +16,16 @@ std::optional<Error> loadDebugScene() {
     using namespace whal;
 
     auto player = createPlayer();
-    auto playerCopyExpected = createPlayer();
+    // auto playerCopyExpected = createPlayer();
 
     // player.value().kill();  // deleting here makes the collision box wrong! see bug in readme
-    if (playerCopyExpected.isExpected()) {
-        auto playerCopy = playerCopyExpected.value();
-        playerCopy.set(Velocity(Vector2f(5.0, 0.0)));
-        playerCopy.get<Sprite>().setColor(Color::EMERALD);
-    } else {
-        return playerCopyExpected.error();
-    }
+    // if (playerCopyExpected.isExpected()) {
+    //     auto playerCopy = playerCopyExpected.value();
+    //     playerCopy.set(Velocity(Vector2f(5.0, 0.0)));
+    //     playerCopy.get<Sprite>().setColor(Color::EMERALD);
+    // } else {
+    //     return playerCopyExpected.error();
+    // }
 
     for (s32 i = 0; i < 50; i++) {
         createBlock(Position::tiles(i, 1));

@@ -31,7 +31,10 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 
 # Animation 
 - needs cleanup + some light optimization (remove frequent string comparisons)
-- something to prevent syncing
+- something to prevent syncing, maybe add a random amount of time to secondsPerFrame
+
+## Math 
+- ease in/out quadratic/cubic
 
 ## Non-ECS Systems
 - chunk loading/unloading
@@ -41,11 +44,13 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
         - hot reloading
 - text rendering\*\*
 - Level editor\*\*
+- RNG
 
 ## Misc
 - ECS lib tasks
 - make this an actual framework 
     - move stuff in main.cpp into game class
+- Sys class (WIP name) that holds deltatime, frameNum, etc. so calling them is less annoying
 
 ## Bugs
 - deleting player after cloning makes clone's debug collider draw location wrong (but collision works fine) -> because the componentarray data gets moved to maintain density

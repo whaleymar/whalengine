@@ -2,8 +2,10 @@
 	<trim>false</trim>
 	<rotate>false</trim>
 	<tex n="atlas0">
-		<img n="actor/player-idle2" x="0" y="0" w="16" h="16" />
-		<img n="actor/player-idle1" x="0" y="17" w="16" h="16" />
+		<img n="actor/player-fall1" x="0" y="0" w="16" h="16" />
+		<img n="actor/player-jump1" x="0" y="0" w="16" h="16" />
+		<img n="actor/player-idle2" x="0" y="17" w="16" h="16" />
+		<img n="actor/player-idle1" x="0" y="0" w="16" h="16" />
 		<img n="actor/player-run4" x="0" y="34" w="16" h="16" />
 		<img n="actor/player-run3" x="0" y="51" w="16" h="16" />
 		<img n="actor/player-run2" x="0" y="68" w="16" h="16" />

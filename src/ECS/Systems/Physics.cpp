@@ -123,6 +123,8 @@ void PhysicsSystem::update() {
                     rb.value()->collider.resetMomentum();
                 }
 
+                rb.value()->isLanding = false;
+
             } else {
                 if (totalVelocity.y() < 0 && !rb.value()->isJumping) {
                     // zero gravity when grounded and not trying to jump, otherwise entity falls at terminal velocity after walking off platform
@@ -131,6 +133,8 @@ void PhysicsSystem::update() {
                 if (isMomentumStored) {
                     rb.value()->collider.momentumNotUsed();
                 }
+
+                rb.value()->isLanding = !wasGrounded;
             }
 
         } else if (std::optional<SolidBody*> sb = entity.tryGet<SolidBody>(); sb) {
