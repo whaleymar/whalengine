@@ -3,14 +3,12 @@
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Position.h"
 #include "ECS/Components/SolidBody.h"
-#include "ECS/Components/Velocity.h"
 #include "ECS/Entities/Block.h"
 #include "ECS/Entities/Player.h"
 #include "ECS/Lib/ECS.h"
 #include "Gfx/Color.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
-#include "Util/Vector.h"
 
 std::optional<Error> loadDebugScene() {
     using namespace whal;
@@ -30,6 +28,15 @@ std::optional<Error> loadDebugScene() {
     for (s32 i = 0; i < 50; i++) {
         createBlock(Position::tiles(i, 1));
     }
+
+    // auto tmp = createBlock(Position::tiles(5, 15));
+    // if (tmp.isExpected()) {
+    //     auto tmpBlock = tmp.value();
+    //     tmpBlock.add<PlayerControlFree>();
+    //     tmpBlock.add<Velocity>();
+    // } else {
+    //     print(tmp.error());
+    // }
 
     for (s32 i = 21; i < 50; i++) {
         s32 y = 4;

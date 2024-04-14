@@ -84,7 +84,7 @@ template <typename T>
 std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<T*>& objects, const Vector2i position) const {
     static_assert(std::is_base_of_v<IUseCollision, T>, "collider must inherit IUseCollision");
 
-    auto movedCollider = AABB(position, mCollider.mHalf);
+    auto movedCollider = AABB(position, mCollider.half);
     for (auto& object : objects) {
         if (!object->isCollidable()) {
             continue;
@@ -104,7 +104,7 @@ void ActorCollider::squish(const HitInfo hitInfo) {
 
 bool ActorCollider::isRiding(const SolidCollider* solid) const {
     // check for collision 1 unit down
-    auto movedCollider = AABB(mCollider.mCenter + Vector::unitiDown, mCollider.mHalf);
+    auto movedCollider = AABB(mCollider.center + Vector::unitiDown, mCollider.half);
     if (movedCollider.collide(solid->getCollider()) != std::nullopt) {
         return true;
     }

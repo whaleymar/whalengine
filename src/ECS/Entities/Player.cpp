@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "ECS/Components/AnimUtil.h"
 #include "ECS/Components/Animator.h"
 #include "ECS/Components/Draw.h"
@@ -44,15 +46,14 @@ bool brain(Animator& animator, ecs::Entity entity) {
     auto& rb = entity.get<RigidBody>();
     auto& vel = entity.get<Velocity>();
     auto& sprite = entity.get<Sprite>();
-    // f32 frameCompletion = animator.curFrameDuration/animator.getAnimation().secondsPerFrame;
-    // idea: duration of current animation, use that for stretch and squish, not frame
 
     f32 unsquishStep = Deltatime::getInstance().get() * 1.75;
     sprite.scale = {approach(sprite.scale.x(), 1.0, unsquishStep), approach(sprite.scale.y(), 1.0, unsquishStep)};
     sprite.isVertsUpdateNeeded = true;
     if (rb.collider.isGrounded()) {
         if (rb.isLanding) {
-            sprite.scale = {1.2, 0.8};  // TODO base on landing speed
+            f32 squish = std::min(abs(vel.total.y()) / 15, 1.0f);
+            sprite.scale = {lerp(1, 1.2, squish), lerp(1, 0.8, squish)};
         }
         if (vel.total.x() != 0) {
             if (animator.setAnimation(RUN)) {

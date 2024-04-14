@@ -10,6 +10,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/Deltatime.h"
 #include "Util/MathUtil.h"
+#include "Util/Vector.h"
 
 namespace whal {
 
@@ -52,11 +53,14 @@ void PhysicsSystem::update() {
         Position& pos = entity.get<Position>();
         Velocity& vel = entity.get<Velocity>();
         std::optional<RigidBody*> rb = entity.tryGet<RigidBody>();
+        std::optional<SolidBody*> sb = entity.tryGet<SolidBody>();
 
-        // TODO? update collider position to match position component before moving?
-        // only necessary if i change position outside of PhysicsSystem
-        //
-        // -> I think i should do it. teleporting entities will be a pain otherwise
+        // sync collider in case position changed in another system
+        if (rb) {
+            rb.value()->collider.getCollider().setPositionFromBottom(pos.e);
+        } else if (sb) {
+            sb.value()->collider.getCollider().setPositionFromBottom(pos.e);
+        }
 
         // if impulse ends, use residual
         Vector2f impulse = vel.impulse;
@@ -119,7 +123,7 @@ void PhysicsSystem::update() {
                 applyGravity(vel, dt, rb.value()->isJumping);
 
                 if (isMomentumStored) {
-                    vel.stable += rb.value()->collider.getMomentum() * dt;  // TODO scaling by dt feels wrong
+                    vel.stable += rb.value()->collider.getMomentum() * dt;  // TODO scaling by dt feels wrong -- is possibly just bad naming?
                     rb.value()->collider.resetMomentum();
                 }
 
@@ -127,7 +131,7 @@ void PhysicsSystem::update() {
 
             } else {
                 if (totalVelocity.y() < 0 && !rb.value()->isJumping) {
-                    // zero gravity when grounded and not trying to jump, otherwise entity falls at terminal velocity after walking off platform
+                    // zero y velocity when grounded and not trying to jump, otherwise entity falls at terminal velocity after walking off platform
                     vel.stable.e[1] = 0;
                 }
                 if (isMomentumStored) {
@@ -137,9 +141,10 @@ void PhysicsSystem::update() {
                 rb.value()->isLanding = !wasGrounded;
             }
 
-        } else if (std::optional<SolidBody*> sb = entity.tryGet<SolidBody>(); sb) {
+        } else if (sb) {
             sb.value()->collider.move(moveX, moveY);
-            pos.e = sb.value()->collider.getCollider().getPosition();
+            // pos.e = sb.value()->collider.getCollider().getPosition();
+            pos.e = sb.value()->collider.getCollider().getPositionEdge(Vector::unitiDown);
 
         } else {
             pos.e += Vector2i(std::round(moveX), std::round(moveY));
@@ -150,7 +155,9 @@ void PhysicsSystem::update() {
     for (auto& entity : needsPositionUpdateRB) {
         Position& pos = entity.get<Position>();
         RigidBody& rb = entity.get<RigidBody>();
-        pos.e = {rb.collider.getCollider().getPosition().x(), static_cast<s32>(rb.collider.getCollider().bottom())};  // TODO ugly
+
+        // position is bottom-middle of collider
+        pos.e = rb.collider.getCollider().getPositionEdge(Vector::unitiDown);
     }
 }
 

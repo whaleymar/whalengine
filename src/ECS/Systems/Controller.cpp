@@ -7,6 +7,7 @@
 
 #include "Systems/Deltatime.h"
 #include "Systems/InputHandler.h"
+#include "Util/Print.h"
 
 namespace whal {
 

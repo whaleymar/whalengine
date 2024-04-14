@@ -5,20 +5,28 @@
 
 namespace whal {
 
-AABB::AABB(Vector2i half) : mCenter(Vector::zero2i), mHalf(half) {}
-AABB::AABB(Vector2i center, Vector2i half) : mCenter(center), mHalf(half) {}
+AABB::AABB(Vector2i half_) : center(Vector::zero2i), half(half_) {}
+AABB::AABB(Vector2i center_, Vector2i half_) : center(center_), half(half_) {}
+
+AABB AABB::fromBottom(Vector2i bottom, Vector2i half) {
+    return AABB({bottom.x(), bottom.y() + half.y()}, half);
+}
 
 void AABB::setPosition(Vector2i position) {
-    mCenter = position;
+    center = position;
 }
 
 void AABB::setPosition(Vector2f position) {
-    mCenter = Vector2i(static_cast<s32>(position.x()), static_cast<s32>(position.y()));
+    center = Vector2i(static_cast<s32>(position.x()), static_cast<s32>(position.y()));
+}
+
+void AABB::setPositionFromBottom(Vector2i bottom) {
+    center = {bottom.x(), bottom.y() + half.y()};
 }
 
 const std::optional<HitInfo> AABB::collide(AABB other) const {
-    const auto delta = other.mCenter - mCenter;
-    const auto overlap = mHalf + other.mHalf;
+    const auto delta = other.center - center;
+    const auto overlap = half + other.half;
 
     const s32 px = overlap.x() - abs(delta.x());
     if (px <= 0) {
@@ -33,20 +41,20 @@ const std::optional<HitInfo> AABB::collide(AABB other) const {
     if (px == py) {
         const s32 signX = sign(delta.x());
         const s32 signY = sign(delta.y());
-        Vector2i hitPos(mCenter.x() + mHalf.x() * signX, mCenter.y() + mHalf.y() * signY);
+        Vector2i hitPos(center.x() + half.x() * signX, center.y() + half.y() * signY);
         Vector2i hitDelta(px * signX, py * signY);
         Vector2i hitNormal(signX, signY);
         return HitInfo(hitPos, hitDelta, hitNormal);
     }
     if (px < py) {
         const s32 signX = sign(delta.x());
-        Vector2i hitPos(mCenter.x() + mHalf.x() * signX, other.mCenter.y());
+        Vector2i hitPos(center.x() + half.x() * signX, other.center.y());
         Vector2i hitDelta(px * signX, 0);
         Vector2i hitNormal(signX, 0);
         return HitInfo(hitPos, hitDelta, hitNormal);
     } else {
         const s32 signY = sign(delta.y());
-        Vector2i hitPos(other.mCenter.x(), mCenter.y() + mHalf.y() * signY);
+        Vector2i hitPos(other.center.x(), center.y() + half.y() * signY);
         Vector2i hitDelta(0, py * signY);
         Vector2i hitNormal(0, signY);
         return HitInfo(hitPos, hitDelta, hitNormal);
@@ -59,11 +67,11 @@ const std::optional<HitInfo> AABB::collide(Segment segment) const {
     const s32 signX = sign(segment.delta.x());
     const s32 signY = sign(segment.delta.y());
 
-    const s32 nearX = (mCenter.x() - signX * mHalf.x() - segment.origin.x()) * scaleX;
-    const s32 nearY = (mCenter.y() - signY * mHalf.y() - segment.origin.y()) * scaleY;
+    const s32 nearX = (center.x() - signX * half.x() - segment.origin.x()) * scaleX;
+    const s32 nearY = (center.y() - signY * half.y() - segment.origin.y()) * scaleY;
 
-    const s32 farX = (mCenter.x() + signX * mHalf.x() - segment.origin.x()) * scaleX;
-    const s32 farY = (mCenter.y() + signY * mHalf.y() - segment.origin.y()) * scaleY;
+    const s32 farX = (center.x() + signX * half.x() - segment.origin.x()) * scaleX;
+    const s32 farY = (center.y() + signY * half.y() - segment.origin.y()) * scaleY;
 
     if (nearX > farY || nearY > farX) {
         // segment missed the AABB
@@ -98,9 +106,13 @@ const std::optional<HitInfo> AABB::collide(Segment segment) const {
 }
 
 bool AABB::isOverlapping(AABB other) const {
-    const auto delta = other.mCenter - mCenter;
-    const auto overlap = mHalf + other.mHalf;
+    const auto delta = other.center - center;
+    const auto overlap = half + other.half;
     return overlap.x() > abs(delta.x()) && overlap.y() > abs(delta.y());
+}
+
+Vector2i AABB::getPositionEdge(Vector2i unitDir) const {
+    return center + half * unitDir;
 }
 
 }  // namespace whal

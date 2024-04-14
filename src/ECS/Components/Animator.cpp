@@ -43,7 +43,7 @@ bool Animator::setAnimation(const char* name) {
         if (strcmp(animation.name, name) == 0) {
             curAnimIx = i;
             resetAnimation();
-            print("set animation:", name);
+            // print("set animation:", name);
             return true;
         }
     }

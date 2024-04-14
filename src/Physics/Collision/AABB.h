@@ -12,8 +12,8 @@
 namespace whal {
 
 struct AABB {
-    Vector2i mCenter;
-    Vector2i mHalf;
+    Vector2i center;
+    Vector2i half;
 
 #ifndef NDEBUG
     Vao vao;
@@ -22,17 +22,20 @@ struct AABB {
 
     AABB(Vector2i half);
     AABB(Vector2i center, Vector2i half);
+    static AABB fromBottom(Vector2i bottom, Vector2i half);
     void setPosition(Vector2i position);
     void setPosition(Vector2f position);
+    void setPositionFromBottom(Vector2i position);
     const std::optional<HitInfo> collide(AABB other) const;
     const std::optional<HitInfo> collide(Segment segment) const;
     bool isOverlapping(AABB other) const;
+    Vector2i getPositionEdge(Vector2i unitDir) const;
 
-    Vector2i getPosition() const { return mCenter; }
-    f32 top() const { return mCenter.y() + mHalf.y(); }
-    f32 bottom() const { return mCenter.y() - mHalf.y(); }
-    f32 right() const { return mCenter.x() + mHalf.x(); }
-    f32 left() const { return mCenter.x() - mHalf.x(); }
+    Vector2i getPosition() const { return center; }
+    f32 top() const { return center.y() + half.y(); }
+    f32 bottom() const { return center.y() - half.y(); }
+    f32 right() const { return center.x() + half.x(); }
+    f32 left() const { return center.x() - half.x(); }
 };
 
 using EdgeGetter = f32 (AABB::*)() const;
