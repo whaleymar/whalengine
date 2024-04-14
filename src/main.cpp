@@ -9,8 +9,8 @@
 #include "ECS/Systems/Controller.h"
 #include "ECS/Systems/DrawManager.h"
 #include "ECS/Systems/Gfx.h"
-#include "ECS/Systems/PathController.h"
 #include "ECS/Systems/Physics.h"
+#include "ECS/Systems/Rails.h"
 
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
@@ -30,7 +30,7 @@ void MainLoop(GLFWwindow* window) {
     auto& ecs = ecs::ECS::getInstance();
     auto controlSystemRB = ecs.registerSystem<ControllerSystemRB>();
     auto controlSystemFree = ecs.registerSystem<ControllerSystemFree>();
-    auto pathSystem = ecs.registerSystem<PathControllerSystem>();
+    auto pathSystem = ecs.registerSystem<RailsSystem>();
     auto physicsSystem = ecs.registerSystem<PhysicsSystem>();
     auto spriteSystem = ecs.registerSystem<SpriteSystem>();
     auto drawSystem = ecs.registerSystem<DrawSystem>();

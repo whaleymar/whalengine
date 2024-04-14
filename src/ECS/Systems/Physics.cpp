@@ -49,18 +49,26 @@ void PhysicsSystem::update() {
     f32 frictionRatioAir = 1.0 / (1.0 + (FRICTION_AIR * dt));
     f32 frictionRatioImpulse = 1.0 / (1.0 + (FRICTION_IMPULSE * dt));
     std::vector<ecs::Entity> needsPositionUpdateRB;
+
+    // sync collider in case position changed in another system
+    // is a little inefficient to do it this way (vs separating the systems)
     for (auto& [entityid, entity] : getEntities()) {
         Position& pos = entity.get<Position>();
-        Velocity& vel = entity.get<Velocity>();
         std::optional<RigidBody*> rb = entity.tryGet<RigidBody>();
         std::optional<SolidBody*> sb = entity.tryGet<SolidBody>();
 
-        // sync collider in case position changed in another system
         if (rb) {
             rb.value()->collider.setPositionFromBottom(pos.e);
         } else if (sb) {
             sb.value()->collider.setPositionFromBottom(pos.e);
         }
+    }
+
+    for (auto& [entityid, entity] : getEntities()) {
+        Position& pos = entity.get<Position>();
+        Velocity& vel = entity.get<Velocity>();
+        std::optional<RigidBody*> rb = entity.tryGet<RigidBody>();
+        std::optional<SolidBody*> sb = entity.tryGet<SolidBody>();
 
         // if impulse ends, use residual
         Vector2f impulse = vel.impulse;
