@@ -9,6 +9,8 @@ public:
     IUseCollision(AABB collider) : mCollider(collider){};
     AABB getCollider() const { return mCollider; }
     bool isCollidable() const { return mIsCollidable; }
+    void setPosition(Vector2i center) { mCollider.setPosition(center); }
+    void setPositionFromBottom(Vector2i bottom) { mCollider.setPositionFromBottom(bottom); }
 
 protected:
     AABB mCollider;

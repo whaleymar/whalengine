@@ -57,9 +57,9 @@ void PhysicsSystem::update() {
 
         // sync collider in case position changed in another system
         if (rb) {
-            rb.value()->collider.getCollider().setPositionFromBottom(pos.e);
+            rb.value()->collider.setPositionFromBottom(pos.e);
         } else if (sb) {
-            sb.value()->collider.getCollider().setPositionFromBottom(pos.e);
+            sb.value()->collider.setPositionFromBottom(pos.e);
         }
 
         // if impulse ends, use residual
@@ -143,7 +143,6 @@ void PhysicsSystem::update() {
 
         } else if (sb) {
             sb.value()->collider.move(moveX, moveY);
-            // pos.e = sb.value()->collider.getCollider().getPosition();
             pos.e = sb.value()->collider.getCollider().getPositionEdge(Vector::unitiDown);
 
         } else {

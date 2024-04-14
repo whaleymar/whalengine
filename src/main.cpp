@@ -38,6 +38,7 @@ void MainLoop(GLFWwindow* window) {
 
     // single-component systems for running psuedo-destructors:
     auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
+    // these don't have update methods:
     auto solidBodyMgr = ecs.registerSystem<SolidBodyManager>();
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
     auto drawMgr = ecs.registerSystem<DrawManager>();
@@ -66,7 +67,7 @@ void MainLoop(GLFWwindow* window) {
         controlSystemFree->update();
         pathSystem->update();
         physicsSystem->update();
-        rigidBodyMgr->update();  // this doesn't need to run every frame
+        rigidBodyMgr->update();  // kill entities that are destroyed by the phyiscs sim. this doesn't need to run every frame
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
