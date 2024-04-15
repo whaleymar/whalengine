@@ -16,7 +16,7 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
     mCollider.setPosition(position);
 }
 
-void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback) {
+void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback, bool isManualMove) {
     // RESEARCH doesn't handle colliding with other actors
     s32 toMove = std::round(amount);
     auto& solids = CollisionManager::getInstance().getAllSolids();
@@ -28,6 +28,7 @@ void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
         }
         return;
     }
+    mWasMovedManually = mWasMovedManually || isManualMove;
 
     s32 moveSign = sign(toMove);
     bool isMovingDown = !isXDirection && moveSign == -1;
@@ -55,6 +56,15 @@ void ActorCollider::setMomentum(const f32 momentum, const bool isXDirection) {
         mStoredMomentum.e[0] = momentum;
     } else {
         mStoredMomentum.e[1] = momentum;
+    }
+    mMomentumFramesLeft = MOMENTUM_LIFETIME_FRAMES;
+}
+
+void ActorCollider::addMomentum(const f32 momentum, const bool isXDirection) {
+    if (isXDirection) {
+        mStoredMomentum.e[0] += momentum;
+    } else {
+        mStoredMomentum.e[1] += momentum;
     }
     mMomentumFramesLeft = MOMENTUM_LIFETIME_FRAMES;
 }

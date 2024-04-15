@@ -2,16 +2,20 @@
 
 namespace whal {
 
-RailsControl::RailsControl(f32 moveSpeed_, std::vector<Position> checkPoints_, f32 waitTime_)
-    : checkpoints(checkPoints_), moveSpeed(moveSpeed_), waitTime(waitTime_), curWaitTime(waitTime_) {}
+RailsControl::RailsControl(f32 moveSpeed_, std::vector<Position> checkPoints_, f32 waitTime_, bool isCycle_)
+    : mCheckpoints(checkPoints_), maxSpeed(moveSpeed_), waitTime(waitTime_), curActionTime(waitTime_), isCycle(isCycle_) {
+    if (checkPoints_.size() > 0) {
+        curTarget = 1;
+    }
+}
 
 Position RailsControl::getTarget() const {
-    return checkpoints[curTarget];
+    return mCheckpoints[curTarget];
 }
 
 void RailsControl::step() {
     curTarget++;
-    if (curTarget == checkpoints.size()) {
+    if (curTarget == mCheckpoints.size()) {
         curTarget = 0;
     }
 }

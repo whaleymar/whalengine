@@ -18,11 +18,12 @@ class ActorCollider : public IUseCollision {
 public:
     ActorCollider(Vector2f position, Vector2i half);
 
-    void moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback);
+    void moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback, bool isManualMove = false);
     bool isAlive() const { return mIsAlive; }
     bool isGrounded() const { return mIsGrounded; }
     void setGrounded(const bool grounded) { mIsGrounded = grounded; }
     void setMomentum(const f32 momentum, const bool isXDirection);
+    void addMomentum(const f32 momentum, const bool isXDirection);
     void resetMomentum();
     Vector2f getMomentum() const { return mStoredMomentum; }
     bool isMomentumStored() const { return mMomentumFramesLeft > 0; }

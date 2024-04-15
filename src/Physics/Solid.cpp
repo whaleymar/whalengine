@@ -15,12 +15,14 @@ SolidCollider::SolidCollider(Vector2f position, Vector2i half) : IUseCollision(A
     mCollider.setPosition(position);
 }
 
-void SolidCollider::move(f32 x, f32 y) {
+void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
     s32 toMoveX = std::round(x);
     s32 toMoveY = std::round(y);
     if (toMoveX == 0 && toMoveY == 0) {
         return;
     }
+
+    mWasMovedManually = isManualMove;
 
     // check riding status *before* moving
     auto riding = getRidingActors();
@@ -29,38 +31,47 @@ void SolidCollider::move(f32 x, f32 y) {
     mIsCollidable = false;
     if (toMoveX > 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(toMoveX, 0));
-        moveDirection(toMoveX, true, mCollider.right(), &AABB::left, riding);
+        moveDirection(toMoveX, true, mCollider.right(), &AABB::left, riding, isManualMove);
     } else if (toMoveX < 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(toMoveX, 0));
-        moveDirection(toMoveX, true, mCollider.left(), &AABB::right, riding);
+        moveDirection(toMoveX, true, mCollider.left(), &AABB::right, riding, isManualMove);
     }
 
     if (toMoveY > 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(0, toMoveY));
-        moveDirection(toMoveY, false, mCollider.top(), &AABB::bottom, riding);
+        moveDirection(toMoveY, false, mCollider.top(), &AABB::bottom, riding, isManualMove);
     } else if (toMoveY < 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(0, toMoveY));
-        moveDirection(toMoveY, false, mCollider.bottom(), &AABB::top, riding);
+        moveDirection(toMoveY, false, mCollider.bottom(), &AABB::top, riding, isManualMove);
     }
 
     mIsCollidable = true;
 }
 
-void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding) {
+void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding,
+                                  bool isManualMove) {
     f32 dt = Deltatime::getInstance().get();
     for (auto& actor : CollisionManager::getInstance().getAllActors()) {
         // push takes priority over carry
         if (mCollider.isOverlapping(actor->getCollider())) {
             f32 actorEdge = (actor->getCollider().*edgeFunc)();
             toMove = solidEdge - actorEdge;
-            actor->moveDirection(isXDirection, toMove, &ActorCollider::squish);
+            actor->moveDirection(isXDirection, toMove, &ActorCollider::squish, isManualMove);
             f32 momentum = toMove / dt;
-            actor->setMomentum(momentum, isXDirection);
+            if (isManualMove) {
+                actor->addMomentum(momentum, isXDirection);
+            } else {
+                actor->setMomentum(momentum, isXDirection);
+            }
         } else if (std::find(riding.begin(), riding.end(), actor) != riding.end()) {
             // I might change this for solids moving down faster than gravity RESEARCH
-            actor->moveDirection(isXDirection, toMove, nullptr);
+            actor->moveDirection(isXDirection, toMove, nullptr, isManualMove);
             f32 momentum = toMove / dt;
-            actor->setMomentum(momentum, isXDirection);
+            if (isManualMove) {
+                actor->addMomentum(momentum, isXDirection);
+            } else {
+                actor->setMomentum(momentum, isXDirection);
+            }
         }
     }
 }

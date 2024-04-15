@@ -54,13 +54,19 @@ void PhysicsSystem::update() {
     // is a little inefficient to do it this way (vs separating the systems)
     for (auto& [entityid, entity] : getEntities()) {
         Position& pos = entity.get<Position>();
-        std::optional<RigidBody*> rb = entity.tryGet<RigidBody>();
-        std::optional<SolidBody*> sb = entity.tryGet<SolidBody>();
 
-        if (rb) {
-            rb.value()->collider.setPositionFromBottom(pos.e);
-        } else if (sb) {
-            sb.value()->collider.setPositionFromBottom(pos.e);
+        if (std::optional<RigidBody*> rb = entity.tryGet<RigidBody>(); rb) {
+            if (rb.value()->collider.wasMovedManually()) {
+                rb.value()->collider.manualMoveComplete();
+            } else {
+                rb.value()->collider.setPositionFromBottom(pos.e);
+            }
+        } else if (std::optional<SolidBody*> sb = entity.tryGet<SolidBody>(); sb) {
+            if (sb.value()->collider.wasMovedManually()) {
+                sb.value()->collider.manualMoveComplete();
+            } else {
+                sb.value()->collider.setPositionFromBottom(pos.e);
+            }
         }
     }
 

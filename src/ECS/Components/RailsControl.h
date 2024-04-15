@@ -6,14 +6,6 @@
 
 namespace whal {
 
-// 2 variants I can think of (for constant speed)
-// - set speed
-// - set time per checkpoint
-
-// would need acceleration value as param?
-
-// and an isIdle flag if I want to trigger movement somewhere else
-
 struct RailsControl {
     // TODO
     // this could apply to all checkpoints, or each one could have a unique value
@@ -32,16 +24,21 @@ struct RailsControl {
         Movement movement;
     };
 
-    RailsControl(f32 moveSpeed_ = 5, std::vector<Position> checkPoints_ = {}, f32 waitTime_ = 0);
+    RailsControl(f32 moveSpeed_ = 5, std::vector<Position> checkPoints_ = {}, f32 waitTime_ = 0, bool isCycle_ = true);
 
-    std::vector<Position> checkpoints;
-    f32 moveSpeed;
+private:
+    std::vector<Position> mCheckpoints;
+
+public:
+    f32 maxSpeed;
     f32 waitTime;
 
-    f32 curWaitTime = 0;
+    f32 curActionTime = 0;  // time spent moving or waiting
+    f32 invSegmentDistance = 0;
+    bool isCycle;  // if true, repeats after returning to first checkpoint
     bool isWaiting = false;
-    bool isVelocityUpdateNeeded = true;
-    bool isCycle = true;
+    bool isMoving = false;
+    bool isVelocityUpdateNeeded = false;
     u64 curTarget = 0;
 
     Position getTarget() const;

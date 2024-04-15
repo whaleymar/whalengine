@@ -64,11 +64,13 @@ std::optional<Error> loadDebugScene() {
         invisBlock2.remove<SolidBody>();
     }
 
-    auto platform = createBlock(Position::tiles(5, 5)).value();
-    platform.add<Velocity>();
-    auto pathControl = RailsControl(10, {}, 2);
-    pathControl.checkpoints.push_back(Position::tiles(5, 10));
-    pathControl.checkpoints.push_back(Position::tiles(5, 1));
+    auto platform = createBlock(Position::tiles(5, 1)).value();
+    auto pathControl = RailsControl(30,
+                                    {
+                                        Position::tiles(5, 1),
+                                        Position::tiles(5, 15),
+                                    },
+                                    2, true);
     platform.add<RailsControl>(pathControl);
 
     return std::nullopt;

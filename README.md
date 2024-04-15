@@ -51,6 +51,8 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - make this an actual framework 
     - move stuff in main.cpp into game class
 - Sys class (WIP name) that holds deltatime, frameNum, etc. so calling them is less annoying
+- API change: make unit vectors static methods for vector2 class 
+- API change: easier way to convert between collider center and Position
 
 ## Bugs
 - deleting player after cloning makes clone's debug collider draw location wrong (but collision works fine) -> because the componentarray data gets moved to maintain density

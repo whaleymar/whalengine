@@ -8,7 +8,7 @@ struct RailsControl;
 struct Velocity;
 struct Position;
 
-class RailsSystem : public ecs::ISystem<RailsControl, Position, Velocity> {
+class RailsSystem : public ecs::ISystem<RailsControl, Position> {
 public:
     void update() override;
 };
