@@ -4,24 +4,24 @@
 
 namespace whal {
 
-std::optional<Error> GLResourceManager::registerProgram(ShaderProgram program, const char* name) {
-    s32 ix = getProgramIndex(name);
+std::optional<Error> GLResourceManager::registerProgram(ShaderProgram program, ShaderType shaderType) {
+    s32 ix = getProgramIndex(shaderType);
     if (ix >= 0) {
-        return Error(std::format("Program with name '{}' already registered", name));
+        return Error(std::format("Program with name '{}' already registered", toString(shaderType)));
     }
     mShaders.push_back(program);
-    mShaderNames.push_back(name);
+    mShaderTypes.push_back(shaderType);
     return std::nullopt;
 }
 
-const ShaderProgram GLResourceManager::getProgram(const char* name) const {
-    return mShaders[getProgramIndex(name)];
+const ShaderProgram GLResourceManager::getProgram(ShaderType shaderType) const {
+    return mShaders[getProgramIndex(shaderType)];
 }
 
-s32 GLResourceManager::getProgramIndex(std::string name) const {
-    for (size_t i = 0; i < mShaderNames.size(); i++) {
-        std::string shaderName = mShaderNames[i];
-        if (shaderName == name) {
+s32 GLResourceManager::getProgramIndex(ShaderType shaderType) const {
+    for (size_t i = 0; i < mShaderTypes.size(); i++) {
+        ShaderType sType = mShaderTypes[i];
+        if (sType == shaderType) {
             return static_cast<s32>(i);
         }
     }
@@ -52,12 +52,12 @@ s32 GLResourceManager::getTextureIndex(std::string name) const {
     return -1;
 }
 
-std::optional<Error> createAndRegisterShader(const char* vertexPath, const char* fragmentPath, const char* shaderName, VertexInfo vInfo) {
+std::optional<Error> createAndRegisterShader(const char* vertexPath, const char* fragmentPath, ShaderType shaderType, VertexInfo vInfo) {
     Expected<ShaderProgram> program = createShader(vertexPath, fragmentPath, vInfo);
     if (!program.isExpected()) {
         return program.error();
     }
-    return GLResourceManager::getInstance().registerProgram(*program, shaderName);
+    return GLResourceManager::getInstance().registerProgram(*program, shaderType);
 }
 
 std::optional<Error> createAndRegisterTexture(const char* atlasPath, const char* textureName) {

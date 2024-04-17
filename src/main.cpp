@@ -114,25 +114,25 @@ int main() {
     print<Format({"", "\n"})>("Loaded OpenGL ", GLAD_VERSION_MAJOR(version), ".", GLAD_VERSION_MINOR(version));
 
     // Load Shaders
-    auto err = createAndRegisterShader(VERTEX_RGBUV_SHADER_PATH, FRAG_SPRITE_RGB_SHADER_PATH, SHNAME_SPRITE_RGB, VertexInfo::RGBUV);
+    auto err = createAndRegisterShader(VERTEX_RGBUV_SHADER_PATH, FRAG_SPRITE_RGB_SHADER_PATH, ShaderType::SpriteRGB, VertexInfo::RGBUV);
     if (err) {
         print("Failed to register shader. Got error:\n", *err);
         return -1;
     }
 
-    err = createAndRegisterShader(VERTEX_UV_SHADER_PATH, FRAG_SPRITE_SHADER_PATH, SHNAME_SPRITE, VertexInfo::UV);
+    err = createAndRegisterShader(VERTEX_UV_SHADER_PATH, FRAG_SPRITE_SHADER_PATH, ShaderType::SpritePlain, VertexInfo::UV);
     if (err) {
         print("Failed to register shader. Got error:\n", *err);
         return -1;
     }
 
-    err = createAndRegisterShader(VERTEX_RGBUV_SHADER_PATH, FRAG_OUTLINE_SHADER_PATH, SHNAME_DEBUG, VertexInfo::RGBUV);
+    err = createAndRegisterShader(VERTEX_RGBUV_SHADER_PATH, FRAG_OUTLINE_SHADER_PATH, ShaderType::Debug, VertexInfo::RGBUV);
     if (err) {
         print("Failed to register shader. Got error:\n", *err);
         return -1;
     }
 
-    err = createAndRegisterShader(VERTEX_RGB_SHADER_PATH, FRAG_COLOR_SHADER_PATH, SHNAME_COLOR, VertexInfo::RGB);
+    err = createAndRegisterShader(VERTEX_RGB_SHADER_PATH, FRAG_COLOR_SHADER_PATH, ShaderType::RGBonly, VertexInfo::RGB);
     if (err) {
         print("Failed to register shader. Got error:\n", *err);
         return -1;

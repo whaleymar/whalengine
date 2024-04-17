@@ -9,10 +9,7 @@
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Transform.h"
 
-// clang-format off
 #include <glad/gl.h>
-#include <GLFW/glfw3.h>  // always include after glad
-// clang-format on
 
 namespace whal {
 
@@ -35,7 +32,7 @@ void SpriteSystem::onRemove(const ecs::Entity entity) {
 }
 
 void SpriteSystem::drawEntities() {
-    auto program = GLResourceManager::getInstance().getProgram(SHNAME_SPRITE_RGB);
+    auto program = GLResourceManager::getInstance().getProgram(ShaderType::SpriteRGB);
     GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).bind();
     program.useProgram();
     for (auto const& entity : mSorted) {
@@ -62,7 +59,7 @@ void SpriteSystem::drawEntities() {
 }
 
 void DrawSystem::drawEntities() {
-    auto program = GLResourceManager::getInstance().getProgram(SHNAME_COLOR);
+    auto program = GLResourceManager::getInstance().getProgram(ShaderType::RGBonly);
     program.useProgram();
     // sorting not required since Draw components don't have transparency
     for (auto const& [entityid, entity] : getEntities()) {

@@ -38,11 +38,8 @@ static const char* FRAG_SPRITE_RGB_SHADER_PATH = "shader/sprite-rgb-frag.glsl";
 static const char* FRAG_OUTLINE_SHADER_PATH = "shader/outline-frag.glsl";
 static const char* FRAG_COLOR_SHADER_PATH = "shader/coloronly-frag.glsl";
 
-// TODO do an enum
-static const char* SHNAME_SPRITE_RGB = "spritergb";
-static const char* SHNAME_SPRITE = "sprite";
-static const char* SHNAME_DEBUG = "debug";
-static const char* SHNAME_COLOR = "color";
+enum ShaderType : u8 { SpritePlain, SpriteRGB, Debug, RGBonly };
+const char* toString(ShaderType shaderType);
 
 static const char* SPRITE_TEXTURE_PATH = "data/sprite/atlas0.png";
 static const char* ATLAS_METADATA_PATH = "data/sprite/atlas.xml";

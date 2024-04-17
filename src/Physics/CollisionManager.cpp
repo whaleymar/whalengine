@@ -58,7 +58,7 @@ void drawCollider(ShaderProgram program, const IUseCollision* collider) {
 }
 
 void drawColliders() {
-    auto program = GLResourceManager::getInstance().getProgram(SHNAME_DEBUG);
+    auto program = GLResourceManager::getInstance().getProgram(ShaderType::Debug);
     program.useProgram();
 
     for (const IUseCollision* collider : CollisionManager::getInstance().getAllActors()) {
