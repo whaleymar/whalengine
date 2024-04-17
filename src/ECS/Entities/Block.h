@@ -8,12 +8,12 @@ namespace ecs {
 class Entity;
 }
 
-struct Position;
+struct Transform;
 struct Draw;
 struct Sprite;
 
-Expected<ecs::Entity> createBlock(Position position);
-Expected<ecs::Entity> createBlock(Position position, Draw draw);
-Expected<ecs::Entity> createBlock(Position position, Sprite sprite);
+Expected<ecs::Entity> createBlock(Transform transform);
+Expected<ecs::Entity> createBlock(Transform transform, Draw draw);
+Expected<ecs::Entity> createBlock(Transform transform, Sprite sprite);
 
 }  // namespace whal

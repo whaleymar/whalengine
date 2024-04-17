@@ -2,9 +2,9 @@
 
 #include <cmath>
 
-#include "ECS/Components/Position.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/SolidBody.h"
+#include "ECS/Components/Transform.h"
 
 #include "ECS/Components/Velocity.h"
 #include "Gfx/GfxUtil.h"
@@ -53,21 +53,21 @@ void PhysicsSystem::update() {
     // sync collider in case position changed in another system
     // is a little inefficient to do it this way (vs separating the systems)
     for (auto& [entityid, entity] : getEntities()) {
-        Position& pos = entity.get<Position>();
-        if (!pos.isManuallyMoved) {
+        Transform& trans = entity.get<Transform>();
+        if (!trans.isManuallyMoved) {
             continue;
         }
 
-        pos.isManuallyMoved = false;
+        trans.isManuallyMoved = false;
         if (std::optional<RigidBody*> rb = entity.tryGet<RigidBody>(); rb) {
-            rb.value()->collider.setPositionFromBottom(pos.e);
+            rb.value()->collider.setPositionFromBottom(trans.position);
         } else if (std::optional<SolidBody*> sb = entity.tryGet<SolidBody>(); sb) {
-            sb.value()->collider.setPositionFromBottom(pos.e);
+            sb.value()->collider.setPositionFromBottom(trans.position);
         }
     }
 
     for (auto& [entityid, entity] : getEntities()) {
-        Position& pos = entity.get<Position>();
+        Transform& trans = entity.get<Transform>();
         Velocity& vel = entity.get<Velocity>();
         std::optional<RigidBody*> rb = entity.tryGet<RigidBody>();
         std::optional<SolidBody*> sb = entity.tryGet<SolidBody>();
@@ -88,12 +88,12 @@ void PhysicsSystem::update() {
         vel.impulse = {0, 0};
         vel.total = totalVelocity;
 
-        if (moveX > 0 && pos.facing != Facing::Right) {
-            pos.facing = Facing::Right;
-            pos.isDirectionChanged = true;
-        } else if (moveX < 0 && pos.facing != Facing::Left) {
-            pos.facing = Facing::Left;
-            pos.isDirectionChanged = true;
+        if (moveX > 0 && trans.facing != Facing::Right) {
+            trans.facing = Facing::Right;
+            trans.isDirectionChanged = true;
+        } else if (moveX < 0 && trans.facing != Facing::Left) {
+            trans.facing = Facing::Left;
+            trans.isDirectionChanged = true;
         }
 
         // I can split this into separate systems if this gets slow
@@ -153,20 +153,20 @@ void PhysicsSystem::update() {
 
         } else if (sb) {
             sb.value()->collider.move(moveX, moveY);
-            pos.e = sb.value()->collider.getCollider().getPositionEdge(Vector2i::unitDown);
+            trans.position = sb.value()->collider.getCollider().getPositionEdge(Vector2i::unitDown);
 
         } else {
-            pos.e += Vector2i(std::round(moveX), std::round(moveY));
+            trans.position += Vector2i(std::round(moveX), std::round(moveY));
         }
     }
 
     // actors can be moved by other colliders, so wait until all collisions are processed to update position
     for (auto& entity : needsPositionUpdateRB) {
-        Position& pos = entity.get<Position>();
+        Transform& trans = entity.get<Transform>();
         RigidBody& rb = entity.get<RigidBody>();
 
         // position is bottom-middle of collider
-        pos.e = rb.collider.getCollider().getPositionEdge(Vector2i::unitDown);
+        trans.position = rb.collider.getCollider().getPositionEdge(Vector2i::unitDown);
     }
 }
 

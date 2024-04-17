@@ -7,15 +7,15 @@ namespace whal {
 struct PlayerControlRB;
 struct PlayerControlFree;
 struct RigidBody;
-struct Position;
+struct Transform;
 struct Velocity;
 
-class ControllerSystemRB : public ecs::ISystem<PlayerControlRB, Position, Velocity, RigidBody> {
+class ControllerSystemRB : public ecs::ISystem<PlayerControlRB, Transform, Velocity, RigidBody> {
 public:
     void update() override;
 };
 
-class ControllerSystemFree : public ecs::ISystem<PlayerControlFree, Position, Velocity> {
+class ControllerSystemFree : public ecs::ISystem<PlayerControlFree, Transform, Velocity> {
 public:
     void update() override;
 };

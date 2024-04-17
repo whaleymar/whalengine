@@ -2,7 +2,7 @@
 
 #include "ECS/Components/Animator.h"
 #include "ECS/Components/Draw.h"
-#include "ECS/Components/Position.h"
+#include "ECS/Components/Transform.h"
 #include "ECS/Lib/ECS.h"
 #include "Gfx/Texture.h"
 
@@ -23,10 +23,10 @@ void AnimationSystem::update() {
             sprite.isVertsUpdateNeeded = true;
         } else {
             // frame unchanged
-            auto& pos = entity.get<Position>();
-            if (pos.isDirectionChanged) {
+            auto& trans = entity.get<Transform>();
+            if (trans.isDirectionChanged) {
                 sprite.isVertsUpdateNeeded = true;
-                pos.isDirectionChanged = false;
+                trans.isDirectionChanged = false;
             }
         }
     }

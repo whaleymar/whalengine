@@ -6,9 +6,9 @@ namespace whal {
 
 struct Animator;
 struct Sprite;
-struct Position;
+struct Transform;
 
-class AnimationSystem : public ecs::ISystem<Animator, Sprite, Position> {
+class AnimationSystem : public ecs::ISystem<Animator, Sprite, Transform> {
 public:
     void update() override;
 };

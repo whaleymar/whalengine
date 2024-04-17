@@ -1,9 +1,9 @@
 #include "Game/DebugScene.h"
 
 #include "ECS/Components/Draw.h"
-#include "ECS/Components/Position.h"
 #include "ECS/Components/RailsControl.h"
 #include "ECS/Components/SolidBody.h"
+#include "ECS/Components/Transform.h"
 #include "ECS/Entities/Block.h"
 #include "ECS/Entities/Player.h"
 #include "ECS/Lib/ECS.h"
@@ -27,7 +27,7 @@ std::optional<Error> loadDebugScene() {
     // }
 
     for (s32 i = 0; i < 50; i++) {
-        createBlock(Position::tiles(i, 1));
+        createBlock(Transform::tiles(i, 1));
     }
 
     // auto tmp = createBlock(Position::tiles(5, 15));
@@ -47,30 +47,30 @@ std::optional<Error> loadDebugScene() {
             continue;
         }
         createBlock(
-            Position::tiles(i, y),
+            Transform::tiles(i, y),
             Sprite(Depth::Player, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/dirtblock").value(), Color::MAGENTA));
     }
 
     for (s32 i = 10; i < 15; i++) {
         Depth d = i % 2 == 0 ? Depth::Foreground : Depth::BackgroundNoParallax;
         auto invisBlock =
-            createBlock(Position::tiles(i, 2),
+            createBlock(Transform::tiles(i, 2),
                         Sprite(d, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/dirtblock").value(), Color::EMERALD))
                 .value();
         invisBlock.remove<SolidBody>();
-        auto invisBlock2 = createBlock(Position::tiles(i - 5, 2), Draw(d, Color::EMERALD)).value();
+        auto invisBlock2 = createBlock(Transform::tiles(i - 5, 2), Draw(d, Color::EMERALD)).value();
         // invisBlock.remove<SolidBody>(); // TODO after collision manager rework, check that deleting here actually removes the solidBody
         invisBlock2.remove<SolidBody>();
     }
 
-    createBlock(Position::tiles(6, 15), Draw(Depth::Player, Color::RED));
-    createBlock(Position::tiles(6, 16), Draw(Depth::Player, Color::RED));
+    createBlock(Transform::tiles(6, 15), Draw(Depth::Player, Color::RED));
+    createBlock(Transform::tiles(6, 16), Draw(Depth::Player, Color::RED));
 
-    auto platform = createBlock(Position::tiles(5, 1)).value();
+    auto platform = createBlock(Transform::tiles(5, 1)).value();
     auto pathControl = RailsControl(14,
                                     {
-                                        {Position::tiles(5, 1).e, RailsControl::Movement::LINEAR},
-                                        {Position::tiles(5, 15).e, RailsControl::Movement::EASEIO_BEZIER},
+                                        {Transform::tiles(5, 1).position, RailsControl::Movement::LINEAR},
+                                        {Transform::tiles(5, 15).position, RailsControl::Movement::EASEIO_BEZIER},
                                     },
                                     2, true);
     platform.add<RailsControl>(pathControl);

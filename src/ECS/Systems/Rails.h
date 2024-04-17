@@ -6,9 +6,9 @@ namespace whal {
 
 struct RailsControl;
 struct Velocity;
-struct Position;
+struct Transform;
 
-class RailsSystem : public ecs::ISystem<RailsControl, Position> {
+class RailsSystem : public ecs::ISystem<RailsControl, Transform> {
 public:
     void update() override;
 };

@@ -7,7 +7,7 @@
 #include "Util/Vector.h"
 
 #include "ECS/Components/Draw.h"
-#include "ECS/Components/Position.h"
+#include "ECS/Components/Transform.h"
 
 // clang-format off
 #include <glad/gl.h>
@@ -39,17 +39,17 @@ void SpriteSystem::drawEntities() {
     GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).bind();
     program.useProgram();
     for (auto const& entity : mSorted) {
-        Position& pos = entity.get<Position>();
+        Transform& trans = entity.get<Transform>();
         Sprite& sprite = entity.get<Sprite>();
         if (sprite.isVertsUpdateNeeded) {
-            sprite.updateVertices(pos.facing != Facing::Left);
+            sprite.updateVertices(trans.facing != Facing::Left);
         }
 
         // position is the bottom-middle of the vao, but openGL expects position of the top left corner
         // TODO clamp to texel grid
         // f32 height = static_cast<f32>(sprite.frameSizeTexels.x() * PIXELS_PER_TEXEL) * sprite.scale.y();
         Vector2f drawOffset = toFloatVec(sprite.frameSizeTexels * PIXELS_PER_TEXEL) * sprite.scale * Vector2f(-0.5, 1.0);
-        Vector2f floatPos = (toFloatVec(pos.e) + drawOffset);
+        Vector2f floatPos = (toFloatVec(trans.position) + drawOffset);
         glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
 
         sprite.vao.bind();
@@ -67,13 +67,13 @@ void DrawSystem::drawEntities() {
     // sorting not required since Draw components don't have transparency
     for (auto const& [entityid, entity] : getEntities()) {
         // TODO abstract this loop
-        Position& pos = entity.get<Position>();
+        Transform& trans = entity.get<Transform>();
         Draw& draw = entity.get<Draw>();
 
         // position is the bottom-middle of the vao, but openGL expects position of the top left corner
         // TODO clamp to texel grid
         Vector2f drawOffset = toFloatVec(draw.frameSizeTexels * PIXELS_PER_TEXEL) * Vector2f(-0.5, 1.0);
-        Vector2f floatPos = (toFloatVec(pos.e) + drawOffset);
+        Vector2f floatPos = (toFloatVec(trans.position) + drawOffset);
         glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
 
         draw.vao.bind();

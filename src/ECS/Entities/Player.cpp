@@ -4,8 +4,8 @@
 #include "ECS/Components/Animator.h"
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/PlayerControl.h"
-#include "ECS/Components/Position.h"
 #include "ECS/Components/RigidBody.h"
+#include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
 #include "ECS/Systems/Physics.h"
@@ -93,8 +93,8 @@ Expected<ecs::Entity> createPlayer() {
         return expected;
     }
     auto player = expected.value();
-    Position position = Position::tiles(15, 10);
-    player.add(position);
+    Transform transform = Transform::tiles(15, 10);
+    player.add(transform);
     player.add<Velocity>();
     player.add<PlayerControlRB>();
     // player.add<PlayerControlFree>();
@@ -118,7 +118,7 @@ Expected<ecs::Entity> createPlayer() {
     constexpr s32 height = 16;
     constexpr s32 halfLenX = PIXELS_PER_TEXEL * width / 4;
     constexpr s32 halfLenY = PIXELS_PER_TEXEL * height / 2;
-    player.add<RigidBody>(RigidBody(toFloatVec(position.e) + Vector2f(0, halfLenY), halfLenX, halfLenY));
+    player.add<RigidBody>(RigidBody(toFloatVec(transform.position) + Vector2f(0, halfLenY), halfLenX, halfLenY));
 
     return player;
 }

@@ -19,7 +19,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 ## Entity Prefabs
 - particle
     - draw, position, velocity, lifetime
-- player
 - camera
 - death plane
 
