@@ -9,10 +9,24 @@ namespace whal {
 // jump trajectory
 // coyote time window
 
+struct BufferedInput {
+    s16 framesLeft = 0;
+    bool isActive = false;
+
+    void buffer();
+    void consume();
+    void reset();
+    void notUsed();
+};
+
 struct PlayerControlRB {
     PlayerControlRB(f32 moveSpeed_ = 10, f32 jumpHeight_ = 25);
     f32 moveSpeed;
     f32 jumpHeight;  // not used currently
+    BufferedInput jumpBuffer;
+
+    bool isJumping() const;
+    bool canJump() const;
 };
 
 struct PlayerControlFree {

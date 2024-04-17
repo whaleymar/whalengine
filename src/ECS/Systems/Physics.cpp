@@ -15,7 +15,6 @@
 namespace whal {
 
 constexpr f32 GRAVITY = -35;
-// constexpr f32 TERMINAL_VELOCITY_Y = -20;
 
 constexpr f32 FRICTION_GROUND = 5.0;
 constexpr f32 FRICTION_AIR = 2.0;

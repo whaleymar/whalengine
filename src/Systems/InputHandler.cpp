@@ -27,7 +27,7 @@ void Input::set(InputType input) {
 
     case InputType::JUMP:
         mIsJump = true;
-        mIsJumpUsed = false;
+        mIsJumpPressed = true;
         break;
 
     case InputType::PAUSE:
@@ -78,6 +78,7 @@ void Input::reset(InputType input) {
 
     case InputType::JUMP:
         mIsJump = false;
+        mIsJumpPressed = false;
         break;
 
 #ifndef NDEBUG
@@ -125,7 +126,7 @@ void Input::loadMappings() const {
 }
 
 void Input::useJump() {
-    mIsJumpUsed = true;
+    mIsJumpPressed = false;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {

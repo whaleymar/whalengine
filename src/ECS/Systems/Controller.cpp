@@ -14,10 +14,14 @@ namespace whal {
 void ControllerSystemRB::update() {
     auto& input = Input::getInstance();
     f32 dt = Deltatime::getInstance().get();
-    bool isJumpUsed = false;
+
+    bool isJumpAvailable = input.isJumpAvailable();
+    input.useJump();
+
     for (auto& [entityid, entity] : getEntities()) {
         Velocity& vel = entity.get<Velocity>();
         RigidBody& rb = entity.get<RigidBody>();
+        PlayerControlRB& control = entity.get<PlayerControlRB>();
 
 #ifndef NDEBUG
         auto sprite = entity.tryGet<Sprite>();
@@ -54,10 +58,14 @@ void ControllerSystemRB::update() {
         }
 
         f32 impulseY = 0;
+        if (isJumpAvailable) {
+            control.jumpBuffer.buffer();
+        }
+
         if (input.isJump()) {
-            if ((rb.collider.isGrounded() || rb.coyoteSecondsRemaining > 0) && !input.isJumpUsed()) {
+            if ((rb.collider.isGrounded() || rb.coyoteSecondsRemaining > 0) && control.canJump()) {
+                control.jumpBuffer.consume();
                 rb.isJumping = true;
-                isJumpUsed = true;
 
                 if (vel.stable.y() < 0) {
                     vel.stable.e[1] = 0;
@@ -65,29 +73,27 @@ void ControllerSystemRB::update() {
 
                 impulseY += rb.jumpInitialVelocity;
                 rb.jumpSecondsRemaining = rb.jumpSecondsMax;
-            } else if (rb.isJumping) {
+            } else if (control.isJumping()) {
                 f32 damping = rb.jumpSecondsRemaining / rb.jumpSecondsMax;
                 damping *= damping;  // TODO play around with this
                 impulseY += rb.jumpInitialVelocity * damping;
                 rb.jumpSecondsRemaining -= dt;
                 if (rb.jumpSecondsRemaining < 0) {
                     rb.jumpSecondsRemaining = 0;
+                    control.jumpBuffer.reset();
                     rb.isJumping = false;
                 }
+            } else if (control.canJump()) {
+                control.jumpBuffer.notUsed();
             }
         } else {
+            control.jumpBuffer.reset();
             rb.isJumping = false;
         }
 
-        PlayerControlRB& control = entity.get<PlayerControlRB>();
         impulseX *= control.moveSpeed;
 
         vel.impulse += Vector2f(impulseX, impulseY);
-    }
-    if (isJumpUsed) {
-        // use jump after all entities have processed inputs
-        // so multiple entities can jump
-        input.useJump();
     }
 }
 

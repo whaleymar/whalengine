@@ -9,7 +9,6 @@ enum class InputType { LEFT, RIGHT, UP, DOWN, JUMP, PAUSE, DEBUG, GROWX, GROWY, 
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-// TODO track frame/time of input for buffering
 class Input {
 public:
     static Input& getInstance() {
@@ -30,7 +29,7 @@ public:
     bool isPause() const { return mIsPause; }
     bool isDebug() const { return mIsDebug; }
 
-    bool isJumpUsed() const { return mIsJumpUsed; }
+    bool isJumpAvailable() const { return mIsJumpPressed; }
 
 #ifndef NDEBUG
     bool isShrinkX() const { return mIsShrinkX; }
@@ -54,7 +53,7 @@ private:
     bool mIsPause = false;
     bool mIsDebug = false;
 
-    bool mIsJumpUsed = false;
+    bool mIsJumpPressed = false;
 
 #ifndef NDEBUG
     bool mIsShrinkX = false;
