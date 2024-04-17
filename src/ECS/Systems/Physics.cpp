@@ -54,19 +54,15 @@ void PhysicsSystem::update() {
     // is a little inefficient to do it this way (vs separating the systems)
     for (auto& [entityid, entity] : getEntities()) {
         Position& pos = entity.get<Position>();
+        if (!pos.isManuallyMoved) {
+            continue;
+        }
 
+        pos.isManuallyMoved = false;
         if (std::optional<RigidBody*> rb = entity.tryGet<RigidBody>(); rb) {
-            if (rb.value()->collider.wasMovedManually()) {
-                rb.value()->collider.manualMoveComplete();
-            } else {
-                rb.value()->collider.setPositionFromBottom(pos.e);
-            }
+            rb.value()->collider.setPositionFromBottom(pos.e);
         } else if (std::optional<SolidBody*> sb = entity.tryGet<SolidBody>(); sb) {
-            if (sb.value()->collider.wasMovedManually()) {
-                sb.value()->collider.manualMoveComplete();
-            } else {
-                sb.value()->collider.setPositionFromBottom(pos.e);
-            }
+            sb.value()->collider.setPositionFromBottom(pos.e);
         }
     }
 
@@ -170,7 +166,8 @@ void PhysicsSystem::update() {
         RigidBody& rb = entity.get<RigidBody>();
 
         // position is bottom-middle of collider
-        pos.e = rb.collider.getCollider().getPositionEdge(Vector::unitiDown);
+        // pos.e = rb.collider.getCollider().getPositionEdge(Vector::unitiDown);
+        pos.e = rb.collider.getCollider().getPositionEdge(Vector2i::unitDown);
     }
 }
 

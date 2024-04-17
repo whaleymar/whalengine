@@ -64,11 +64,14 @@ std::optional<Error> loadDebugScene() {
         invisBlock2.remove<SolidBody>();
     }
 
+    createBlock(Position::tiles(6, 15), Draw(Depth::Player, Color::RED));
+    createBlock(Position::tiles(6, 16), Draw(Depth::Player, Color::RED));
+
     auto platform = createBlock(Position::tiles(5, 1)).value();
-    auto pathControl = RailsControl(30,
+    auto pathControl = RailsControl(400,
                                     {
-                                        Position::tiles(5, 1),
-                                        Position::tiles(5, 15),
+                                        {Position::tiles(5, 1).e, RailsControl::Movement::LINEAR},
+                                        {Position::tiles(5, 15).e, RailsControl::Movement::LINEAR},
                                     },
                                     2, true);
     platform.add<RailsControl>(pathControl);

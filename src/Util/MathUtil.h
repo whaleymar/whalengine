@@ -71,6 +71,11 @@ inline f32 easeInOutSine(const f32 n1, const f32 n2, const f32 t) {
     return lerp(n1, n2, 0.5 * (1 + std::sin(PI * (t - 0.5))));
 }
 
+inline f32 easeInOutSineFirstOrder(const f32 n1, const f32 n2, const f32 t) {
+    // trough @ t=0, crest @ t=0.5, trough @ t=1
+    return lerp(n1, n2, 0.5 * (1 + std::sin(PI * (2 * t - 0.5))));
+}
+
 inline f32 easeInQuad(const f32 n1, const f32 n2, const f32 t) {
     return lerp(n1, n2, t * t);
 }

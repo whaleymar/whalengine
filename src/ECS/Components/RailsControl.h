@@ -2,13 +2,11 @@
 
 #include <vector>
 
-#include "ECS/Components/Position.h"
+#include "Util/Vector.h"
 
 namespace whal {
 
 struct RailsControl {
-    // TODO
-    // this could apply to all checkpoints, or each one could have a unique value
     enum class Movement {
         LINEAR,
         EASEIO_BEZIER,
@@ -24,25 +22,27 @@ struct RailsControl {
         Movement movement;
     };
 
-    RailsControl(f32 moveSpeed_ = 5, std::vector<Position> checkPoints_ = {}, f32 waitTime_ = 0, bool isCycle_ = true);
+    RailsControl(f32 moveSpeed_ = 5, std::vector<CheckPoint> checkPoints_ = {}, f32 waitTime_ = 0, bool isCycle_ = true);
 
 private:
-    std::vector<Position> mCheckpoints;
+    std::vector<CheckPoint> mCheckpoints;
 
 public:
-    f32 maxSpeed;
+    f32 speed;
     f32 waitTime;
 
+    Vector2f startPosition;
     f32 curActionTime = 0;  // time spent moving or waiting
-    f32 invSegmentDistance = 0;
-    bool isCycle;  // if true, repeats after returning to first checkpoint
+    bool isCycle;           // if true, repeats after returning to first checkpoint
     bool isWaiting = false;
-    bool isMoving = false;
+    bool isMoving = false;  // should be able to get rid of this
     bool isVelocityUpdateNeeded = false;
     u64 curTarget = 0;
 
-    Position getTarget() const;
+    CheckPoint getTarget() const;
     void step();
+    f32 getSpeed(Vector2i currentPosition, f32 inv_dt);
+    bool isValid() const;
 };
 
 }  // namespace whal

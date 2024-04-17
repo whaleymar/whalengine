@@ -22,8 +22,6 @@ void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
         return;
     }
 
-    mWasMovedManually = isManualMove;
-
     // check riding status *before* moving
     auto riding = getRidingActors();
 
@@ -56,7 +54,7 @@ void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, 
         if (mCollider.isOverlapping(actor->getCollider())) {
             f32 actorEdge = (actor->getCollider().*edgeFunc)();
             toMove = solidEdge - actorEdge;
-            actor->moveDirection(isXDirection, toMove, &ActorCollider::squish, isManualMove);
+            actor->moveDirection(isXDirection, toMove, &ActorCollider::squish);
             f32 momentum = toMove / dt;
             if (isManualMove) {
                 actor->addMomentum(momentum, isXDirection);
@@ -65,7 +63,7 @@ void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, 
             }
         } else if (std::find(riding.begin(), riding.end(), actor) != riding.end()) {
             // I might change this for solids moving down faster than gravity RESEARCH
-            actor->moveDirection(isXDirection, toMove, nullptr, isManualMove);
+            actor->moveDirection(isXDirection, toMove, nullptr);
             f32 momentum = toMove / dt;
             if (isManualMove) {
                 actor->addMomentum(momentum, isXDirection);

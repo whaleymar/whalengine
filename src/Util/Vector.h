@@ -25,6 +25,11 @@ struct Vector2 {
         e[1] = other.e[1];
     }
 
+    static inline Vector2<T> unitUp = {0, 1};
+    static inline Vector2<T> unitDown = {0, -1};
+    static inline Vector2<T> unitLeft{-1, 0};
+    static inline Vector2<T> unitRight{1, 0};
+
     Vector2<T>& operator=(const Vector2<T>& other) {
         if (this != &other) {
             e[0] = other.e[0];

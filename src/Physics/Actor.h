@@ -18,7 +18,7 @@ class ActorCollider : public IUseCollision {
 public:
     ActorCollider(Vector2f position, Vector2i half);
 
-    void moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback, bool isManualMove = false);
+    void moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback);
     bool isAlive() const { return mIsAlive; }
     bool isGrounded() const { return mIsGrounded; }
     void setGrounded(const bool grounded) { mIsGrounded = grounded; }
