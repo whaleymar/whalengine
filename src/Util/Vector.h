@@ -29,6 +29,7 @@ struct Vector2 {
     static inline Vector2<T> unitDown = {0, -1};
     static inline Vector2<T> unitLeft{-1, 0};
     static inline Vector2<T> unitRight{1, 0};
+    static inline Vector2<T> zero{0, 0};
 
     Vector2<T>& operator=(const Vector2<T>& other) {
         if (this != &other) {
@@ -82,21 +83,5 @@ Vector2i toIntVec(const Vector2f floatVec);
 // template <typename T>
 // Vector2<T> lerp(const Vector2<T>, const Vector2<T>);
 Vector2f lerp(const Vector2f, const Vector2f, const f32);
-
-namespace Vector {
-
-static Vector2f zero2f = Vector2f();
-static Vector2f unitfUp = Vector2f(0, 1);
-static Vector2f unitfDown = Vector2f(0, -1);
-static Vector2f unitfLeft = Vector2f(-1, 0);
-static Vector2f unitfRight = Vector2f(1, 0);
-
-static Vector2i zero2i = Vector2i();
-static Vector2i unitiUp = Vector2i(0, 1);
-static Vector2i unitiDown = Vector2i(0, -1);
-static Vector2i unitiLeft = Vector2i(-1, 0);
-static Vector2i unitiRight = Vector2i(1, 0);
-
-}  // namespace Vector
 
 }  // namespace whal

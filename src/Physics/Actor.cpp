@@ -113,7 +113,7 @@ void ActorCollider::squish(const HitInfo hitInfo) {
 
 bool ActorCollider::isRiding(const SolidCollider* solid) const {
     // check for collision 1 unit down
-    auto movedCollider = AABB(mCollider.center + Vector::unitiDown, mCollider.half);
+    auto movedCollider = AABB(mCollider.center + Vector2i::unitDown, mCollider.half);
     if (movedCollider.collide(solid->getCollider()) != std::nullopt) {
         return true;
     }

@@ -4,7 +4,6 @@
 #include "ECS/Components/Position.h"
 #include "ECS/Components/RailsControl.h"
 #include "ECS/Components/SolidBody.h"
-#include "ECS/Components/Velocity.h"
 #include "ECS/Entities/Block.h"
 #include "ECS/Entities/Player.h"
 #include "ECS/Lib/ECS.h"
@@ -68,10 +67,10 @@ std::optional<Error> loadDebugScene() {
     createBlock(Position::tiles(6, 16), Draw(Depth::Player, Color::RED));
 
     auto platform = createBlock(Position::tiles(5, 1)).value();
-    auto pathControl = RailsControl(400,
+    auto pathControl = RailsControl(14,
                                     {
                                         {Position::tiles(5, 1).e, RailsControl::Movement::LINEAR},
-                                        {Position::tiles(5, 15).e, RailsControl::Movement::LINEAR},
+                                        {Position::tiles(5, 15).e, RailsControl::Movement::EASEIO_BEZIER},
                                     },
                                     2, true);
     platform.add<RailsControl>(pathControl);

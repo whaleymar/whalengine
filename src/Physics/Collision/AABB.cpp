@@ -5,7 +5,7 @@
 
 namespace whal {
 
-AABB::AABB(Vector2i half_) : center(Vector::zero2i), half(half_) {}
+AABB::AABB(Vector2i half_) : center(Vector2i::zero), half(half_) {}
 AABB::AABB(Vector2i center_, Vector2i half_) : center(center_), half(half_) {}
 
 AABB AABB::fromBottom(Vector2i bottom, Vector2i half) {
@@ -90,7 +90,7 @@ const std::optional<HitInfo> AABB::collide(Segment segment) const {
     // "If the near time is greater than zero, the segment starts outside and is entering the box. Otherwise, the segment starts inside the box, and
     // is exiting it. If we’re entering the box, we can set the hit time to the near time, since that’s the point along the segment at which it
     // collided. If it’s inside, it’s colliding at the very starting of the line, so just set the hit time to zero."
-    Vector2i hitNormal = Vector::zero2i;
+    Vector2i hitNormal = Vector2i::zero;
     if (nearX == nearY) {
         hitNormal.e[0] = -signX;
         hitNormal.e[1] = -signY;

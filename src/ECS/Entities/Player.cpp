@@ -8,6 +8,7 @@
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
+#include "ECS/Systems/Physics.h"
 #include "Systems/Deltatime.h"
 #include "Util/MathUtil.h"
 
@@ -32,6 +33,7 @@ const char* RUN = "actor/player-run";
 const char* JUMP = "actor/player-jump";
 const char* FALL = "actor/player-fall";
 
+// RESEARCH
 // interesting concept to try:
 // *transition animations*
 // -> animations which play for a fixed # of cycles & knows which animation follows? Maybe a custom data structure is overkill & we only need a static
@@ -47,13 +49,13 @@ bool brain(Animator& animator, ecs::Entity entity) {
     auto& vel = entity.get<Velocity>();
     auto& sprite = entity.get<Sprite>();
 
-    f32 unsquishStep = Deltatime::getInstance().get() * 1.75;
+    f32 unsquishStep = Deltatime::getInstance().get() * 1.50;
     sprite.scale = {approach(sprite.scale.x(), 1.0, unsquishStep), approach(sprite.scale.y(), 1.0, unsquishStep)};
     sprite.isVertsUpdateNeeded = true;
     if (rb.collider.isGrounded()) {
         if (rb.isLanding) {
-            f32 squish = std::min(abs(vel.total.y()) / 15, 1.0f);
-            sprite.scale = {lerp(1, 1.2, squish), lerp(1, 0.8, squish)};
+            f32 squish = std::min(abs(vel.total.y()) / abs(TERMINAL_VELOCITY_Y), 1.0f);
+            sprite.scale = {lerp(1, 1.25, squish), lerp(1, 0.8, squish)};
         }
         if (vel.total.x() != 0) {
             if (animator.setAnimation(RUN)) {
@@ -67,7 +69,7 @@ bool brain(Animator& animator, ecs::Entity entity) {
     } else {
         if (rb.isJumping) {
             if (animator.setAnimation(JUMP)) {
-                sprite.scale = {0.8, 1.2};
+                sprite.scale = {0.8, 1.25};
                 return true;
             }
         } else {
@@ -100,7 +102,7 @@ Expected<ecs::Entity> createPlayer() {
     // graphics
     Animator animator;
     AnimInfo animInfo = {
-        {PlayerAnim::RUN, 4, 0.25},
+        {PlayerAnim::RUN, 4, 0.125},
         {PlayerAnim::IDLE, 2, 1.0},
         {PlayerAnim::JUMP, 1, 1.0},
         {PlayerAnim::FALL, 1, 1.0},

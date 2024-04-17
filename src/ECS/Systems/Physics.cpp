@@ -15,7 +15,7 @@
 namespace whal {
 
 constexpr f32 GRAVITY = -35;
-constexpr f32 TERMINAL_VELOCITY_Y = -15;
+// constexpr f32 TERMINAL_VELOCITY_Y = -20;
 
 constexpr f32 FRICTION_GROUND = 5.0;
 constexpr f32 FRICTION_AIR = 2.0;
@@ -153,7 +153,7 @@ void PhysicsSystem::update() {
 
         } else if (sb) {
             sb.value()->collider.move(moveX, moveY);
-            pos.e = sb.value()->collider.getCollider().getPositionEdge(Vector::unitiDown);
+            pos.e = sb.value()->collider.getCollider().getPositionEdge(Vector2i::unitDown);
 
         } else {
             pos.e += Vector2i(std::round(moveX), std::round(moveY));
@@ -166,7 +166,6 @@ void PhysicsSystem::update() {
         RigidBody& rb = entity.get<RigidBody>();
 
         // position is bottom-middle of collider
-        // pos.e = rb.collider.getCollider().getPositionEdge(Vector::unitiDown);
         pos.e = rb.collider.getCollider().getPositionEdge(Vector2i::unitDown);
     }
 }

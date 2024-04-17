@@ -96,16 +96,16 @@ void ControllerSystemFree::update() {
     for (auto& [entityid, entity] : getEntities()) {
         Vector2f delta;
         if (input.isLeft()) {
-            delta += Vector::unitfLeft;
+            delta += Vector2f::unitLeft;
         }
         if (input.isRight()) {
-            delta += Vector::unitfRight;
+            delta += Vector2f::unitRight;
         }
         if (input.isUp()) {
-            delta += Vector::unitfUp;
+            delta += Vector2f::unitUp;
         }
         if (input.isDown()) {
-            delta += Vector::unitfDown;
+            delta += Vector2f::unitDown;
         }
 
         PlayerControlFree& control = entity.get<PlayerControlFree>();

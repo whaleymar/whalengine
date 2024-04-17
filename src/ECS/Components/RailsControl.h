@@ -13,8 +13,6 @@ struct RailsControl {
         EASEIO_SINE,
         EASEI_QUAD,
         EASEI_CUBE,
-        EASEO_QUAD,
-        EASEO_CUBE,
     };
 
     struct CheckPoint {
@@ -28,18 +26,18 @@ private:
     std::vector<CheckPoint> mCheckpoints;
 
 public:
-    f32 speed;
+    f32 speed;  // tiles per second
     f32 waitTime;
 
     Vector2f startPosition;
     f32 curActionTime = 0;  // time spent moving or waiting
     bool isCycle;           // if true, repeats after returning to first checkpoint
-    bool isWaiting = false;
-    bool isMoving = false;  // should be able to get rid of this
+    bool isWaiting = true;
     bool isVelocityUpdateNeeded = false;
     u64 curTarget = 0;
 
     CheckPoint getTarget() const;
+    void startManually();
     void step();
     f32 getSpeed(Vector2i currentPosition, f32 inv_dt);
     bool isValid() const;
