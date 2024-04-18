@@ -45,7 +45,7 @@ void SpriteSystem::drawEntities() {
         // position is the bottom-middle of the vao, but openGL expects position of the top left corner
         // TODO clamp to texel grid
         // f32 height = static_cast<f32>(sprite.frameSizeTexels.x() * PIXELS_PER_TEXEL) * sprite.scale.y();
-        Vector2f drawOffset = toFloatVec(sprite.frameSizeTexels * PIXELS_PER_TEXEL) * sprite.scale * Vector2f(-0.5, 1.0);
+        Vector2f drawOffset = toFloatVec(sprite.getFrameSizeTexels() * PIXELS_PER_TEXEL) * sprite.scale * Vector2f(-0.5, 1.0);
         Vector2f floatPos = (toFloatVec(trans.position) + drawOffset);
         glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
 

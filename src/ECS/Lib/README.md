@@ -20,6 +20,7 @@ The main changes are:
 - thread-safe system methods
 - auto-call systems
 - system scheduler (every X frames)
+- ECS::Query<T...> method which gives const list of entities with those types
 
 # Nice to have
 

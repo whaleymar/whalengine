@@ -13,12 +13,12 @@ constexpr f32 getPixelSize(const s32 frameSize, const f32 scale) {
 }
 
 Sprite::Sprite(Depth depth_, Frame frame, RGB rgb)
-    : depth(depth_), atlasPositionTexels(frame.atlasPositionTexels), frameSizeTexels(frame.dimensionsTexels), color(rgb) {
+    : depth(depth_), atlasPositionTexels(frame.atlasPositionTexels), color(rgb), mFrameSizeTexels(frame.dimensionsTexels) {
     updateVertices();
 }
 
 void Sprite::setFrameSize(s32 frameSizeX, s32 frameSizeY) {
-    frameSizeTexels = {frameSizeX, frameSizeY};
+    mFrameSizeTexels = {frameSizeX, frameSizeY};
     isVertsUpdateNeeded = true;
 }
 
@@ -28,8 +28,8 @@ void Sprite::setColor(RGB rgb) {
 }
 
 void Sprite::updateVertices(bool isFlipX) {
-    const f32 width = getPixelSize(frameSizeTexels.x(), scale.x());
-    const f32 height = getPixelSize(frameSizeTexels.y(), scale.y());
+    const f32 width = getPixelSize(mFrameSizeTexels.x(), scale.x());
+    const f32 height = getPixelSize(mFrameSizeTexels.y(), scale.y());
 
     Vector2f sheetSize = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getSize();
     f32 scaleX = 1 / sheetSize.x();
@@ -37,9 +37,9 @@ void Sprite::updateVertices(bool isFlipX) {
 
     Vector2f texelOffset = toFloatVec(atlasPositionTexels);
     f32 xMin = texelOffset.x() * scaleX;
-    f32 xMax = (texelOffset.x() + frameSizeTexels.x()) * scaleX;
+    f32 xMax = (texelOffset.x() + mFrameSizeTexels.x()) * scaleX;
     f32 yMin = texelOffset.y() * scaleY;
-    f32 yMax = (texelOffset.y() + frameSizeTexels.y()) * scaleY;
+    f32 yMax = (texelOffset.y() + mFrameSizeTexels.y()) * scaleY;
 
     if (isFlipX) {
         mVertices = MakeRectVerticesRGBUV(width, height, depth, color, xMax, xMin, yMax, yMin);
@@ -49,7 +49,7 @@ void Sprite::updateVertices(bool isFlipX) {
     isVertsUpdateNeeded = false;
 }
 
-Draw::Draw(Depth depth_, RGB color_) : depth(depth_), color(color_) {
+Draw::Draw(RGB color_, Vector2i frameSizeTexels_, Depth depth_) : depth(depth_), color(color_), frameSizeTexels(frameSizeTexels_) {
     updateVertices();
 }
 

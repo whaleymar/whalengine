@@ -58,13 +58,13 @@ std::optional<Error> loadDebugScene() {
                         Sprite(d, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/dirtblock").value(), Color::EMERALD))
                 .value();
         invisBlock.remove<SolidBody>();
-        auto invisBlock2 = createBlock(Transform::tiles(i - 5, 2), Draw(d, Color::EMERALD)).value();
+        auto invisBlock2 = createBlock(Transform::tiles(i - 5, 2), Draw(Color::EMERALD, {8, 8}, d)).value();
         // invisBlock.remove<SolidBody>(); // TODO after collision manager rework, check that deleting here actually removes the solidBody
         invisBlock2.remove<SolidBody>();
     }
 
-    createBlock(Transform::tiles(6, 15), Draw(Depth::Player, Color::RED));
-    createBlock(Transform::tiles(6, 16), Draw(Depth::Player, Color::RED));
+    createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8}));
+    createBlock(Transform::tiles(6, 16), Draw(Color::RED, {8, 8}));
 
     auto platform = createBlock(Transform::tiles(5, 1)).value();
     auto pathControl = RailsControl(14,
