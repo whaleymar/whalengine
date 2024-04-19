@@ -43,6 +43,8 @@ void MainLoop(GLFWwindow* window) {
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
     auto drawMgr = ecs.registerSystem<DrawManager>();
 
+    CollisionManager::getInstance().init(rigidBodyMgr, solidBodyMgr);
+
     // load scene
     auto err = loadDebugScene();
     if (err) {
@@ -67,7 +69,12 @@ void MainLoop(GLFWwindow* window) {
         controlSystemFree->update();
         pathSystem->update();
         physicsSystem->update();
-        rigidBodyMgr->update();  // kill entities that are destroyed by the phyiscs sim. this doesn't need to run every frame
+
+        // these don't need to run every frame:
+        // they sync the collision manager
+        // and kill crushed actors
+        rigidBodyMgr->update();
+        solidBodyMgr->update();
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

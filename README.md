@@ -51,8 +51,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - Logger queue that runs on another thread
 
 ## Bugs
-- deleting player after cloning makes clone's debug collider draw location wrong (but collision works fine) -> because the componentarray data gets moved to maintain density
-    - can't hold on to component pointers outside of the ECS, need to completely rethink CollisionManager
 - isNearZero not working
 - cppcheck issues
 - depth test broken for Draw components (low priority)

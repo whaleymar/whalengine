@@ -13,7 +13,7 @@ Expected<Entity> ECS::entity() const {
 }
 
 void ECS::kill(Entity entity) const {
-    mSystemManager->entityDestroyed(entity);  // this goes first so onDelete can fetch components before they're deallocated
+    mSystemManager->entityDestroyed(entity);  // this goes first so onRemove can fetch components before they're deallocated
     mEntityManager->destroyEntity(entity);
     mComponentManager->entityDestroyed(entity);
 }

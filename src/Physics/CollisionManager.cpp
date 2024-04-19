@@ -1,45 +1,24 @@
 #include "CollisionManager.h"
 
-#include <algorithm>
 #include <glad/gl.h>
 
+#include "Actor.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Shader.h"
-#include "Physics/Actor.h"
 #include "Physics/IUseCollision.h"
-#include "Physics/Solid.h"
+#include "Solid.h"
 
 namespace whal {
 
-void CollisionManager::add(ActorCollider* actor) {
-    mActors.push_back(actor);
-}
-
-void CollisionManager::add(SolidCollider* solid) {
-    mSolids.push_back(solid);
-}
-
-void CollisionManager::remove(ActorCollider* actor) {
-    auto ix = std::find(mActors.begin(), mActors.end(), actor);
-    if (ix != mActors.end()) {
-        mActors.erase(ix);
+void CollisionManager::init(std::shared_ptr<RigidBodyManager> actorMgr, std::shared_ptr<SolidBodyManager> solidMgr) {
+    mActorMgr = actorMgr;
+    mSolidMgr = solidMgr;
+#ifndef NDEBUG
+    if (mActorMgr && mSolidMgr) {
+        mIsValid = true;
     }
-}
-
-void CollisionManager::remove(SolidCollider* solid) {
-    auto ix = std::find(mSolids.begin(), mSolids.end(), solid);
-    if (ix != mSolids.end()) {
-        mSolids.erase(ix);
-    }
-}
-
-void CollisionManager::clearActors() {
-    mActors.clear();
-}
-
-void CollisionManager::clearSolids() {
-    mSolids.clear();
+#endif  // !NDEBUG
 }
 
 #ifndef NDEBUG

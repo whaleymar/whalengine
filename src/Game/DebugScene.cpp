@@ -14,15 +14,15 @@
 std::optional<Error> loadDebugScene() {
     using namespace whal;
 
-    createPlayer();
+    auto player = createPlayer();
     // auto player = createPlayer().value();
     // player.remove<PlayerControlRB>();
 
     // auto playerCopyExpected = createPlayer();
-    // player.value().kill();  // deleting here makes the collision box wrong! see bug in readme
+    // player.value().kill();
     // if (playerCopyExpected.isExpected()) {
     //     auto playerCopy = playerCopyExpected.value();
-    //     playerCopy.set(Position::tiles(20, 10));
+    //     playerCopy.set(Transform::tiles(20, 10));
     //     playerCopy.get<Sprite>().setColor(Color::EMERALD);
     // } else {
     //     return playerCopyExpected.error();
@@ -61,7 +61,6 @@ std::optional<Error> loadDebugScene() {
                 .value();
         invisBlock.remove<SolidBody>();
         auto invisBlock2 = createBlock(Transform::tiles(i - 5, 2), Draw(Color::EMERALD, {8, 8}, d)).value();
-        // invisBlock.remove<SolidBody>(); // TODO after collision manager rework, check that deleting here actually removes the solidBody
         invisBlock2.remove<SolidBody>();
     }
 

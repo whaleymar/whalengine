@@ -1,6 +1,8 @@
 #pragma once
 
-#include <vector>
+// #include <vector>
+
+#include "ECS/Systems/CollisionManager.h"
 
 namespace whal {
 
@@ -14,14 +16,17 @@ public:
         return instance;
     }
 
-    const std::vector<ActorCollider*>& getAllActors() const { return mActors; }
-    const std::vector<SolidCollider*>& getAllSolids() const { return mSolids; }
-    void add(ActorCollider* actor);
-    void add(SolidCollider* solid);
-    void remove(ActorCollider* actor);
-    void remove(SolidCollider* solid);
-    void clearActors();
-    void clearSolids();
+    void init(std::shared_ptr<RigidBodyManager> actorMgr, std::shared_ptr<SolidBodyManager> solidMgr);
+
+    const std::vector<ActorCollider*>& getAllActors() const {
+        assert(mIsValid && "CollisionManager was not initialized");
+        return mActorMgr->getAllActors();
+    }
+
+    const std::vector<SolidCollider*>& getAllSolids() const {
+        assert(mIsValid && "CollisionManager was not initialized");
+        return mSolidMgr->getAllSolids();
+    }
 
 private:
     CollisionManager() = default;
@@ -29,8 +34,12 @@ private:
     CollisionManager(const CollisionManager&) = delete;
     void operator=(const CollisionManager&) = delete;
 
-    std::vector<ActorCollider*> mActors{};
-    std::vector<SolidCollider*> mSolids{};
+    std::shared_ptr<RigidBodyManager> mActorMgr;
+    std::shared_ptr<SolidBodyManager> mSolidMgr;
+
+#ifndef NDEBUG
+    bool mIsValid = false;
+#endif
 };
 
 #ifndef NDEBUG
