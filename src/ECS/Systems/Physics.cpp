@@ -14,7 +14,7 @@
 
 namespace whal {
 
-constexpr f32 GRAVITY = -35;
+constexpr f32 GRAVITY = 35;
 
 constexpr f32 FRICTION_GROUND = 30.0;
 constexpr f32 FRICTION_AIR = 25.0;
@@ -26,7 +26,7 @@ constexpr f32 JUMP_PEAK_SPEED_MAX = -3.5;  // once Y velocity is below this, no 
 void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
     bool isInJumpPeak = isJumping && isBetween(velocity.total.y(), JUMP_PEAK_SPEED_MAX, 0.0f);
     f32 peakMultiplier = 1 - static_cast<f32>(isInJumpPeak) * (1 - JUMP_PEAK_GRAVITY_MULT);
-    velocity.stable.e[1] = approach(velocity.stable.y(), TERMINAL_VELOCITY_Y, -GRAVITY * peakMultiplier * dt);
+    velocity.stable.e[1] = approach(velocity.stable.y(), TERMINAL_VELOCITY_Y, GRAVITY * peakMultiplier * dt);
 }
 
 void applyFriction(Vector2f& velocity, f32 frictionMultiplier) {
@@ -37,6 +37,7 @@ void PhysicsSystem::update() {
     const f32 dt = Deltatime::getInstance().get();
     const f32 frictionStepGround = dt * FRICTION_GROUND;
     const f32 frictionStepAir = dt * FRICTION_AIR;
+    const f32 gravityStep = dt * GRAVITY * 3;
     std::vector<ecs::Entity> needsPositionUpdateRB;
 
     // sync collider in case position changed in another system
@@ -73,7 +74,7 @@ void PhysicsSystem::update() {
         Vector2f totalVelocity = vel.stable + impulse;
         f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
         f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
-        vel.residualImpulse = {approach(impulse.x(), 0, frictionStepGround), approach(impulse.y(), 0, frictionStepAir)};
+        vel.residualImpulse = {approach(impulse.x(), 0, frictionStepGround), approach(impulse.y(), 0, gravityStep)};
         vel.impulse = {0, 0};
         vel.total = totalVelocity;
 
