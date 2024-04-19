@@ -8,7 +8,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 
 ## Graphics
 - glfw -> sdl (for text and audio)
-- figure out how to do physics sim in texels instead of pixels (for my cpu)
 
 ## Systems
 - sound\*

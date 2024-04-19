@@ -5,11 +5,24 @@
 namespace whal {
 
 static const char* WINDOW_TITLE = "Untitled Engine";
+// only used by openGL:
+static u32 WINDOW_WIDTH_PIXELS_ACTUAL = 1280;
+static u32 WINDOW_HEIGHT_PIXELS_ACTUAL = 720;
 
+// used by the game (openGL will scale up to the actual resolution automatically):
 // EFFECTIVE GRID SIZE: 320 x 180
-static constexpr u32 WINDOW_WIDTH_PIXELS = 1280;
-static constexpr u32 WINDOW_HEIGHT_PIXELS = 720;
-static constexpr u32 PIXELS_PER_TEXEL = 4;
+// static constexpr u32 WINDOW_WIDTH_PIXELS = 320;
+// static constexpr u32 WINDOW_HEIGHT_PIXELS = 180;
+// static constexpr u32 PIXELS_PER_TEXEL = 1;
+
+// this is a nice balance of smoothness + not doing too much work. Things are positioned in half-texels
+static constexpr u32 WINDOW_WIDTH_PIXELS = 640;
+static constexpr u32 WINDOW_HEIGHT_PIXELS = 360;
+static constexpr u32 PIXELS_PER_TEXEL = 2;
+
+// static constexpr u32 WINDOW_WIDTH_PIXELS = 1280;
+// static constexpr u32 WINDOW_HEIGHT_PIXELS = 720;
+// static constexpr u32 PIXELS_PER_TEXEL = 4;
 // constexpr u32 WINDOW_WIDTH_PIXELS = 1600;
 // constexpr u32 WINDOW_HEIGHT_PIXELS = 900;
 // constexpr u32 PIXELS_PER_TEXEL = 5;

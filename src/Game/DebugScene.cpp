@@ -74,7 +74,8 @@ std::optional<Error> loadDebugScene() {
     auto pathControl = RailsControl(14,
                                     {
                                         {Transform::tiles(5, 1).position, RailsControl::Movement::LINEAR},
-                                        {Transform::tiles(5, 15).position, RailsControl::Movement::EASEIO_BEZIER},
+                                        // {Transform::tiles(5, 15).position, RailsControl::Movement::EASEIO_BEZIER},
+                                        {Transform::tiles(5, 15).position, RailsControl::Movement::EASEI_CUBE},
                                     },
                                     2, true);
     platform.add<RailsControl>(pathControl);

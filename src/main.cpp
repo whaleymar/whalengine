@@ -102,7 +102,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH_PIXELS, WINDOW_HEIGHT_PIXELS, WINDOW_TITLE, NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH_PIXELS_ACTUAL, WINDOW_HEIGHT_PIXELS_ACTUAL, WINDOW_TITLE, NULL, NULL);
     glfwMakeContextCurrent(window);
     if (window == NULL) {
         print("Failed to create GLFW window");
