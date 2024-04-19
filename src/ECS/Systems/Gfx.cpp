@@ -13,6 +13,12 @@
 
 namespace whal {
 
+constexpr f32 TEXELS_PER_PIXEL = 1.0f / PIXELS_PER_TEXEL;
+
+Vector2f clampToTexelGrid(Vector2f vec) {
+    return Vector2f(std::roundf(vec.x() * TEXELS_PER_PIXEL), std::roundf(vec.y() * TEXELS_PER_PIXEL)) * PIXELS_PER_TEXEL;
+}
+
 void SpriteSystem::onAdd(const ecs::Entity entity) {
     f32 fDepth = depthToFloat(entity.get<Sprite>().depth);
     auto prev = mSorted.before_begin();
@@ -33,9 +39,11 @@ void SpriteSystem::onRemove(const ecs::Entity entity) {
 
 void drawEntity(ShaderProgram& program, Transform& trans, IDraw& draw, f32* pVertices, s32 nVertices) {
     // position is the bottom-middle of the vao, but openGL expects position of the top left corner
-    // TODO clamp to texel grid
     Vector2f drawOffset = toFloatVec(draw.getFrameSizeTexels() * PIXELS_PER_TEXEL) * draw.scale * Vector2f(-0.5, 1.0);
     Vector2f floatPos = (toFloatVec(trans.position) + drawOffset);
+
+    // RESEARCH
+    // Vector2f floatPos = clampToTexelGrid(toFloatVec(trans.position) + drawOffset);
     glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
 
     draw.vao.bind();
