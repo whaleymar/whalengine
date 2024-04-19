@@ -6,6 +6,10 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 ## Current Goal: Textures and Animations
 - next goal: clean up bugs && some todos
 
+## Graphics
+- glfw -> sdl (for text and audio)
+- figure out how to do physics sim in texels instead of pixels (for my cpu)
+
 ## Systems
 - sound\*
 - lighting\*
@@ -27,6 +31,12 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - end jump if head bonk
 - jump sometimes still happens after landing 
 - isTrigger flag for IUseCollider (+ maybe rename mIsCollidable -> mIsActive + add new isCollidable flag which determines if only a trigger happens)
+- RigidBody is doing too much, needs to be split up:
+    - ActorCollider: determines how it interacts with solids 
+        - maybe this could be a generic component (that solids also have) that could be used as a trigger, or can combine with RigidBody/SolidBody to get current behavior
+    - RigidBody: determines how friction and gravity affect it (so I can have these systems affect entities without collision, like sweat particles)
+    - PlatformerController: coyote time, jump time, jump height, isLanding/Grounded/Jumping flags
+        - NPCs can have their own component to adjust these
 
 # Animation 
 - needs cleanup + some light optimization (remove frequent string comparisons)
