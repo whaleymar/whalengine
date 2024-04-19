@@ -85,11 +85,11 @@ inline f32 easeInCubic(const f32 n1, const f32 n2, const f32 t) {
 }
 
 inline f32 easeOutQuad(const f32 n1, const f32 n2, const f32 t) {
-    return lerp(n1, n2, 1.0f - t * t);
+    return lerp(n1, n2, std::sqrt(t));
 }
 
 inline f32 easeOutCubic(const f32 n1, const f32 n2, const f32 t) {
-    return lerp(n1, n2, 1.0f - t * t * t);
+    return lerp(n1, n2, std::cbrt(t));
 }
 
 }  // namespace whal
