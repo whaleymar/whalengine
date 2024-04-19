@@ -12,10 +12,9 @@ constexpr f32 getPixelSize(const s32 frameSize, const f32 scale) {
     return static_cast<f32>(frameSize) * PIXELS_PER_TEXEL * scale;
 }
 
-Sprite::Sprite(Depth depth_, Frame frame, RGB rgb)
-    : depth(depth_), atlasPositionTexels(frame.atlasPositionTexels), color(rgb), mFrameSizeTexels(frame.dimensionsTexels) {
-    updateVertices();
-}
+IDraw::IDraw(Depth depth_, RGB rgb, Vector2i frameSizeTexels) : depth(depth_), color(rgb), mFrameSizeTexels(frameSizeTexels){};
+
+Sprite::Sprite(Depth depth_, Frame frame, RGB rgb) : IDraw({depth_, rgb, frame.dimensionsTexels}), atlasPositionTexels(frame.atlasPositionTexels) {}
 
 void Sprite::setFrameSize(s32 frameSizeX, s32 frameSizeY) {
     mFrameSizeTexels = {frameSizeX, frameSizeY};
@@ -49,20 +48,24 @@ void Sprite::updateVertices(bool isFlipX) {
     isVertsUpdateNeeded = false;
 }
 
-Draw::Draw(RGB color_, Vector2i frameSizeTexels_, Depth depth_) : depth(depth_), color(color_), frameSizeTexels(frameSizeTexels_) {
+Draw::Draw(RGB color_, Vector2i frameSizeTexels_, Depth depth_) : IDraw(depth_, color_, frameSizeTexels_) {
     updateVertices();
 }
 
 void Draw::setFrameSize(s32 frameSizeX, s32 frameSizeY) {
-    frameSizeTexels = {frameSizeX, frameSizeY};
+    mFrameSizeTexels = {frameSizeX, frameSizeY};
     updateVertices();
 }
 
 void Draw::updateVertices() {
-    const f32 width = getPixelSize(frameSizeTexels.x(), 1.0);
-    const f32 height = getPixelSize(frameSizeTexels.y(), 1.0);
+    const f32 width = getPixelSize(mFrameSizeTexels.x(), 1.0);
+    const f32 height = getPixelSize(mFrameSizeTexels.y(), 1.0);
 
     mVertices = MakeRectVerticesRGB(width, height, depth, color);
+}
+
+void Draw::setColor(RGB rgb) {
+    color = rgb;
 }
 
 }  // namespace whal

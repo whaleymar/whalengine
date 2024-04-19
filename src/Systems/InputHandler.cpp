@@ -105,7 +105,7 @@ void Input::reset(InputType input) {
 }
 
 void Input::loadMappings() const {
-    // TODO load from file
+    // EVENTUALLY load from file once i have, like, menus working
 
     KeyMap.clear();
 

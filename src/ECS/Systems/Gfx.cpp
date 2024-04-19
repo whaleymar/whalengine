@@ -31,6 +31,20 @@ void SpriteSystem::onRemove(const ecs::Entity entity) {
     mSorted.remove_if([entity](const ecs::Entity& e) { return e.id() == entity.id(); });
 }
 
+void drawEntity(ShaderProgram& program, Transform& trans, IDraw& draw, f32* pVertices, s32 nVertices) {
+    // position is the bottom-middle of the vao, but openGL expects position of the top left corner
+    // TODO clamp to texel grid
+    Vector2f drawOffset = toFloatVec(draw.getFrameSizeTexels() * PIXELS_PER_TEXEL) * draw.scale * Vector2f(-0.5, 1.0);
+    Vector2f floatPos = (toFloatVec(trans.position) + drawOffset);
+    glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
+
+    draw.vao.bind();
+    draw.vbo.buffer(pVertices, nVertices * sizeof(float));
+
+    updateShaderVars(program);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, draw.nVertices);
+}
+
 void SpriteSystem::drawEntities() {
     auto program = GLResourceManager::getInstance().getProgram(ShaderType::SpriteRGB);
     GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).bind();
@@ -41,20 +55,7 @@ void SpriteSystem::drawEntities() {
         if (sprite.isVertsUpdateNeeded) {
             sprite.updateVertices(trans.facing != Facing::Left);
         }
-
-        // position is the bottom-middle of the vao, but openGL expects position of the top left corner
-        // TODO clamp to texel grid
-        // f32 height = static_cast<f32>(sprite.frameSizeTexels.x() * PIXELS_PER_TEXEL) * sprite.scale.y();
-        Vector2f drawOffset = toFloatVec(sprite.getFrameSizeTexels() * PIXELS_PER_TEXEL) * sprite.scale * Vector2f(-0.5, 1.0);
-        Vector2f floatPos = (toFloatVec(trans.position) + drawOffset);
-        glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
-
-        sprite.vao.bind();
-        auto vertices = sprite.getVertices();
-        sprite.vbo.buffer(vertices.data(), vertices.size() * sizeof(float));
-
-        updateShaderVars(program);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, sprite.nVertices);
+        drawEntity(program, trans, sprite, sprite.getVertices().data(), sprite.getVertices().size());
     }
 }
 
@@ -63,22 +64,9 @@ void DrawSystem::drawEntities() {
     program.useProgram();
     // sorting not required since Draw components don't have transparency
     for (auto const& [entityid, entity] : getEntities()) {
-        // TODO abstract this loop
         Transform& trans = entity.get<Transform>();
         Draw& draw = entity.get<Draw>();
-
-        // position is the bottom-middle of the vao, but openGL expects position of the top left corner
-        // TODO clamp to texel grid
-        Vector2f drawOffset = toFloatVec(draw.frameSizeTexels * PIXELS_PER_TEXEL) * Vector2f(-0.5, 1.0);
-        Vector2f floatPos = (toFloatVec(trans.position) + drawOffset);
-        glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
-
-        draw.vao.bind();
-        auto vertices = draw.getVertices();
-        draw.vbo.buffer(vertices.data(), vertices.size() * sizeof(float));
-
-        updateShaderVars(program);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, draw.nVertices);
+        drawEntity(program, trans, draw, draw.getVertices().data(), draw.getVertices().size());
     }
 }
 
