@@ -12,6 +12,7 @@ The main changes are:
 1. Components need a default constructor and be copyable (you can still use other constructors for initialization)
 2. Components need a unique type (after name mangling -> aliases aren't unique)
 3. Systems need a default constructor
+4. Cannot store pointers to components. Components are densely packed in arrays, so a deleted entity may make the pointer invalid
 
 ## TODO
 

@@ -94,7 +94,7 @@ void ControllerSystemRB::update() {
                 rb.jumpSecondsRemaining = rb.jumpSecondsMax;
             } else if (control.isJumping()) {
                 f32 damping = rb.jumpSecondsRemaining / rb.jumpSecondsMax;
-                damping *= damping;  // TODO play around with this
+                damping *= damping;
                 impulseY += rb.jumpInitialVelocity * damping;
                 rb.jumpSecondsRemaining -= dt;
                 if (rb.jumpSecondsRemaining < 0) {

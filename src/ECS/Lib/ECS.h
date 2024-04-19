@@ -254,18 +254,8 @@ public:
         return getComponentArray<T>(ix)->getData(entity);
     }
 
-    // TODO cpp file (next 2 funcs)
-    void entityDestroyed(const Entity entity) {
-        for (auto const& componentArray : mComponentArrays) {
-            componentArray->entityDestroyed(entity);
-        }
-    }
-
-    void copyComponents(const Entity prefab, Entity dest) {
-        for (auto const& componentArray : mComponentArrays) {
-            componentArray->copyComponent(prefab, dest);
-        }
-    }
+    void entityDestroyed(const Entity entity);
+    void copyComponents(const Entity prefab, Entity dest);
 
     // assign unique IDs to each component type
     static inline ComponentType ComponentID = 0;
@@ -348,15 +338,6 @@ public:
         mPatterns.push_back(system->getPattern());
         mSystems.push_back(system);
         return system;
-    }
-
-    template <class T>
-    void setPattern(const Pattern pattern) {
-        const SystemId id = getSystemID<T>();
-        auto it = std::find(mSystemIDs.begin(), mSystemIDs.end(), id);
-        assert(it != mSystemIDs.end());  // msg: can't set pattern for unregistered system
-        int ix = std::distance(mSystemIDs.begin(), it);
-        mPatterns[ix] = pattern;
     }
 
     void entityDestroyed(const Entity entity) const {
@@ -465,12 +446,6 @@ public:
     template <typename T>
     std::shared_ptr<T> registerSystem() const {
         return mSystemManager->registerSystem<T>();
-    }
-
-    // todo delete (double check not needed)
-    template <typename T>
-    void setSystemPattern(Pattern pattern) const {
-        mSystemManager->setPattern<T>(pattern);
     }
 
 private:
