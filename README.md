@@ -26,7 +26,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - jump corner correction
 - end jump if head bonk
 - jump sometimes still happens after landing 
-- ramp up to full run speed
 - isTrigger flag for IUseCollider (+ maybe rename mIsCollidable -> mIsActive + add new isCollidable flag which determines if only a trigger happens)
 
 # Animation 

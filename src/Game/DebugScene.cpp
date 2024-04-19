@@ -14,7 +14,9 @@
 std::optional<Error> loadDebugScene() {
     using namespace whal;
 
-    auto player = createPlayer();
+    createPlayer();
+    // auto player = createPlayer().value();
+    // player.remove<PlayerControlRB>();
 
     // auto playerCopyExpected = createPlayer();
     // player.value().kill();  // deleting here makes the collision box wrong! see bug in readme
@@ -65,6 +67,9 @@ std::optional<Error> loadDebugScene() {
 
     createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8}));
     createBlock(Transform::tiles(6, 16), Draw(Color::RED, {8, 8}));
+    // auto myBlock = createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8})).value();
+    // myBlock.add<PlayerControlFree>();
+    // myBlock.add<Velocity>();
 
     auto platform = createBlock(Transform::tiles(5, 1)).value();
     auto pathControl = RailsControl(14,

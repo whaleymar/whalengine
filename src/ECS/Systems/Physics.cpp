@@ -16,9 +16,8 @@ namespace whal {
 
 constexpr f32 GRAVITY = -35;
 
-constexpr f32 FRICTION_GROUND = 5.0;
-constexpr f32 FRICTION_AIR = 2.0;
-constexpr f32 FRICTION_IMPULSE = 10.0;
+constexpr f32 FRICTION_GROUND = 30.0;
+constexpr f32 FRICTION_AIR = 25.0;
 constexpr f32 MOVE_EPSILON = 0.1;
 
 constexpr f32 JUMP_PEAK_GRAVITY_MULT = 0.5;
@@ -27,26 +26,17 @@ constexpr f32 JUMP_PEAK_SPEED_MAX = -3.5;  // once Y velocity is below this, no 
 void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
     bool isInJumpPeak = isJumping && isBetween(velocity.total.y(), JUMP_PEAK_SPEED_MAX, 0.0f);
     f32 peakMultiplier = 1 - static_cast<f32>(isInJumpPeak) * (1 - JUMP_PEAK_GRAVITY_MULT);
-    f32 newVelY = velocity.stable.y() + GRAVITY * peakMultiplier * dt;
-    if (newVelY < TERMINAL_VELOCITY_Y) {
-        newVelY = TERMINAL_VELOCITY_Y;
-    }
-    velocity.stable.e[1] = newVelY;
+    velocity.stable.e[1] = approach(velocity.stable.y(), TERMINAL_VELOCITY_Y, -GRAVITY * peakMultiplier * dt);
 }
 
 void applyFriction(Vector2f& velocity, f32 frictionMultiplier) {
-    if (abs(velocity.e[0]) < MOVE_EPSILON) {
-        velocity.e[0] = 0.0;
-    } else {
-        velocity.e[0] *= frictionMultiplier;
-    }
+    velocity.e[0] = approach(velocity.x(), 0, frictionMultiplier);
 }
 
 void PhysicsSystem::update() {
-    f32 dt = Deltatime::getInstance().get();
-    f32 frictionRatioGround = 1.0 / (1.0 + (FRICTION_GROUND * dt));
-    f32 frictionRatioAir = 1.0 / (1.0 + (FRICTION_AIR * dt));
-    f32 frictionRatioImpulse = 1.0 / (1.0 + (FRICTION_IMPULSE * dt));
+    const f32 dt = Deltatime::getInstance().get();
+    const f32 frictionStepGround = dt * FRICTION_GROUND;
+    const f32 frictionStepAir = dt * FRICTION_AIR;
     std::vector<ecs::Entity> needsPositionUpdateRB;
 
     // sync collider in case position changed in another system
@@ -83,17 +73,9 @@ void PhysicsSystem::update() {
         Vector2f totalVelocity = vel.stable + impulse;
         f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
         f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
-        vel.residualImpulse = impulse * frictionRatioImpulse;
+        vel.residualImpulse = {approach(impulse.x(), 0, frictionStepGround), approach(impulse.y(), 0, frictionStepAir)};
         vel.impulse = {0, 0};
         vel.total = totalVelocity;
-
-        if (moveX > 0 && trans.facing != Facing::Right) {
-            trans.facing = Facing::Right;
-            trans.isDirectionChanged = true;
-        } else if (moveX < 0 && trans.facing != Facing::Left) {
-            trans.facing = Facing::Left;
-            trans.isDirectionChanged = true;
-        }
 
         // I can split this into separate systems if this gets slow
         if (rb) {
@@ -108,9 +90,10 @@ void PhysicsSystem::update() {
             // friction
             if (vel.stable.x()) {
                 if (rb.value()->collider.isGrounded()) {
-                    applyFriction(vel.stable, frictionRatioGround);
+                    applyFriction(vel.stable, frictionStepGround);
                 } else {
-                    applyFriction(vel.stable, frictionRatioAir);
+                    applyFriction(vel.stable, frictionStepAir);
+                    vel.residualImpulse.e[0] = approach(impulse.x(), 0, frictionStepAir);  // recalced
                 }
             }
 

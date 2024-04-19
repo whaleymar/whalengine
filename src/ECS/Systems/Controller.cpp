@@ -3,13 +3,16 @@
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/PlayerControl.h"
 #include "ECS/Components/RigidBody.h"
+#include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
 
 #include "Systems/Deltatime.h"
 #include "Systems/InputHandler.h"
-#include "Util/Print.h"
+#include "Util/MathUtil.h"
 
 namespace whal {
+
+constexpr f32 APPROACH_SPEED_X = 10.0;  // 5 frames to max speed
 
 void ControllerSystemRB::update() {
     auto& input = Input::getInstance();
@@ -56,6 +59,22 @@ void ControllerSystemRB::update() {
         if (input.isRight()) {
             impulseX += 1;
         }
+        impulseX *= control.moveSpeed;
+        const f32 approachSpeed = APPROACH_SPEED_X * dt * control.moveSpeed;
+        if (impulseX != 0) {
+            f32 approachFrom;
+            if (sign(impulseX) == sign(vel.total.x())) {
+                approachFrom = vel.total.x();
+            } else {
+                approachFrom = 0;
+            }
+            impulseX = approach(approachFrom, impulseX, approachSpeed);
+        }
+        // if (abs(impulseX) == control.moveSpeed) {
+        //     print("hit max speed");
+        // } else if (impulseX) {
+        //     print("frame");
+        // }
 
         f32 impulseY = 0;
         if (isJumpAvailable) {
@@ -91,9 +110,16 @@ void ControllerSystemRB::update() {
             rb.isJumping = false;
         }
 
-        impulseX *= control.moveSpeed;
-
         vel.impulse += Vector2f(impulseX, impulseY);
+
+        auto& trans = entity.get<Transform>();
+        if (impulseX > 0 && trans.facing != Facing::Right) {
+            trans.facing = Facing::Right;
+            trans.isDirectionChanged = true;
+        } else if (impulseX < 0 && trans.facing != Facing::Left) {
+            trans.facing = Facing::Left;
+            trans.isDirectionChanged = true;
+        }
     }
 }
 
