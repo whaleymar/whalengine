@@ -28,7 +28,7 @@ struct Sprite : public IDraw {
     Sprite(Depth depth_ = Depth::Player, Frame frame = {}, RGB rgb = Color::WHITE);
 
     Vector2i atlasPositionTexels;
-    bool isVertsUpdateNeeded = false;  // anim, size, color, and/or scale changed
+    bool isVertsUpdateNeeded = true;  // anim, size, color, and/or scale changed
 
     VertArrayRectRGBUV getVertices() const { return mVertices; }
     void updateVertices(bool flipX = false);

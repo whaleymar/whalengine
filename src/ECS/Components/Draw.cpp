@@ -14,7 +14,7 @@ constexpr f32 getPixelSize(const s32 frameSize, const f32 scale) {
 
 IDraw::IDraw(Depth depth_, RGB rgb, Vector2i frameSizeTexels) : depth(depth_), color(rgb), mFrameSizeTexels(frameSizeTexels){};
 
-Sprite::Sprite(Depth depth_, Frame frame, RGB rgb) : IDraw({depth_, rgb, frame.dimensionsTexels}), atlasPositionTexels(frame.atlasPositionTexels) {}
+Sprite::Sprite(Depth depth_, Frame frame, RGB rgb) : IDraw(depth_, rgb, frame.dimensionsTexels), atlasPositionTexels(frame.atlasPositionTexels) {}
 
 void Sprite::setFrameSize(s32 frameSizeX, s32 frameSizeY) {
     mFrameSizeTexels = {frameSizeX, frameSizeY};
