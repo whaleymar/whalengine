@@ -2,12 +2,11 @@
 
 #include <glad/gl.h>
 
-#include "Actor.h"
+#include "ECS/Components/Collision.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Shader.h"
 #include "Physics/IUseCollision.h"
-#include "Solid.h"
 
 namespace whal {
 

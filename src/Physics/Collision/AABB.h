@@ -12,6 +12,7 @@
 namespace whal {
 
 struct AABB {
+    AABB() = default;
     Vector2i center;
     Vector2i half;
 

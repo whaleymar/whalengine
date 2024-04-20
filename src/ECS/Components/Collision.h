@@ -2,20 +2,33 @@
 
 #include <vector>
 
-#include "Physics/Collision/HitInfo.h"
 #include "Physics/IUseCollision.h"
-#include "Util/Types.h"
 #include "Util/Vector.h"
 
 namespace whal {
 
-class SolidCollider;
+struct TriggerCollider {};
+
 class ActorCollider;
+struct HitInfo;
+
+class SolidCollider : public IUseCollision {
+public:
+    SolidCollider() = default;
+    SolidCollider(Vector2f position, Vector2i half);
+
+    void move(f32 x, f32 y, bool isManualMove = false);
+    std::vector<ActorCollider*> getRidingActors() const;
+
+private:
+    void moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding, bool isManualMove);
+};
 
 using CollisionCallback = void (ActorCollider::*)(HitInfo);
 
 class ActorCollider : public IUseCollision {
 public:
+    ActorCollider() = default;
     ActorCollider(Vector2f position, Vector2i half);
 
     void moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback);

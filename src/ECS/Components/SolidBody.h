@@ -1,7 +1,7 @@
 #pragma once
 
+#include "ECS/Components/Collision.h"
 #include "Gfx/GfxUtil.h"
-#include "Physics/Solid.h"
 
 namespace whal {
 

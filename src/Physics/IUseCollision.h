@@ -6,6 +6,7 @@ namespace whal {
 
 class IUseCollision {
 public:
+    IUseCollision() = default;
     IUseCollision(AABB collider) : mCollider(collider){};
     AABB getCollider() const { return mCollider; }
     bool isCollidable() const { return mIsCollidable; }

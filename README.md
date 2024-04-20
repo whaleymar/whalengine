@@ -3,8 +3,15 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 
 # To Do 
 
-## Current Goal: Textures and Animations
-- next goal: clean up bugs && some todos
+## Current Goal: 
+- merge Physics code into ECS
+    - New components:
+        - ActorCollider 
+        - SolidCollider
+        - TriggerCollider
+        - RigidBody
+    - Merge CollisionManagers
+    - Collision Callbacks take parent entity as argument
 
 ## Graphics
 - glfw -> sdl (for text and audio)
@@ -26,7 +33,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - death plane
 
 ## Physics
-- jump corner correction
 - end jump if head bonk
 - jump sometimes still happens after landing 
 - isTrigger flag for IUseCollider (+ maybe rename mIsCollidable -> mIsActive + add new isCollidable flag which determines if only a trigger happens)

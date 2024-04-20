@@ -2,8 +2,6 @@
 
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/SolidBody.h"
-#include "Physics/Actor.h"
-#include "Physics/Solid.h"
 #include "Util/Print.h"
 
 namespace whal {
