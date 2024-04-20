@@ -48,7 +48,7 @@ void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
                 // TODO set isJumping to false
             } else if (!isXDirection && moveSign == 1) {
                 // moving up
-                isStopped = !tryCornerCorrection(hitInfo.value(), solids, nextPos, 0);  // todo pass X speed here in last arg
+                isStopped = !tryCornerCorrection(solids, nextPos, 0);  // todo pass X speed here in last arg
                 if (isStopped) {
                     // set isJumping of parent collider to false... // TODO maybe collisioncallback should take an ENTITY arg...
                     // or MAYBE moveDirection can just return a struct with this shit
@@ -136,7 +136,7 @@ bool ActorCollider::isRiding(const SolidCollider* solid) const {
     return false;
 }
 
-bool ActorCollider::tryCornerCorrection(const HitInfo hitInfo, const std::vector<SolidCollider*>& solids, Vector2i nextPosition, s32 moveSignX) {
+bool ActorCollider::tryCornerCorrection(const std::vector<SolidCollider*>& solids, Vector2i nextPosition, s32 moveSignX) {
     // try to wiggle out of collision if barely clipping another collider
     // returns true if successful
 

@@ -38,7 +38,7 @@ public:
     virtual bool isRiding(const SolidCollider* solid) const;
 
 private:
-    bool tryCornerCorrection(const HitInfo hitInfo, const std::vector<SolidCollider*>& solids, Vector2i nextPos, s32 moveSign);
+    bool tryCornerCorrection(const std::vector<SolidCollider*>& solids, Vector2i nextPos, s32 moveSign);
 
     Vector2f mStoredMomentum;
     s32 mMomentumFramesLeft = 0;
