@@ -38,6 +38,8 @@ public:
     virtual bool isRiding(const SolidCollider* solid) const;
 
 private:
+    bool tryCornerCorrection(const HitInfo hitInfo, const std::vector<SolidCollider*>& solids, Vector2i nextPos, s32 moveSign);
+
     Vector2f mStoredMomentum;
     s32 mMomentumFramesLeft = 0;
     // f32 mMass = 1; // could give solids a mass and use mass ratio to calculate force

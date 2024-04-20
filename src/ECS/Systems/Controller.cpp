@@ -12,7 +12,8 @@
 
 namespace whal {
 
-constexpr f32 APPROACH_SPEED_X = 10.0;  // 5 frames to max speed
+// constexpr f32 APPROACH_SPEED_X = 10.0;  // 5 frames to max speed
+constexpr f32 APPROACH_SPEED_X = 7.5;  // 5 frames to max speed
 
 void ControllerSystemRB::update() {
     auto& input = Input::getInstance();

@@ -115,9 +115,9 @@ Expected<ecs::Entity> createPlayer() {
     player.add(sprite);
 
     constexpr s32 width = 16;
-    constexpr s32 height = 16;
+    // constexpr s32 height = 16;
     constexpr s32 halfLenX = PIXELS_PER_TEXEL * width / 4;
-    constexpr s32 halfLenY = PIXELS_PER_TEXEL * height / 2;
+    constexpr s32 halfLenY = PIXELS_PER_TEXEL * 6;
     player.add<RigidBody>(RigidBody(toFloatVec(transform.position) + Vector2f(0, halfLenY), halfLenX, halfLenY));
 
     return player;

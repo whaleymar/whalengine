@@ -3,6 +3,7 @@
 #include <cmath>
 #include <type_traits>
 
+#include "Gfx/GfxUtil.h"
 #include "Physics/CollisionManager.h"
 #include "Physics/IUseCollision.h"
 #include "Physics/Solid.h"
@@ -11,6 +12,8 @@
 namespace whal {
 
 constexpr s32 MOMENTUM_LIFETIME_FRAMES = 10;
+constexpr s32 SPIXELS_PER_TEXEL = static_cast<s32>(PIXELS_PER_TEXEL);
+constexpr s32 CORNERCORRECTIONWIGGLE = 4 * SPIXELS_PER_TEXEL;
 
 ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(AABB(half)) {
     mCollider.setPosition(position);
@@ -29,9 +32,8 @@ void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
         return;
     }
 
-    s32 moveSign = sign(toMove);
-    bool isMovingDown = !isXDirection && moveSign == -1;
-    auto moveVector = isXDirection ? Vector2i(moveSign, 0) : Vector2i(0, moveSign);
+    const s32 moveSign = sign(toMove);
+    const auto moveVector = isXDirection ? Vector2i(moveSign, 0) : Vector2i(0, moveSign);
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveVector;
         auto hitInfo = checkCollision(solids, nextPos);
@@ -39,13 +41,27 @@ void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
         } else {
-            if (isMovingDown) {
+            bool isStopped = true;
+            if (!isXDirection && moveSign == -1) {
+                // moving down
                 setGrounded(true);
+                // TODO set isJumping to false
+            } else if (!isXDirection && moveSign == 1) {
+                // moving up
+                isStopped = !tryCornerCorrection(hitInfo.value(), solids, nextPos, 0);  // todo pass X speed here in last arg
+                if (isStopped) {
+                    // set isJumping of parent collider to false... // TODO maybe collisioncallback should take an ENTITY arg...
+                    // or MAYBE moveDirection can just return a struct with this shit
+                } else {
+                    continue;
+                }
             }
             if (callback != nullptr) {
                 ((*this).*callback)(hitInfo.value());
             }
-            break;
+            if (isStopped) {
+                break;
+            }
         }
     }
 }
@@ -117,6 +133,35 @@ bool ActorCollider::isRiding(const SolidCollider* solid) const {
     if (movedCollider.collide(solid->getCollider()) != std::nullopt) {
         return true;
     }
+    return false;
+}
+
+bool ActorCollider::tryCornerCorrection(const HitInfo hitInfo, const std::vector<SolidCollider*>& solids, Vector2i nextPosition, s32 moveSignX) {
+    // try to wiggle out of collision if barely clipping another collider
+    // returns true if successful
+
+    // TODO if vel.total.x() >= 0 check right
+    // if vel.total.x() <= 0 check left
+    if (moveSignX >= 0) {
+        // if we are on a half texel x coord, start at 0.5 texels of movement
+        for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
+            Vector2i nextPos = nextPosition + Vector2i(i, 0);
+            if (!checkCollision(solids, nextPos)) {
+                mCollider.setPosition(nextPos);
+                return true;
+            }
+        }
+    }
+    if (moveSignX <= 0) {
+        for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
+            Vector2i nextPos = nextPosition + Vector2i(-i, 0);
+            if (!checkCollision(solids, nextPos)) {
+                mCollider.setPosition(nextPos);
+                return true;
+            }
+        }
+    }
+
     return false;
 }
 

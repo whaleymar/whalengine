@@ -3,11 +3,7 @@
 
 namespace whal {
 
-HitInfo::HitInfo() {
-    mPos = Vector2i::zero;
-    mDelta = Vector2i::zero;
-    mNormal = Vector2i::zero;
-}
+HitInfo::HitInfo() {}
 
-HitInfo::HitInfo(Vector2i position, Vector2i delta, Vector2i normal) : mPos(position), mDelta(delta), mNormal(normal){};
+HitInfo::HitInfo(Vector2i position, Vector2i normal, AABB* other_) : pos(position), normal(normal), other(other_){};
 }  // namespace whal

@@ -4,13 +4,16 @@
 
 namespace whal {
 
+struct AABB;
+
+// TODO none of these are used
 struct HitInfo {
-    Vector2i mPos;
-    Vector2i mDelta;
-    Vector2i mNormal;
+    Vector2i pos;  // definitely don't need this
+    Vector2i normal;
+    AABB* other = nullptr;
 
     HitInfo();
-    HitInfo(Vector2i position, Vector2i delta, Vector2i normal);
+    HitInfo(Vector2i position, Vector2i normal, AABB* other);
 };
 
 }  // namespace whal
