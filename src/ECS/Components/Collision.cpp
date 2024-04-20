@@ -7,7 +7,6 @@
 #include "ECS/Systems/CollisionManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Physics/Collision/HitInfo.h"
-#include "Physics/CollisionManager.h"
 #include "Physics/IUseCollision.h"
 #include "Systems/Deltatime.h"
 #include "Util/MathUtil.h"
@@ -22,17 +21,16 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
     mCollider.setPosition(position);
 }
 
-void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback) {
+bool ActorCollider::moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
     s32 toMove = std::round(amount);
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
 
     if (toMove == 0) {
-        // manually check isGrounded (gravity may not move an actor by a full texel every frame)
-        if (!isXDirection) {
-            checkIsGrounded(solids);
+        if (isXDirection || amount > 0) {
+            return false;
         }
-        return;
+        return checkIsGrounded(solids);
     }
 
     const s32 moveSign = sign(toMove);
@@ -45,28 +43,24 @@ void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
             toMove -= moveSign;
         } else {
             bool isStopped = true;
-            if (!isXDirection && moveSign == -1) {
-                // moving down
-                setGrounded(true);
-                // TODO set isJumping to false
-            } else if (!isXDirection && moveSign == 1) {
+            if (!isXDirection && moveSign == 1) {
                 // moving up
-                isStopped = !tryCornerCorrection(solids, nextPos, 0);  // todo pass X speed here in last arg
-                if (isStopped) {
-                    // set isJumping of parent collider to false... // TODO maybe collisioncallback should take an ENTITY arg...
-                    // or MAYBE moveDirection can just return a struct with this shit
-                } else {
-                    continue;
+                if (tryCornerCorrection(solids, nextPos, 0)) {  // todo pass X speed here in last arg
+                    continue;                                   // avoided collision
                 }
             }
             if (callback != nullptr) {
                 ((*this).*callback)(hitInfo.value());
             }
             if (isStopped) {
-                break;
+                return true;
             }
         }
     }
+    if (isXDirection || amount >= 0) {
+        return false;
+    }
+    return checkIsGrounded(solids);
 }
 
 void ActorCollider::setMomentum(const f32 momentum, const bool isXDirection) {
@@ -99,13 +93,13 @@ void ActorCollider::momentumNotUsed() {
     }
 }
 
-void ActorCollider::checkIsGrounded(const std::vector<SolidCollider*>& solids) {
+bool ActorCollider::checkIsGrounded(const std::vector<SolidCollider*>& solids) {
     for (auto solid : solids) {
         if (isRiding(solid)) {
-            mIsGrounded = true;
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 template <typename T>
@@ -139,14 +133,11 @@ bool ActorCollider::isRiding(const SolidCollider* solid) const {
     return false;
 }
 
+// Try to wiggle out of collision if barely clipping another collider.
+// Returns true if successful.
 bool ActorCollider::tryCornerCorrection(const std::vector<SolidCollider*>& solids, Vector2i nextPosition, s32 moveSignX) {
-    // try to wiggle out of collision if barely clipping another collider
-    // returns true if successful
-
-    // TODO if vel.total.x() >= 0 check right
-    // if vel.total.x() <= 0 check left
+    // if we are on a half texel x coord, start at 0.5 texels of movement
     if (moveSignX >= 0) {
-        // if we are on a half texel x coord, start at 0.5 texels of movement
         for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
             Vector2i nextPos = nextPosition + Vector2i(i, 0);
             if (!checkCollision(solids, nextPos)) {
@@ -206,7 +197,7 @@ void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
 void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding,
                                   bool isManualMove) {
     f32 dt = Deltatime::getInstance().get();
-    for (auto& actor : CollisionManager::getInstance().getAllActors()) {
+    for (auto& actor : ActorsManager::getInstance()->getAllActors()) {
         // push takes priority over carry
         if (mCollider.isOverlapping(actor->getCollider())) {
             f32 actorEdge = (actor->getCollider().*edgeFunc)();
@@ -233,7 +224,7 @@ void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, 
 
 std::vector<ActorCollider*> SolidCollider::getRidingActors() const {
     std::vector<ActorCollider*> riding;
-    for (auto& actor : CollisionManager::getInstance().getAllActors()) {
+    for (auto& actor : ActorsManager::getInstance()->getAllActors()) {
         if (actor->isRiding(this)) {
             riding.push_back(actor);
         }

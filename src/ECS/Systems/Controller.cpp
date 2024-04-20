@@ -83,7 +83,7 @@ void ControllerSystemRB::update() {
         }
 
         if (input.isJump()) {
-            if ((rb.collider.isGrounded() || rb.coyoteSecondsRemaining > 0) && control.canJump()) {
+            if ((rb.isGrounded || rb.coyoteSecondsRemaining > 0) && control.canJump()) {
                 control.jumpBuffer.consume();
                 rb.isJumping = true;
 

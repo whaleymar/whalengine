@@ -2,6 +2,7 @@
 
 #include "ECS/Components/AnimUtil.h"
 #include "ECS/Components/Animator.h"
+#include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/PlayerControl.h"
 #include "ECS/Components/RigidBody.h"
@@ -52,7 +53,7 @@ bool brain(Animator& animator, ecs::Entity entity) {
     f32 unsquishStep = Deltatime::getInstance().get() * 1.50;
     sprite.scale = {approach(sprite.scale.x(), 1.0, unsquishStep), approach(sprite.scale.y(), 1.0, unsquishStep)};
     sprite.isVertsUpdateNeeded = true;
-    if (rb.collider.isGrounded()) {
+    if (rb.isGrounded) {
         if (rb.isLanding) {
             f32 squish = std::min(abs(vel.total.y()) / abs(TERMINAL_VELOCITY_Y), 1.0f);
             sprite.scale = {lerp(1, 1.25, squish), lerp(1, 0.8, squish)};
@@ -118,7 +119,8 @@ Expected<ecs::Entity> createPlayer() {
     // constexpr s32 height = 16;
     constexpr s32 halfLenX = PIXELS_PER_TEXEL * width / 4;
     constexpr s32 halfLenY = PIXELS_PER_TEXEL * 6;
-    player.add<RigidBody>(RigidBody(toFloatVec(transform.position) + Vector2f(0, halfLenY), halfLenX, halfLenY));
+    player.add(ActorCollider(toFloatVec(transform.position) + Vector2f(0, halfLenY), Vector2i(halfLenX, halfLenY)));
+    player.add<RigidBody>();
 
     return player;
 }

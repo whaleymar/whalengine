@@ -15,7 +15,6 @@
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 
-#include "Physics/CollisionManager.h"
 #include "Systems/Deltatime.h"
 #include "Systems/Frametracker.h"
 #include "Systems/InputHandler.h"
@@ -37,13 +36,11 @@ void MainLoop(GLFWwindow* window) {
     auto animationSystem = ecs.registerSystem<AnimationSystem>();
 
     // single-component systems for running psuedo-destructors:
-    auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
+    auto actorsMgr = ActorsManager::getInstance();
     auto solidsMgr = SolidsManager::getInstance();
     // these don't have update methods:
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
     auto drawMgr = ecs.registerSystem<DrawManager>();
-
-    CollisionManager::getInstance().init(rigidBodyMgr, solidsMgr);
 
     // load scene
     auto err = loadDebugScene();
@@ -73,7 +70,7 @@ void MainLoop(GLFWwindow* window) {
         // these don't need to run every frame:
         // they sync the collision manager
         // and kill crushed actors
-        rigidBodyMgr->update();
+        actorsMgr->update();
         solidsMgr->update();
 
         // Render

@@ -5,5 +5,5 @@ namespace whal {
 
 HitInfo::HitInfo() {}
 
-HitInfo::HitInfo(Vector2i position, Vector2i normal, AABB* other_) : pos(position), normal(normal), other(other_){};
+HitInfo::HitInfo(Vector2i normal, AABB* other_) : normal(normal), other(other_){};
 }  // namespace whal

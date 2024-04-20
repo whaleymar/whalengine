@@ -1,7 +1,6 @@
 #pragma once
 
-#include "ECS/Components/Collision.h"
-#include "Gfx/GfxUtil.h"
+#include "Util/Types.h"
 
 namespace whal {
 
@@ -12,13 +11,12 @@ namespace whal {
 // that
 
 struct RigidBody {
-    RigidBody(s32 half_ = TILE_LEN_PIXELS);
-    RigidBody(Vector2f center_, s32 halfx, s32 halfy);
+    RigidBody() = default;
 
-    ActorCollider collider;
     f32 jumpInitialVelocity = 15.5;
     bool isJumping = false;
     bool isLanding = false;
+    bool isGrounded = false;
     f32 jumpSecondsRemaining = 0;
     f32 jumpSecondsMax = 1.25;
     f32 coyoteSecondsRemaining = 0;

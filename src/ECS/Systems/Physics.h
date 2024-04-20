@@ -9,7 +9,6 @@ struct Velocity;
 
 static constexpr f32 TERMINAL_VELOCITY_Y = -20;
 
-// class PhysicsSystem : public ecs::ISystem<Position, Velocity, RigidBody> {
 class PhysicsSystem : public ecs::ISystem<Transform, Velocity> {
 public:
     void update() override;

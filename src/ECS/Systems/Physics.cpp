@@ -10,6 +10,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/Deltatime.h"
 #include "Util/MathUtil.h"
+#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
@@ -38,7 +39,7 @@ void PhysicsSystem::update() {
     const f32 frictionStepGround = dt * FRICTION_GROUND;
     const f32 frictionStepAir = dt * FRICTION_AIR;
     const f32 gravityStep = dt * GRAVITY * 3;
-    std::vector<ecs::Entity> needsPositionUpdateRB;
+    std::vector<ecs::Entity> allActors;
 
     // sync collider in case position changed in another system
     // is a little inefficient to do it this way (vs separating the systems)
@@ -49,18 +50,16 @@ void PhysicsSystem::update() {
         }
 
         trans.isManuallyMoved = false;
-        if (std::optional<RigidBody*> rb = entity.tryGet<RigidBody>(); rb) {
-            rb.value()->collider.setPositionFromBottom(trans.position);
-        } else if (std::optional<SolidCollider*> sb = entity.tryGet<SolidCollider>(); sb) {
-            sb.value()->setPositionFromBottom(trans.position);
+        if (std::optional<ActorCollider*> actor = entity.tryGet<ActorCollider>(); actor) {
+            actor.value()->setPositionFromBottom(trans.position);
+        } else if (std::optional<SolidCollider*> solid = entity.tryGet<SolidCollider>(); solid) {
+            solid.value()->setPositionFromBottom(trans.position);
         }
     }
 
     for (auto& [entityid, entity] : getEntities()) {
         Transform& trans = entity.get<Transform>();
         Velocity& vel = entity.get<Velocity>();
-        std::optional<RigidBody*> rb = entity.tryGet<RigidBody>();
-        std::optional<SolidCollider*> sb = entity.tryGet<SolidCollider>();
 
         // if impulse ends, use residual
         Vector2f impulse = vel.impulse;
@@ -71,26 +70,75 @@ void PhysicsSystem::update() {
             impulse.e[1] += vel.residualImpulse.y();
         }
 
-        Vector2f totalVelocity = vel.stable + impulse;
-        f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
-        f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
+        const Vector2f totalVelocity = vel.stable + impulse;
+        const f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
+        const f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
         vel.residualImpulse = {approach(impulse.x(), 0, frictionStepGround), approach(impulse.y(), 0, gravityStep)};
         vel.impulse = {0, 0};
         vel.total = totalVelocity;
 
-        // I can split this into separate systems if this gets slow
+        std::optional<RigidBody*> rb = entity.tryGet<RigidBody>();
+        std::optional<ActorCollider*> actor = entity.tryGet<ActorCollider>();
+        if (rb && actor) {
+            // MOVEMENT + GROUNDED CHECKS
+            //// only actors can be grounded (because they're the only ones that interact with the ground)
+            //// no callback needed when actor moves into solid
+            const bool wasGrounded = rb.value()->isGrounded;
+            if (actor.value()->moveDirection(false, moveY, nullptr)) {
+                if (moveY <= 0) {
+                    rb.value()->isGrounded = true;
+                    rb.value()->isJumping = false;
+                } else {
+                    rb.value()->isGrounded = false;
+                    rb.value()->isJumping = false;
+                }
+            } else {
+                rb.value()->isGrounded = false;
+            }
+            actor.value()->moveDirection(true, moveX, nullptr);
+            allActors.push_back(entity);
+
+            // RIGIDBODY FLAGS, MOMENTUM, AND COYOTE TIME
+            // should be able to put in if/else block above TODO
+            bool isMomentumStored = actor.value()->isMomentumStored();
+            if (rb.value()->isGrounded) {
+                rb.value()->isLanding = !wasGrounded;
+
+                if (isMomentumStored) {
+                    actor.value()->momentumNotUsed();
+                }
+
+            } else {
+                if (wasGrounded && !rb.value()->isJumping) {
+                    rb.value()->coyoteSecondsRemaining = rb.value()->coyoteTimeSecondsMax;
+                } else if (rb.value()->coyoteSecondsRemaining > 0) {
+                    rb.value()->coyoteSecondsRemaining -= dt;
+                }
+
+                if (isMomentumStored) {
+                    vel.stable += actor.value()->getMomentum() * dt;  // TODO scaling by dt feels wrong -- is possibly just bad naming?
+                    actor.value()->resetMomentum();
+                }
+            }
+
+        } else if (actor) {
+            actor.value()->moveDirection(true, moveX, nullptr);
+            actor.value()->moveDirection(false, moveY, nullptr);
+            allActors.push_back(entity);
+
+        } else if (std::optional<SolidCollider*> solid = entity.tryGet<SolidCollider>(); solid) {
+            solid.value()->move(moveX, moveY);
+            trans.position = solid.value()->getCollider().getPositionEdge(Vector2i::unitDown);
+
+        } else {
+            trans.position += Vector2i(std::round(moveX), std::round(moveY));
+        }
+
+        // This could be made a lot faster if I have separate functions for actors/non-actors
         if (rb) {
-            bool wasGrounded = rb.value()->collider.isGrounded();
-            rb.value()->collider.setGrounded(false);
-
-            // no callback needed when actor moves into solid
-            rb.value()->collider.moveDirection(true, moveX, nullptr);
-            rb.value()->collider.moveDirection(false, moveY, nullptr);
-            needsPositionUpdateRB.push_back(entity);
-
             // friction
             if (vel.stable.x()) {
-                if (rb.value()->collider.isGrounded()) {
+                if (rb.value()->isGrounded) {
                     applyFriction(vel.stable, frictionStepGround);
                 } else {
                     applyFriction(vel.stable, frictionStepAir);
@@ -98,27 +146,15 @@ void PhysicsSystem::update() {
                 }
             }
 
-            // gravity and momentum
-            bool isMomentumStored = rb.value()->collider.isMomentumStored();
-            if (!rb.value()->collider.isGrounded()) {
+            // gravity
+            if (!rb.value()->isGrounded) {
                 if (totalVelocity.y() < JUMP_PEAK_SPEED_MAX) {
                     // falling == not jumping
                     // a little lower than 0 while applying reduced gravity
                     rb.value()->isJumping = false;
                 }
 
-                if (wasGrounded && !rb.value()->isJumping) {
-                    rb.value()->coyoteSecondsRemaining = rb.value()->coyoteTimeSecondsMax;
-                } else if (rb.value()->coyoteSecondsRemaining > 0) {
-                    rb.value()->coyoteSecondsRemaining -= dt;
-                }
-
                 applyGravity(vel, dt, rb.value()->isJumping);
-
-                if (isMomentumStored) {
-                    vel.stable += rb.value()->collider.getMomentum() * dt;  // TODO scaling by dt feels wrong -- is possibly just bad naming?
-                    rb.value()->collider.resetMomentum();
-                }
 
                 rb.value()->isLanding = false;
 
@@ -127,29 +163,17 @@ void PhysicsSystem::update() {
                     // zero y velocity when grounded and not trying to jump, otherwise entity falls at terminal velocity after walking off platform
                     vel.stable.e[1] = 0;
                 }
-                if (isMomentumStored) {
-                    rb.value()->collider.momentumNotUsed();
-                }
-
-                rb.value()->isLanding = !wasGrounded;
             }
-
-        } else if (sb) {
-            sb.value()->move(moveX, moveY);
-            trans.position = sb.value()->getCollider().getPositionEdge(Vector2i::unitDown);
-
-        } else {
-            trans.position += Vector2i(std::round(moveX), std::round(moveY));
         }
     }
 
     // actors can be moved by other colliders, so wait until all collisions are processed to update position
-    for (auto& entity : needsPositionUpdateRB) {
+    for (auto& entity : allActors) {
         Transform& trans = entity.get<Transform>();
-        RigidBody& rb = entity.get<RigidBody>();
+        ActorCollider& actor = entity.get<ActorCollider>();
 
         // position is bottom-middle of collider
-        trans.position = rb.collider.getCollider().getPositionEdge(Vector2i::unitDown);
+        trans.position = actor.getCollider().getPositionEdge(Vector2i::unitDown);
     }
 }
 

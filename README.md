@@ -6,11 +6,11 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 ## Current Goal: 
 - merge Physics code into ECS
     - New components:
-        - ActorCollider 
-        - SolidCollider
-        - TriggerCollider
-        - RigidBody
-    - Merge CollisionManagers
+        - ActorCollider (DONE)
+        - SolidCollider (DONE)
+        - TriggerCollider (do i need this? maybe actorcollider w/out rigidbody would work?)
+        - RigidBody (DONE)
+    - Merge CollisionManagers (DONE)
     - Collision Callbacks take parent entity as argument
 
 ## Graphics

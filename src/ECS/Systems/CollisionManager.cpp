@@ -1,12 +1,15 @@
 #include "CollisionManager.h"
 
 #include "ECS/Components/Collision.h"
-#include "ECS/Components/RigidBody.h"
 #include "Util/Print.h"
+
+#include <glad/gl.h>
+
+#include "Gfx/GLResourceManager.h"
 
 namespace whal {
 
-void RigidBodyManager::update() {
+void ActorsManager::update() {
     if (mIsUpdateNeeded == true) {
         print("Updating actors list");
     }
@@ -16,7 +19,7 @@ void RigidBodyManager::update() {
     mIsUpdateNeeded = false;  // might change if we kill entities
 
     for (auto& [entityid, entity] : getEntities()) {
-        auto pCollider = &entity.get<RigidBody>().collider;
+        auto pCollider = &entity.get<ActorCollider>();
         if (!pCollider->isAlive()) {
             entity.kill();
         } else if (isUpdateNeeded) {
@@ -29,15 +32,15 @@ void RigidBodyManager::update() {
     }
 }
 
-void RigidBodyManager::onAdd(ecs::Entity entity) {
+void ActorsManager::onAdd(ecs::Entity entity) {
     mIsUpdateNeeded = true;
 }
 
-void RigidBodyManager::onRemove(ecs::Entity entity) {
+void ActorsManager::onRemove(ecs::Entity entity) {
     mIsUpdateNeeded = true;
 }
 
-const std::vector<ActorCollider*>& RigidBodyManager::getAllActors() const {
+const std::vector<ActorCollider*>& ActorsManager::getAllActors() const {
     return mActors;
 }
 
@@ -62,5 +65,34 @@ void SolidsManager::onAdd(ecs::Entity entity) {
 void SolidsManager::onRemove(ecs::Entity entity) {
     mIsUpdateNeeded = true;
 }
+
+#ifndef NDEBUG
+
+void drawCollider(ShaderProgram program, const IUseCollision* collider) {
+    const AABB& aabb = collider->getCollider();
+
+    Vector2f floatPos(aabb.left(), aabb.top());
+    glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
+
+    aabb.vao.bind();
+    auto vertices = MakeRectVerticesRGBUV(aabb.half.x() * 2, aabb.half.y() * 2, Depth::Debug, Color::RED);
+    aabb.vbo.buffer(vertices.data(), vertices.size() * sizeof(float));
+
+    updateShaderVars(program);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, N_VERTS_RECT);
+}
+
+void drawColliders() {
+    auto program = GLResourceManager::getInstance().getProgram(ShaderType::Debug);
+    program.useProgram();
+
+    for (const IUseCollision* collider : ActorsManager::getInstance()->getAllActors()) {
+        drawCollider(program, collider);
+    }
+    for (const IUseCollision* collider : SolidsManager::getInstance()->getAllSolids()) {
+        drawCollider(program, collider);
+    }
+}
+#endif
 
 }  // namespace whal

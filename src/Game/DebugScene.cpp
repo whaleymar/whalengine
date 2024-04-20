@@ -80,5 +80,13 @@ std::optional<Error> loadDebugScene() {
                                     2, true);
     platform.add<RailsControl>(pathControl);
 
+    auto rightPlatform = createBlock(Transform::tiles(36, 1)).value();
+    rightPlatform.add(RailsControl(5,
+                                   {
+                                       {Transform::tiles(36, 1).position, RailsControl::Movement::LINEAR},
+                                       {Transform::tiles(36, 7).position, RailsControl::Movement::LINEAR},
+                                   },
+                                   1));
+
     return std::nullopt;
 }

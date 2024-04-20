@@ -2,7 +2,6 @@
 
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/RailsControl.h"
-#include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
 
@@ -60,10 +59,10 @@ void RailsSystem::update() {
             if (std::optional<SolidCollider*> sb = entity.tryGet<SolidCollider>(); sb) {
                 sb.value()->move(delta.x(), delta.y(), true);
                 entity.set(Transform(sb.value()->getCollider().getPositionEdge(Vector2i::unitDown)));
-            } else if (std::optional<RigidBody*> rb = entity.tryGet<RigidBody>(); rb) {
-                rb.value()->collider.moveDirection(true, delta.x(), nullptr);
-                rb.value()->collider.moveDirection(false, delta.y(), nullptr);
-                entity.set(Transform(rb.value()->collider.getCollider().getPositionEdge(Vector2i::unitDown)));
+            } else if (std::optional<ActorCollider*> actor = entity.tryGet<ActorCollider>(); actor) {
+                actor.value()->moveDirection(true, delta.x(), nullptr);
+                actor.value()->moveDirection(false, delta.y(), nullptr);
+                entity.set(Transform(actor.value()->getCollider().getPositionEdge(Vector2i::unitDown)));
             } else {
                 entity.set(Transform(rails.getTarget().position));
             }
