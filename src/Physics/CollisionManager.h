@@ -16,16 +16,11 @@ public:
         return instance;
     }
 
-    void init(std::shared_ptr<RigidBodyManager> actorMgr, std::shared_ptr<SolidBodyManager> solidMgr);
+    void init(std::shared_ptr<RigidBodyManager> actorMgr, std::shared_ptr<SolidsManager> solidMgr);
 
     const std::vector<ActorCollider*>& getAllActors() const {
         assert(mIsValid && "CollisionManager was not initialized");
         return mActorMgr->getAllActors();
-    }
-
-    const std::vector<SolidCollider*>& getAllSolids() const {
-        assert(mIsValid && "CollisionManager was not initialized");
-        return mSolidMgr->getAllSolids();
     }
 
 private:
@@ -35,7 +30,7 @@ private:
     void operator=(const CollisionManager&) = delete;
 
     std::shared_ptr<RigidBodyManager> mActorMgr;
-    std::shared_ptr<SolidBodyManager> mSolidMgr;
+    std::shared_ptr<SolidsManager> mSolidMgr;
 
 #ifndef NDEBUG
     bool mIsValid = false;

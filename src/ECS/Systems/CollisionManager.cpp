@@ -1,7 +1,7 @@
 #include "CollisionManager.h"
 
+#include "ECS/Components/Collision.h"
 #include "ECS/Components/RigidBody.h"
-#include "ECS/Components/SolidBody.h"
 #include "Util/Print.h"
 
 namespace whal {
@@ -41,30 +41,26 @@ const std::vector<ActorCollider*>& RigidBodyManager::getAllActors() const {
     return mActors;
 }
 
-void SolidBodyManager::update() {
+void SolidsManager::update() {
     if (!mIsUpdateNeeded) {
         return;
     }
     print("updating solids list");
     std::vector<SolidCollider*> newSolidList;
     for (auto& [entityid, entity] : getEntities()) {
-        auto pCollider = &entity.get<SolidBody>().collider;
+        auto pCollider = &entity.get<SolidCollider>();
         newSolidList.push_back(pCollider);
     }
     mSolids = newSolidList;
     mIsUpdateNeeded = false;
 }
 
-void SolidBodyManager::onAdd(ecs::Entity entity) {
+void SolidsManager::onAdd(ecs::Entity entity) {
     mIsUpdateNeeded = true;
 }
 
-void SolidBodyManager::onRemove(ecs::Entity entity) {
+void SolidsManager::onRemove(ecs::Entity entity) {
     mIsUpdateNeeded = true;
-}
-
-const std::vector<SolidCollider*>& SolidBodyManager::getAllSolids() const {
-    return mSolids;
 }
 
 }  // namespace whal

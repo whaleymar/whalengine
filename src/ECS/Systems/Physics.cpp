@@ -2,8 +2,8 @@
 
 #include <cmath>
 
+#include "ECS/Components/Collision.h"
 #include "ECS/Components/RigidBody.h"
-#include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Transform.h"
 
 #include "ECS/Components/Velocity.h"
@@ -51,8 +51,8 @@ void PhysicsSystem::update() {
         trans.isManuallyMoved = false;
         if (std::optional<RigidBody*> rb = entity.tryGet<RigidBody>(); rb) {
             rb.value()->collider.setPositionFromBottom(trans.position);
-        } else if (std::optional<SolidBody*> sb = entity.tryGet<SolidBody>(); sb) {
-            sb.value()->collider.setPositionFromBottom(trans.position);
+        } else if (std::optional<SolidCollider*> sb = entity.tryGet<SolidCollider>(); sb) {
+            sb.value()->setPositionFromBottom(trans.position);
         }
     }
 
@@ -60,7 +60,7 @@ void PhysicsSystem::update() {
         Transform& trans = entity.get<Transform>();
         Velocity& vel = entity.get<Velocity>();
         std::optional<RigidBody*> rb = entity.tryGet<RigidBody>();
-        std::optional<SolidBody*> sb = entity.tryGet<SolidBody>();
+        std::optional<SolidCollider*> sb = entity.tryGet<SolidCollider>();
 
         // if impulse ends, use residual
         Vector2f impulse = vel.impulse;
@@ -135,8 +135,8 @@ void PhysicsSystem::update() {
             }
 
         } else if (sb) {
-            sb.value()->collider.move(moveX, moveY);
-            trans.position = sb.value()->collider.getCollider().getPositionEdge(Vector2i::unitDown);
+            sb.value()->move(moveX, moveY);
+            trans.position = sb.value()->getCollider().getPositionEdge(Vector2i::unitDown);
 
         } else {
             trans.position += Vector2i(std::round(moveX), std::round(moveY));

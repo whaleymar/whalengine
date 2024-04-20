@@ -5,7 +5,6 @@
 namespace whal {
 
 struct RigidBody;
-struct SolidBody;
 class ActorCollider;
 class SolidCollider;
 
@@ -22,13 +21,17 @@ private:
     bool mIsUpdateNeeded = false;
 };
 
-class SolidBodyManager : public ecs::ISystem<SolidBody> {
+class SolidsManager : public ecs::ISystem<SolidCollider> {
 public:
+    static std::shared_ptr<SolidsManager> getInstance() {
+        static std::shared_ptr<SolidsManager> instance = ecs::ECS::getInstance().registerSystem<SolidsManager>();
+        return instance;
+    }
     void update() override;
     void onAdd(ecs::Entity entity) override;
     void onRemove(ecs::Entity entity) override;
 
-    const std::vector<SolidCollider*>& getAllSolids() const;
+    const std::vector<SolidCollider*>& getAllSolids() const { return mSolids; };
 
 private:
     std::vector<SolidCollider*> mSolids;

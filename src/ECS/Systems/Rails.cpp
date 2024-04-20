@@ -1,8 +1,8 @@
 #include "Rails.h"
 
+#include "ECS/Components/Collision.h"
 #include "ECS/Components/RailsControl.h"
 #include "ECS/Components/RigidBody.h"
-#include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
 
@@ -57,9 +57,9 @@ void RailsSystem::update() {
 
         } else if (distance < epsilon) {
             // got to checkpoint, clamp to exact position
-            if (std::optional<SolidBody*> sb = entity.tryGet<SolidBody>(); sb) {
-                sb.value()->collider.move(delta.x(), delta.y(), true);
-                entity.set(Transform(sb.value()->collider.getCollider().getPositionEdge(Vector2i::unitDown)));
+            if (std::optional<SolidCollider*> sb = entity.tryGet<SolidCollider>(); sb) {
+                sb.value()->move(delta.x(), delta.y(), true);
+                entity.set(Transform(sb.value()->getCollider().getPositionEdge(Vector2i::unitDown)));
             } else if (std::optional<RigidBody*> rb = entity.tryGet<RigidBody>(); rb) {
                 rb.value()->collider.moveDirection(true, delta.x(), nullptr);
                 rb.value()->collider.moveDirection(false, delta.y(), nullptr);

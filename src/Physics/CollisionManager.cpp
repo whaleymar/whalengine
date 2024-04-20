@@ -3,6 +3,7 @@
 #include <glad/gl.h>
 
 #include "ECS/Components/Collision.h"
+#include "ECS/Systems/CollisionManager.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Shader.h"
@@ -10,7 +11,7 @@
 
 namespace whal {
 
-void CollisionManager::init(std::shared_ptr<RigidBodyManager> actorMgr, std::shared_ptr<SolidBodyManager> solidMgr) {
+void CollisionManager::init(std::shared_ptr<RigidBodyManager> actorMgr, std::shared_ptr<SolidsManager> solidMgr) {
     mActorMgr = actorMgr;
     mSolidMgr = solidMgr;
 #ifndef NDEBUG
@@ -42,7 +43,7 @@ void drawColliders() {
     for (const IUseCollision* collider : CollisionManager::getInstance().getAllActors()) {
         drawCollider(program, collider);
     }
-    for (const IUseCollision* collider : CollisionManager::getInstance().getAllSolids()) {
+    for (const IUseCollision* collider : SolidsManager::getInstance()->getAllSolids()) {
         drawCollider(program, collider);
     }
 }

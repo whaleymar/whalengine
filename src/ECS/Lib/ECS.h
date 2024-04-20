@@ -283,7 +283,6 @@ public:
     virtual void onAdd(const Entity){};
     virtual void onRemove(const Entity){};
 
-protected:
     std::unordered_map<EntityID, Entity> getEntities() const { return mEntities; }
 
 private:

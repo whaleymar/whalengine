@@ -1,8 +1,8 @@
 #include "Game/DebugScene.h"
 
+#include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/RailsControl.h"
-#include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Entities/Block.h"
 #include "ECS/Entities/Player.h"
@@ -59,9 +59,9 @@ std::optional<Error> loadDebugScene() {
             createBlock(Transform::tiles(i, 2),
                         Sprite(d, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/dirtblock").value(), Color::EMERALD))
                 .value();
-        invisBlock.remove<SolidBody>();
+        invisBlock.remove<SolidCollider>();
         auto invisBlock2 = createBlock(Transform::tiles(i - 5, 2), Draw(Color::EMERALD, {8, 8}, d)).value();
-        invisBlock2.remove<SolidBody>();
+        invisBlock2.remove<SolidCollider>();
     }
 
     createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8}));

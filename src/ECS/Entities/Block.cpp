@@ -1,7 +1,7 @@
 #include "Block.h"
 
+#include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
-#include "ECS/Components/SolidBody.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Lib/ECS.h"
 #include "Gfx/GfxUtil.h"
@@ -23,7 +23,7 @@ Expected<ecs::Entity> createBlock(Transform transform) {
 
     const s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     const s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
-    block.add(SolidBody(toFloatVec(transform.position) + Vector2f(0, heightTileHL), widthTileHL, heightTileHL));
+    block.add(SolidCollider(toFloatVec(transform.position) + Vector2f(0, heightTileHL), Vector2i(widthTileHL, heightTileHL)));
 
     return block;
 }
@@ -42,7 +42,7 @@ Expected<ecs::Entity> createBlock(Transform transform, Draw draw) {
 
     const s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     const s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
-    block.add(SolidBody(toFloatVec(transform.position) + Vector2f(0, heightTileHL), widthTileHL, heightTileHL));
+    block.add(SolidCollider(toFloatVec(transform.position) + Vector2f(0, heightTileHL), Vector2i(widthTileHL, heightTileHL)));
 
     return block;
 }
@@ -61,7 +61,7 @@ Expected<ecs::Entity> createBlock(Transform transform, Sprite sprite) {
 
     const s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
     const s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
-    block.add(SolidBody(toFloatVec(transform.position) + Vector2f(0, heightTileHL), widthTileHL, heightTileHL));
+    block.add(SolidCollider(toFloatVec(transform.position) + Vector2f(0, heightTileHL), Vector2i(widthTileHL, heightTileHL)));
 
     return block;
 }

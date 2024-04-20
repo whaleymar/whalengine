@@ -4,6 +4,7 @@
 #include <cmath>
 #include <type_traits>
 
+#include "ECS/Systems/CollisionManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Physics/Collision/HitInfo.h"
 #include "Physics/CollisionManager.h"
@@ -24,7 +25,7 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
 void ActorCollider::moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
     s32 toMove = std::round(amount);
-    auto& solids = CollisionManager::getInstance().getAllSolids();
+    auto const& solids = SolidsManager::getInstance()->getAllSolids();
 
     if (toMove == 0) {
         // manually check isGrounded (gravity may not move an actor by a full texel every frame)

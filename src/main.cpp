@@ -38,12 +38,12 @@ void MainLoop(GLFWwindow* window) {
 
     // single-component systems for running psuedo-destructors:
     auto rigidBodyMgr = ecs.registerSystem<RigidBodyManager>();
+    auto solidsMgr = SolidsManager::getInstance();
     // these don't have update methods:
-    auto solidBodyMgr = ecs.registerSystem<SolidBodyManager>();
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
     auto drawMgr = ecs.registerSystem<DrawManager>();
 
-    CollisionManager::getInstance().init(rigidBodyMgr, solidBodyMgr);
+    CollisionManager::getInstance().init(rigidBodyMgr, solidsMgr);
 
     // load scene
     auto err = loadDebugScene();
@@ -74,7 +74,7 @@ void MainLoop(GLFWwindow* window) {
         // they sync the collision manager
         // and kill crushed actors
         rigidBodyMgr->update();
-        solidBodyMgr->update();
+        solidsMgr->update();
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
