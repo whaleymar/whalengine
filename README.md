@@ -29,6 +29,10 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 ## Physics
 - Trigger colliders
 - X axis momentum is weird
+    - jumping off platform gives very little x momentum 
+    - moving in same direction as momentum gives too much speed
+    - moving in opposite direction as momentum completely negates it 
+    - trying to walk off platform in same direction it's moving is buggy
 
 # Animation 
 - needs cleanup + some light optimization (remove frequent string comparisons)
