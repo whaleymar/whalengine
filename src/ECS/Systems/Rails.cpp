@@ -60,8 +60,8 @@ void RailsSystem::update() {
                 sb.value()->move(delta.x(), delta.y(), true);
                 entity.set(Transform(sb.value()->getCollider().getPositionEdge(Vector2i::unitDown)));
             } else if (std::optional<ActorCollider*> actor = entity.tryGet<ActorCollider>(); actor) {
-                actor.value()->moveDirection(true, delta.x(), nullptr);
-                actor.value()->moveDirection(false, delta.y(), nullptr);
+                actor.value()->moveX(delta, nullptr);
+                actor.value()->moveY(delta, nullptr);
                 entity.set(Transform(actor.value()->getCollider().getPositionEdge(Vector2i::unitDown)));
             } else {
                 entity.set(Transform(rails.getTarget().position));

@@ -33,8 +33,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - death plane
 
 ## Physics
-- end jump if head bonk
-- jump sometimes still happens after landing 
 - isTrigger flag for IUseCollider (+ maybe rename mIsCollidable -> mIsActive + add new isCollidable flag which determines if only a trigger happens)
 - RigidBody is doing too much, needs to be split up:
     - ActorCollider: determines how it interacts with solids 

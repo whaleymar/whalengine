@@ -83,6 +83,8 @@ public:
 template <typename T>
 class ComponentArray : public IComponentArray {
 public:
+    // TODO
+    // static_assert(std::is_trivial_v<T>, "Component is not trivial type (see https://en.cppreference.com/w/cpp/language/classes#Trivial_class)");
     void addData(const Entity entity, T component) {
         if (mEntityToIndex.find(entity.id()) != mEntityToIndex.end()) {
             const u32 ix = mEntityToIndex[entity.id()];

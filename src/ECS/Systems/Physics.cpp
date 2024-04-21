@@ -10,7 +10,6 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/Deltatime.h"
 #include "Util/MathUtil.h"
-#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
@@ -71,8 +70,9 @@ void PhysicsSystem::update() {
         }
 
         const Vector2f totalVelocity = vel.stable + impulse;
-        const f32 moveX = totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
-        const f32 moveY = totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL;
+        const Vector2f move = {totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL,
+                               totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL};
+
         vel.residualImpulse = {approach(impulse.x(), 0, frictionStepGround), approach(impulse.y(), 0, gravityStep)};
         vel.impulse = {0, 0};
         vel.total = totalVelocity;
@@ -84,18 +84,18 @@ void PhysicsSystem::update() {
             //// only actors can be grounded (because they're the only ones that interact with the ground)
             //// no callback needed when actor moves into solid
             const bool wasGrounded = rb.value()->isGrounded;
-            if (actor.value()->moveDirection(false, moveY, nullptr)) {
-                if (moveY <= 0) {
+            if (actor.value()->moveY(move, nullptr)) {
+                if (move.y() <= 0) {
                     rb.value()->isGrounded = true;
-                    rb.value()->isJumping = false;
                 } else {
                     rb.value()->isGrounded = false;
-                    rb.value()->isJumping = false;
                 }
+                rb.value()->isJumping = false;
+                vel.residualImpulse.e[1] = 0;
             } else {
                 rb.value()->isGrounded = false;
             }
-            actor.value()->moveDirection(true, moveX, nullptr);
+            actor.value()->moveX(move, nullptr);
             allActors.push_back(entity);
 
             // RIGIDBODY FLAGS, MOMENTUM, AND COYOTE TIME
@@ -122,16 +122,16 @@ void PhysicsSystem::update() {
             }
 
         } else if (actor) {
-            actor.value()->moveDirection(true, moveX, nullptr);
-            actor.value()->moveDirection(false, moveY, nullptr);
+            actor.value()->moveX(move, nullptr);
+            actor.value()->moveY(move, nullptr);
             allActors.push_back(entity);
 
         } else if (std::optional<SolidCollider*> solid = entity.tryGet<SolidCollider>(); solid) {
-            solid.value()->move(moveX, moveY);
+            solid.value()->move(move.x(), move.y());
             trans.position = solid.value()->getCollider().getPositionEdge(Vector2i::unitDown);
 
         } else {
-            trans.position += Vector2i(std::round(moveX), std::round(moveY));
+            trans.position += Vector2i(std::round(move.x()), std::round(move.y()));
         }
 
         // This could be made a lot faster if I have separate functions for actors/non-actors

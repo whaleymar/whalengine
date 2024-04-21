@@ -21,20 +21,17 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
     mCollider.setPosition(position);
 }
 
-bool ActorCollider::moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback) {
+bool ActorCollider::moveX(const Vector2f amount, const CollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
-    s32 toMove = std::round(amount);
+    s32 toMove = std::round(amount.x());
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
 
     if (toMove == 0) {
-        if (isXDirection || amount > 0) {
-            return false;
-        }
-        return checkIsGrounded(solids);
+        return false;
     }
 
     const s32 moveSign = sign(toMove);
-    const auto moveVector = isXDirection ? Vector2i(moveSign, 0) : Vector2i(0, moveSign);
+    const auto moveVector = Vector2i(moveSign, 0);
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveVector;
         auto hitInfo = checkCollision(solids, nextPos);
@@ -42,25 +39,43 @@ bool ActorCollider::moveDirection(const bool isXDirection, const f32 amount, con
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
         } else {
-            bool isStopped = true;
-            if (!isXDirection && moveSign == 1) {
-                // moving up
-                if (tryCornerCorrection(solids, nextPos, 0)) {  // todo pass X speed here in last arg
-                    continue;                                   // avoided collision
-                }
+            if (callback != nullptr) {
+                ((*this).*callback)(hitInfo.value());
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ActorCollider::moveY(const Vector2f amount, const CollisionCallback callback) {
+    // RESEARCH doesn't handle colliding with other actors
+    s32 toMove = std::round(amount.y());
+    auto const& solids = SolidsManager::getInstance()->getAllSolids();
+
+    if (toMove == 0) {
+        return amount.y() <= 0 && checkIsGrounded(solids);
+    }
+
+    const s32 moveSign = sign(toMove);
+    const auto moveVector = Vector2i(0, moveSign);
+    while (toMove != 0) {
+        auto nextPos = mCollider.getPosition() + moveVector;
+        auto hitInfo = checkCollision(solids, nextPos);
+        if (hitInfo == std::nullopt) {
+            mCollider.setPosition(nextPos);
+            toMove -= moveSign;
+        } else {
+            if (moveSign == 1 && tryCornerCorrection(solids, nextPos, amount.x())) {
+                continue;  // avoided collision
             }
             if (callback != nullptr) {
                 ((*this).*callback)(hitInfo.value());
             }
-            if (isStopped) {
-                return true;
-            }
+            return true;
         }
     }
-    if (isXDirection || amount >= 0) {
-        return false;
-    }
-    return checkIsGrounded(solids);
+    return amount.y() <= 0 && checkIsGrounded(solids);
 }
 
 void ActorCollider::setMomentum(const f32 momentum, const bool isXDirection) {
@@ -202,7 +217,11 @@ void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, 
         if (mCollider.isOverlapping(actor->getCollider())) {
             f32 actorEdge = (actor->getCollider().*edgeFunc)();
             toMove = solidEdge - actorEdge;
-            actor->moveDirection(isXDirection, toMove, &ActorCollider::squish);
+            if (isXDirection) {
+                actor->moveX(Vector2f(toMove, 0), &ActorCollider::squish);
+            } else {
+                actor->moveY(Vector2f(0, toMove), &ActorCollider::squish);
+            }
             f32 momentum = toMove / dt;
             if (isManualMove) {
                 actor->addMomentum(momentum, isXDirection);
@@ -211,7 +230,11 @@ void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, 
             }
         } else if (std::find(riding.begin(), riding.end(), actor) != riding.end()) {
             // I might change this for solids moving down faster than gravity RESEARCH
-            actor->moveDirection(isXDirection, toMove, nullptr);
+            if (isXDirection) {
+                actor->moveX(Vector2f(toMove, 0), nullptr);
+            } else {
+                actor->moveY(Vector2f(0, toMove), nullptr);
+            }
             f32 momentum = toMove / dt;
             if (isManualMove) {
                 actor->addMomentum(momentum, isXDirection);

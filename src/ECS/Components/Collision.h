@@ -31,7 +31,8 @@ public:
     ActorCollider() = default;
     ActorCollider(Vector2f position, Vector2i half);
 
-    bool moveDirection(const bool isXDirection, const f32 amount, const CollisionCallback callback);
+    bool moveX(const Vector2f amount, const CollisionCallback callback);
+    bool moveY(const Vector2f amount, const CollisionCallback callback);
     bool isAlive() const { return mIsAlive; }
     void setMomentum(const f32 momentum, const bool isXDirection);
     void addMomentum(const f32 momentum, const bool isXDirection);

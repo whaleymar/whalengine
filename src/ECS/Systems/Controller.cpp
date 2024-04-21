@@ -24,7 +24,6 @@ void ControllerSystemRB::update() {
 
     for (auto& [entityid, entity] : getEntities()) {
         Velocity& vel = entity.get<Velocity>();
-        RigidBody& rb = entity.get<RigidBody>();
         PlayerControlRB& control = entity.get<PlayerControlRB>();
 
 #ifndef NDEBUG
@@ -82,6 +81,7 @@ void ControllerSystemRB::update() {
             control.jumpBuffer.buffer();
         }
 
+        RigidBody& rb = entity.get<RigidBody>();
         if (input.isJump()) {
             if ((rb.isGrounded || rb.coyoteSecondsRemaining > 0) && control.canJump()) {
                 control.jumpBuffer.consume();
@@ -93,7 +93,7 @@ void ControllerSystemRB::update() {
 
                 impulseY += rb.jumpInitialVelocity;
                 rb.jumpSecondsRemaining = rb.jumpSecondsMax;
-            } else if (control.isJumping()) {
+            } else if (control.isJumping() && rb.isJumping) {
                 f32 damping = rb.jumpSecondsRemaining / rb.jumpSecondsMax;
                 damping *= damping;
                 impulseY += rb.jumpInitialVelocity * damping;

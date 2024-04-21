@@ -3,7 +3,9 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/RailsControl.h"
+#include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Transform.h"
+#include "ECS/Components/Velocity.h"
 #include "ECS/Entities/Block.h"
 #include "ECS/Entities/Player.h"
 #include "ECS/Lib/ECS.h"
@@ -67,6 +69,10 @@ std::optional<Error> loadDebugScene() {
     createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8}));
     createBlock(Transform::tiles(6, 16), Draw(Color::RED, {8, 8}));
     // auto myBlock = createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8})).value();
+    //
+    // myBlock.add<RigidBody>();
+    // myBlock.add<Velocity>();
+    //
     // myBlock.add<PlayerControlFree>();
     // myBlock.add<Velocity>();
 
@@ -86,7 +92,7 @@ std::optional<Error> loadDebugScene() {
                                        {Transform::tiles(36, 1).position, RailsControl::Movement::LINEAR},
                                        {Transform::tiles(36, 7).position, RailsControl::Movement::LINEAR},
                                    },
-                                   1));
+                                   2));
 
     return std::nullopt;
 }
