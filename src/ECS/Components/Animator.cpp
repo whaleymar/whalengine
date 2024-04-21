@@ -32,22 +32,19 @@ Animation& Animator::getAnimation() {
     return animations[curAnimIx];
 }
 
-// TODO switch to enums for comparisons in this func + animator setter
-bool Animator::setAnimation(const char* name) {
-    if (strcmp(getAnimation().name, name) == 0) {
+bool Animator::setAnimation(s32 id) {
+    if (getAnimation().id == id) {
         return false;
     }
 
     for (size_t i = 0; i < animations.size(); i++) {
-        auto& animation = animations[i];
-        if (strcmp(animation.name, name) == 0) {
+        if (animations[i].id == id) {
             curAnimIx = i;
             resetAnimation();
-            // print("set animation:", name);
             return true;
         }
     }
-    print("failed to set animation:", name);
+    print("failed to set animation ID:", id);
     return false;  // return error?
 }
 
@@ -62,10 +59,9 @@ void Animator::resetAnimation() {
     curFrameDuration = 0;
 }
 
-Animation::Animation() : name(""), frames({}){};
+Animation::Animation() : frames({}), id(-1){};
 
-Animation::Animation(const char* name_, std::vector<Frame> frames_, f32 secondsPerFrame_)
-    : name(name_), frames(frames_), secondsPerFrame(secondsPerFrame_) {}
+Animation::Animation(s32 id_, std::vector<Frame> frames_, f32 secondsPerFrame_) : frames(frames_), id(id_), secondsPerFrame(secondsPerFrame_) {}
 
 Frame Animation::getFrame(s32 ix) const {
     return frames[ix];

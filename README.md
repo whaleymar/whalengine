@@ -35,7 +35,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
     - trying to walk off platform in same direction it's moving is buggy
 
 # Animation 
-- needs cleanup + some light optimization (remove frequent string comparisons)
 - something to prevent syncing, maybe add a random amount of time to secondsPerFrame
 
 ## Non-ECS Systems

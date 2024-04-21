@@ -11,12 +11,12 @@
 
 namespace whal {
 
-using AnimInfo = std::vector<std::tuple<const char*, s32, f32>>;
+using AnimInfo = std::vector<std::tuple<const char*, s32, s32, f32>>;
 
-void loadAnimations(Animator& animator, AnimInfo& animInfo) {
+void loadAnimations(Animator& animator, const AnimInfo& animInfo) {
     auto& spriteTexture = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE);
 
-    for (auto [animBaseName, count, secsPerFrame] : animInfo) {
+    for (auto [animBaseName, id, count, secsPerFrame] : animInfo) {
         std::vector<Frame> frames;
         for (s32 i = 0; i < count; i++) {
             auto animName = std::format("{}{}", animBaseName, i + 1);
@@ -29,7 +29,7 @@ void loadAnimations(Animator& animator, AnimInfo& animInfo) {
             }
         }
 
-        animator.animations.push_back(Animation(animBaseName, frames, secsPerFrame));
+        animator.animations.push_back(Animation(id, frames, secsPerFrame));
     }
 }
 

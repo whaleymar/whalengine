@@ -37,7 +37,7 @@ struct Animator {
 
     Frame getFrame() const;
     Animation& getAnimation();
-    bool setAnimation(const char* name);
+    bool setAnimation(s32 id);
     void nextFrame();
     void resetAnimation();
 };
@@ -45,13 +45,13 @@ struct Animator {
 // an animation is a sequence of same-sized frames
 struct Animation {
     Animation();
-    Animation(const char* name, std::vector<Frame> frames, f32 secondsPerFrame = 0.25);
+    Animation(s32 id, std::vector<Frame> frames, f32 secondsPerFrame = 0.25);
 
     Frame getFrame(s32 ix) const;
     s32 getFrameCount() const;
 
-    const char* name;
     std::vector<Frame> frames;
+    s32 id;
     f32 secondsPerFrame = 0.25;
 };
 
