@@ -4,14 +4,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 # To Do 
 
 ## Current Goal: 
-- merge Physics code into ECS
-    - New components:
-        - ActorCollider (DONE)
-        - SolidCollider (DONE)
-        - TriggerCollider (do i need this? maybe actorcollider w/out rigidbody would work?)
-        - RigidBody (DONE)
-    - Merge CollisionManagers (DONE)
-    - Collision Callbacks take parent entity as argument
 
 ## Graphics
 - glfw -> sdl (for text and audio)
@@ -19,11 +11,13 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 ## Systems
 - sound\*
 - lighting\*
+- ui\*
 
 ## Components
 - Follow
 - Light 
 - lifetime
+- Trigger
 - collision callback (move object, kill player, play animation, etc.)
 
 ## Entity Prefabs
@@ -33,13 +27,8 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - death plane
 
 ## Physics
-- isTrigger flag for IUseCollider (+ maybe rename mIsCollidable -> mIsActive + add new isCollidable flag which determines if only a trigger happens)
-- RigidBody is doing too much, needs to be split up:
-    - ActorCollider: determines how it interacts with solids 
-        - maybe this could be a generic component (that solids also have) that could be used as a trigger, or can combine with RigidBody/SolidBody to get current behavior
-    - RigidBody: determines how friction and gravity affect it (so I can have these systems affect entities without collision, like sweat particles)
-    - PlatformerController: coyote time, jump time, jump height, isLanding/Grounded/Jumping flags
-        - NPCs can have their own component to adjust these
+- Trigger colliders
+- X axis momentum is weird
 
 # Animation 
 - needs cleanup + some light optimization (remove frequent string comparisons)
@@ -60,7 +49,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - make this an actual framework 
     - move stuff in main.cpp into game class
 - Sys class (WIP name) that holds deltatime, frameNum, etc. so calling them is less annoying
-- API change: easier way to convert between collider center and Position
 - Logger queue that runs on another thread
 
 ## Bugs

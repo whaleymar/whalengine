@@ -13,7 +13,7 @@ void ActorsManager::update() {
     if (mIsUpdateNeeded == true) {
         print("Updating actors list");
     }
-    std::vector<ActorCollider*> newActorList;
+    std::vector<std::tuple<ecs::Entity, ActorCollider*>> newActorList;
 
     bool isUpdateNeeded = mIsUpdateNeeded;
     mIsUpdateNeeded = false;  // might change if we kill entities
@@ -23,7 +23,7 @@ void ActorsManager::update() {
         if (!pCollider->isAlive()) {
             entity.kill();
         } else if (isUpdateNeeded) {
-            newActorList.push_back(pCollider);
+            newActorList.push_back({entity, pCollider});
         }
     }
 
@@ -33,15 +33,11 @@ void ActorsManager::update() {
 }
 
 void ActorsManager::onAdd(ecs::Entity entity) {
-    mIsUpdateNeeded = true;
+    mActors.push_back({entity, &entity.get<ActorCollider>()});
 }
 
 void ActorsManager::onRemove(ecs::Entity entity) {
     mIsUpdateNeeded = true;
-}
-
-const std::vector<ActorCollider*>& ActorsManager::getAllActors() const {
-    return mActors;
 }
 
 void SolidsManager::update() {
@@ -49,17 +45,17 @@ void SolidsManager::update() {
         return;
     }
     print("updating solids list");
-    std::vector<SolidCollider*> newSolidList;
+    std::vector<std::tuple<ecs::Entity, SolidCollider*>> newSolidList;
     for (auto& [entityid, entity] : getEntities()) {
         auto pCollider = &entity.get<SolidCollider>();
-        newSolidList.push_back(pCollider);
+        newSolidList.push_back({entity, pCollider});
     }
     mSolids = newSolidList;
     mIsUpdateNeeded = false;
 }
 
 void SolidsManager::onAdd(ecs::Entity entity) {
-    mIsUpdateNeeded = true;
+    mSolids.push_back({entity, &entity.get<SolidCollider>()});
 }
 
 void SolidsManager::onRemove(ecs::Entity entity) {
@@ -86,10 +82,10 @@ void drawColliders() {
     auto program = GLResourceManager::getInstance().getProgram(ShaderType::Debug);
     program.useProgram();
 
-    for (const IUseCollision* collider : ActorsManager::getInstance()->getAllActors()) {
+    for (const auto& [entity, collider] : ActorsManager::getInstance()->getAllActors()) {
         drawCollider(program, collider, Color::MAGENTA);
     }
-    for (const IUseCollision* collider : SolidsManager::getInstance()->getAllSolids()) {
+    for (const auto& [entity, collider] : SolidsManager::getInstance()->getAllSolids()) {
         drawCollider(program, collider, Color::RED);
     }
 }

@@ -21,6 +21,27 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
     mCollider.setPosition(position);
 }
 
+// TODO Triggers
+// CURRENT PLAN
+/*
+ * Trigger component, holds callback which takes, self(?), other, and hitinfo
+ * Pass "self" Entity into actor.move and solid.move
+ *
+ * in actor.move: check collision with solids. For solids which have collision turned off but have trigger components, add their entity IDs to a list
+ *   => after movement is done, run each callback
+ *   => if they have collision on, also add to list but then break
+ * in actor.move: check collision with actors. For actors which have collision turned off but have trigger components, do same list thingy
+ *   => isCollidable only affects whether other actors can collide with an entity
+ *   => if I don't want the actor to interact with solids, it should be a solid
+ * in actor.move: if the actor has collision turned off don't worry about other triggers -- only check for collidable actors/solids
+ *   => add each collidable entity passed through to list & run moving entity's trigger callback on them after movement
+ *   => only break from movement loop if colliding with solid
+ *
+ * in solid.move:
+ *   => if solid.isCollidable == true, run callback on each actor we hit AND push/move the actor
+ *   => if                    == false run callback on each actor we hit but don't push/move
+ */
+
 bool ActorCollider::moveX(const Vector2f amount, const CollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
     s32 toMove = std::round(amount.x());
@@ -108,8 +129,8 @@ void ActorCollider::momentumNotUsed() {
     }
 }
 
-bool ActorCollider::checkIsGrounded(const std::vector<SolidCollider*>& solids) {
-    for (auto solid : solids) {
+bool ActorCollider::checkIsGrounded(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids) {
+    for (auto& [entity, solid] : solids) {
         if (isRiding(solid)) {
             return true;
         }
@@ -118,15 +139,15 @@ bool ActorCollider::checkIsGrounded(const std::vector<SolidCollider*>& solids) {
 }
 
 template <typename T>
-std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<T*>& objects, const Vector2i position) const {
+std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::tuple<ecs::Entity, T*>>& objects, const Vector2i position) const {
     static_assert(std::is_base_of_v<IUseCollision, T>, "collider must inherit IUseCollision");
 
     auto movedCollider = AABB(position, mCollider.half);
-    for (auto& object : objects) {
-        if (!object->isCollidable()) {
+    for (auto& [entity, collider] : objects) {
+        if (!collider->isCollidable()) {
             continue;
         }
-        std::optional<HitInfo> hitInfo = movedCollider.collide(object->getCollider());
+        std::optional<HitInfo> hitInfo = movedCollider.collide(collider->getCollider());
         if (hitInfo != std::nullopt) {
             return hitInfo;
         }
@@ -150,7 +171,7 @@ bool ActorCollider::isRiding(const SolidCollider* solid) const {
 
 // Try to wiggle out of collision if barely clipping another collider.
 // Returns true if successful.
-bool ActorCollider::tryCornerCorrection(const std::vector<SolidCollider*>& solids, Vector2i nextPosition, s32 moveSignX) {
+bool ActorCollider::tryCornerCorrection(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPosition, s32 moveSignX) {
     // if we are on a half texel x coord, start at 0.5 texels of movement
     if (moveSignX >= 0) {
         for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
@@ -189,6 +210,7 @@ void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
     auto riding = getRidingActors();
 
     // turn off collision so actors moved by the solid don't get stuck on it
+    bool wasCollidable = mIsCollidable;
     mIsCollidable = false;
     if (toMoveX > 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(toMoveX, 0));
@@ -206,13 +228,13 @@ void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
         moveDirection(toMoveY, false, mCollider.bottom(), &AABB::top, riding, isManualMove);
     }
 
-    mIsCollidable = true;
+    mIsCollidable = wasCollidable;
 }
 
 void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding,
                                   bool isManualMove) {
     f32 dt = Deltatime::getInstance().get();
-    for (auto& actor : ActorsManager::getInstance()->getAllActors()) {
+    for (auto& [entity, actor] : ActorsManager::getInstance()->getAllActors()) {
         // push takes priority over carry
         if (mCollider.isOverlapping(actor->getCollider())) {
             f32 actorEdge = (actor->getCollider().*edgeFunc)();
@@ -247,7 +269,7 @@ void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, 
 
 std::vector<ActorCollider*> SolidCollider::getRidingActors() const {
     std::vector<ActorCollider*> riding;
-    for (auto& actor : ActorsManager::getInstance()->getAllActors()) {
+    for (auto& [entity, actor] : ActorsManager::getInstance()->getAllActors()) {
         if (actor->isRiding(this)) {
             riding.push_back(actor);
         }

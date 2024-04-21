@@ -13,10 +13,8 @@ namespace ecs {
 class Entity;
 }
 
-using TriggerCallback = void (*)(HitInfo);
+// using TriggerCallback = void (*)(HitInfo, Entity self, Entity other);
 using CollisionCallback = void (ActorCollider::*)(HitInfo);
-
-// These collider classes have bad memory layout because of the bool at byte 25 of IUseCollision
 
 class SolidCollider : public IUseCollision {
 public:
@@ -44,10 +42,10 @@ public:
     Vector2f getMomentum() const { return mStoredMomentum; }
     bool isMomentumStored() const { return mMomentumFramesLeft > 0; }
     void momentumNotUsed();
-    bool checkIsGrounded(const std::vector<SolidCollider*>& solids);
+    bool checkIsGrounded(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids);
 
     template <typename T>
-    std::optional<HitInfo> checkCollision(const std::vector<T*>& objects, const Vector2i position) const;
+    std::optional<HitInfo> checkCollision(const std::vector<std::tuple<ecs::Entity, T*>>& objects, const Vector2i position) const;
 
     // squish is a CollisionCallback. Not sure if I will define others
     // TODO these can't be virtual bc ECS
@@ -55,7 +53,7 @@ public:
     virtual bool isRiding(const SolidCollider* solid) const;
 
 private:
-    bool tryCornerCorrection(const std::vector<SolidCollider*>& solids, Vector2i nextPos, s32 moveSign);
+    bool tryCornerCorrection(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPos, s32 moveSign);
 
     Vector2f mStoredMomentum;
     s32 mMomentumFramesLeft = 0;

@@ -3,9 +3,7 @@
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/RailsControl.h"
-#include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Transform.h"
-#include "ECS/Components/Velocity.h"
 #include "ECS/Entities/Block.h"
 #include "ECS/Entities/Player.h"
 #include "ECS/Lib/ECS.h"
@@ -16,9 +14,10 @@
 std::optional<Error> loadDebugScene() {
     using namespace whal;
 
-    auto player = createPlayer();
     // auto player = createPlayer().value();
     // player.remove<PlayerControlRB>();
+
+    auto player = createPlayer();
 
     // auto playerCopyExpected = createPlayer();
     // player.value().kill();
