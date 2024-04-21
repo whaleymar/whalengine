@@ -7,10 +7,16 @@
 
 namespace whal {
 
-struct TriggerCollider {};
-
 class ActorCollider;
 struct HitInfo;
+namespace ecs {
+class Entity;
+}
+
+using TriggerCallback = void (*)(HitInfo);
+using CollisionCallback = void (ActorCollider::*)(HitInfo);
+
+// These collider classes have bad memory layout because of the bool at byte 25 of IUseCollision
 
 class SolidCollider : public IUseCollision {
 public:
@@ -23,8 +29,6 @@ public:
 private:
     void moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding, bool isManualMove);
 };
-
-using CollisionCallback = void (ActorCollider::*)(HitInfo);
 
 class ActorCollider : public IUseCollision {
 public:
@@ -46,6 +50,7 @@ public:
     std::optional<HitInfo> checkCollision(const std::vector<T*>& objects, const Vector2i position) const;
 
     // squish is a CollisionCallback. Not sure if I will define others
+    // TODO these can't be virtual bc ECS
     virtual void squish(const HitInfo hitInfo);
     virtual bool isRiding(const SolidCollider* solid) const;
 

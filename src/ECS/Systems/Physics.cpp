@@ -99,7 +99,6 @@ void PhysicsSystem::update() {
             allActors.push_back(entity);
 
             // RIGIDBODY FLAGS, MOMENTUM, AND COYOTE TIME
-            // should be able to put in if/else block above TODO
             bool isMomentumStored = actor.value()->isMomentumStored();
             if (rb.value()->isGrounded) {
                 rb.value()->isLanding = !wasGrounded;

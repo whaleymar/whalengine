@@ -35,7 +35,7 @@ void MainLoop(GLFWwindow* window) {
     auto drawSystem = ecs.registerSystem<DrawSystem>();
     auto animationSystem = ecs.registerSystem<AnimationSystem>();
 
-    // single-component systems for running psuedo-destructors:
+    // single-component systems for running psuedo-destructors / updating some global var
     auto actorsMgr = ActorsManager::getInstance();
     auto solidsMgr = SolidsManager::getInstance();
     // these don't have update methods:

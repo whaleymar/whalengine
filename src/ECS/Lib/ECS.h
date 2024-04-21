@@ -176,7 +176,7 @@ public:
     template <typename T>
     void registerComponent() {
         const ComponentType type = getComponentID<T>();
-        assert(std::find(mComponentTypes.begin(), mComponentTypes.end(), type) == mComponentTypes.end());  // msg: component type already registered
+        assert(std::find(mComponentTypes.begin(), mComponentTypes.end(), type) == mComponentTypes.end() && "Component type already registered");
         mComponentTypes.push_back(type);
         mComponentArrays.push_back(std::make_shared<ComponentArray<T>>());
     }
@@ -331,7 +331,7 @@ public:
 
 #ifndef NDEBUG  // avoid unused variable warning
         auto it = std::find(mSystemIDs.begin(), mSystemIDs.end(), id);
-        assert(it == mSystemIDs.end());  // msg: system already registered
+        assert(it == mSystemIDs.end() && "System already registered");
 #endif
 
         mSystemIDs.push_back(id);

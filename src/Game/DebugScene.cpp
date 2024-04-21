@@ -66,8 +66,8 @@ std::optional<Error> loadDebugScene() {
         invisBlock2.remove<SolidCollider>();
     }
 
-    createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8}));
-    createBlock(Transform::tiles(6, 16), Draw(Color::RED, {8, 8}));
+    // createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8}));
+    // createBlock(Transform::tiles(6, 16), Draw(Color::RED, {8, 8}));
     // auto myBlock = createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8})).value();
     //
     // myBlock.add<RigidBody>();
@@ -81,7 +81,7 @@ std::optional<Error> loadDebugScene() {
                                     {
                                         {Transform::tiles(5, 1).position, RailsControl::Movement::LINEAR},
                                         // {Transform::tiles(5, 15).position, RailsControl::Movement::EASEIO_BEZIER},
-                                        {Transform::tiles(5, 15).position, RailsControl::Movement::EASEI_CUBE},
+                                        {Transform::tiles(15, 15).position, RailsControl::Movement::EASEI_CUBE},
                                     },
                                     2, true);
     platform.add<RailsControl>(pathControl);

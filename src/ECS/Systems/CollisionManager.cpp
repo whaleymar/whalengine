@@ -68,14 +68,14 @@ void SolidsManager::onRemove(ecs::Entity entity) {
 
 #ifndef NDEBUG
 
-void drawCollider(ShaderProgram program, const IUseCollision* collider) {
+void drawCollider(ShaderProgram program, const IUseCollision* collider, const RGB color) {
     const AABB& aabb = collider->getCollider();
 
     Vector2f floatPos(aabb.left(), aabb.top());
     glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
 
     aabb.vao.bind();
-    auto vertices = MakeRectVerticesRGBUV(aabb.half.x() * 2, aabb.half.y() * 2, Depth::Debug, Color::RED);
+    auto vertices = MakeRectVerticesRGBUV(aabb.half.x() * 2, aabb.half.y() * 2, Depth::Debug, color);
     aabb.vbo.buffer(vertices.data(), vertices.size() * sizeof(float));
 
     updateShaderVars(program);
@@ -87,10 +87,10 @@ void drawColliders() {
     program.useProgram();
 
     for (const IUseCollision* collider : ActorsManager::getInstance()->getAllActors()) {
-        drawCollider(program, collider);
+        drawCollider(program, collider, Color::MAGENTA);
     }
     for (const IUseCollision* collider : SolidsManager::getInstance()->getAllSolids()) {
-        drawCollider(program, collider);
+        drawCollider(program, collider, Color::RED);
     }
 }
 #endif
