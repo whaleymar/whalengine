@@ -20,7 +20,7 @@ std::optional<Error> loadDebugScene() {
     auto player = createPlayer();
 
     // auto playerCopyExpected = createPlayer();
-    // player.value().kill();
+    // // player.value().kill();
     // if (playerCopyExpected.isExpected()) {
     //     auto playerCopy = playerCopyExpected.value();
     //     playerCopy.set(Transform::tiles(20, 10));
@@ -86,7 +86,7 @@ std::optional<Error> loadDebugScene() {
     platform.add<RailsControl>(pathControl);
 
     auto rightPlatform = createBlock(Transform::tiles(36, 1)).value();
-    rightPlatform.add(RailsControl(5,
+    rightPlatform.add(RailsControl(4,
                                    {
                                        {Transform::tiles(36, 1).position, RailsControl::Movement::LINEAR},
                                        {Transform::tiles(36, 7).position, RailsControl::Movement::LINEAR},

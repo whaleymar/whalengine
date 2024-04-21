@@ -5,16 +5,15 @@
 
 namespace whal {
 
+struct System;
+
 enum class InputType { LEFT, RIGHT, UP, DOWN, JUMP, PAUSE, DEBUG, GROWX, GROWY, SHRINKX, SHRINKY };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-class Input {
+class InputHandler {
 public:
-    static Input& getInstance() {
-        static Input instance;
-        return instance;
-    }
+    friend System;
 
     void set(InputType input);
     void reset(InputType input);
@@ -41,9 +40,9 @@ public:
     inline static std::unordered_map<int, InputType> KeyMap;
 
 private:
-    Input();
-    Input(const Input&) = delete;
-    void operator=(const Input&) = delete;
+    InputHandler();
+    InputHandler(const InputHandler&) = delete;
+    void operator=(const InputHandler&) = delete;
 
     bool mIsLeft = false;
     bool mIsRight = false;

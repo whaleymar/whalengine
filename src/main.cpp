@@ -15,9 +15,7 @@
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 
-#include "Systems/Deltatime.h"
-#include "Systems/Frametracker.h"
-#include "Systems/InputHandler.h"
+#include "Systems/System.h"
 
 #include "Util/Print.h"
 
@@ -49,19 +47,18 @@ void MainLoop(GLFWwindow* window) {
         return;
     }
 
-    auto& input = Input::getInstance();
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // GL_FILL to go back to normal
     while (!glfwWindowShouldClose(window)) {
         // check inputs
 
         glfwPollEvents();
-        if (input.isPause()) {
+        if (System::input.isPause()) {
             glfwSetWindowShouldClose(window, GL_TRUE);
         }
 
         // update systems
-        Deltatime::getInstance().update();
-        Frametracker::getInstance().update();
+        System::dt.update();
+        System::frame.update();
         controlSystemRB->update();
         controlSystemFree->update();
         pathSystem->update();
@@ -82,7 +79,7 @@ void MainLoop(GLFWwindow* window) {
         drawSystem->drawEntities();
         spriteSystem->drawEntities();
 #ifndef NDEBUG
-        if (input.isDebug()) {
+        if (System::input.isDebug()) {
             drawColliders();
         }
 #endif

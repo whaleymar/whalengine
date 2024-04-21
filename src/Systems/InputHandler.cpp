@@ -1,13 +1,16 @@
 #include "InputHandler.h"
 
 #include <GLFW/glfw3.h>
+
+#include "System.h"
+
 namespace whal {
 
-Input::Input() {
+InputHandler::InputHandler() {
     loadMappings();
 }
 
-void Input::set(InputType input) {
+void InputHandler::set(InputType input) {
     switch (input) {
     case InputType::LEFT:
         mIsLeft = true;
@@ -58,7 +61,7 @@ void Input::set(InputType input) {
     }
 }
 
-void Input::reset(InputType input) {
+void InputHandler::reset(InputType input) {
     switch (input) {
     case InputType::LEFT:
         mIsLeft = false;
@@ -104,7 +107,7 @@ void Input::reset(InputType input) {
     }
 }
 
-void Input::loadMappings() const {
+void InputHandler::loadMappings() const {
     // EVENTUALLY load from file once i have, like, menus working
 
     KeyMap.clear();
@@ -125,21 +128,21 @@ void Input::loadMappings() const {
 #endif
 }
 
-void Input::useJump() {
+void InputHandler::useJump() {
     mIsJumpPressed = false;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-    auto search = Input::KeyMap.find(key);
-    if (search == Input::KeyMap.end()) {
+    auto search = InputHandler::KeyMap.find(key);
+    if (search == InputHandler::KeyMap.end()) {
         return;
     }
     InputType input = search->second;
 
     if (action == GLFW_PRESS) {
-        Input::getInstance().set(input);
+        System::input.set(input);
     } else if (action == GLFW_RELEASE) {
-        Input::getInstance().reset(input);
+        System::input.reset(input);
     }
 }
 }  // namespace whal

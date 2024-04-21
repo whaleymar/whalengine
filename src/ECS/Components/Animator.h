@@ -31,7 +31,7 @@ struct Animator {
     std::vector<Animation> animations;
     AnimBrain brain = &basicAnimation;
     s32 curAnimIx = 0;
-    s32 curAnimDuration = 0.0;
+    f32 curAnimDuration = 0.0;
     s32 curFrameIx = 0;
     f32 curFrameDuration = 0.0;
 

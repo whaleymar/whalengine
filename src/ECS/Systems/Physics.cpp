@@ -8,7 +8,7 @@
 
 #include "ECS/Components/Velocity.h"
 #include "Gfx/GfxUtil.h"
-#include "Systems/Deltatime.h"
+#include "Systems/System.h"
 #include "Util/MathUtil.h"
 #include "Util/Vector.h"
 
@@ -34,7 +34,7 @@ void applyFriction(Vector2f& velocity, f32 frictionMultiplier) {
 }
 
 void PhysicsSystem::update() {
-    const f32 dt = Deltatime::getInstance().get();
+    const f32 dt = System::dt();
     const f32 frictionStepGround = dt * FRICTION_GROUND;
     const f32 frictionStepAir = dt * FRICTION_AIR;
     const f32 gravityStep = dt * GRAVITY * 3;

@@ -5,14 +5,13 @@
 
 namespace whal {
 
+struct System;
+
 class Deltatime {
 public:
-    static Deltatime& getInstance() {
-        static Deltatime instance;
-        return instance;
-    }
+    friend System;
 
-    f32 get() const { return mDeltatime; }
+    f32 operator()() const { return mDeltatime; }
     void update();
 
 private:

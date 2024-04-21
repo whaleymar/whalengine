@@ -31,6 +31,7 @@ void loadAnimations(Animator& animator, const AnimInfo& animInfo) {
 
         animator.animations.push_back(Animation(id, frames, secsPerFrame));
     }
+    animator.resetAnimation();
 }
 
 }  // namespace whal

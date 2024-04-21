@@ -10,7 +10,7 @@
 #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
 #include "ECS/Systems/Physics.h"
-#include "Systems/Deltatime.h"
+#include "Systems/System.h"
 #include "Util/MathUtil.h"
 
 #include "Gfx/GfxUtil.h"
@@ -54,7 +54,7 @@ bool brain(Animator& animator, ecs::Entity entity) {
     auto& vel = entity.get<Velocity>();
     auto& sprite = entity.get<Sprite>();
 
-    f32 unsquishStep = Deltatime::getInstance().get() * 1.50;
+    f32 unsquishStep = System::dt() * 1.50;
     sprite.scale = {approach(sprite.scale.x(), 1.0, unsquishStep), approach(sprite.scale.y(), 1.0, unsquishStep)};
     sprite.isVertsUpdateNeeded = true;
     if (rb.isGrounded) {

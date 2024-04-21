@@ -8,7 +8,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Physics/Collision/HitInfo.h"
 #include "Physics/IUseCollision.h"
-#include "Systems/Deltatime.h"
+#include "Systems/System.h"
 #include "Util/MathUtil.h"
 
 namespace whal {
@@ -233,7 +233,7 @@ void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
 
 void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding,
                                   bool isManualMove) {
-    f32 dt = Deltatime::getInstance().get();
+    f32 dt = System::dt();
     for (auto& [entity, actor] : ActorsManager::getInstance()->getAllActors()) {
         // push takes priority over carry
         if (mCollider.isOverlapping(actor->getCollider())) {

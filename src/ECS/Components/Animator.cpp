@@ -4,7 +4,7 @@
 
 #include "ECS/Lib/ECS.h"
 #include "Gfx/Texture.h"
-#include "Systems/Deltatime.h"
+#include "Systems/System.h"
 #include "Util/Print.h"
 
 namespace whal {
@@ -12,7 +12,7 @@ namespace whal {
 bool basicAnimation(Animator& animator, ecs::Entity entity) {
     Animation& anim = animator.getAnimation();
 
-    f32 dt = Deltatime::getInstance().get();
+    f32 dt = System::dt();
     animator.curFrameDuration += dt;
     animator.curAnimDuration += dt;
     if (animator.curFrameDuration >= anim.secondsPerFrame) {
@@ -56,7 +56,7 @@ void Animator::nextFrame() {
 void Animator::resetAnimation() {
     curAnimDuration = 0;
     curFrameIx = 0;
-    curFrameDuration = 0;
+    curFrameDuration = System::rng.uniform() - 0.5;
 }
 
 Animation::Animation() : frames({}), id(-1){};

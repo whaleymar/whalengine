@@ -6,12 +6,11 @@
 
 namespace whal {
 
+struct System;
+
 class Frametracker {
 public:
-    static Frametracker& getInstance() {
-        static Frametracker instance;
-        return instance;
-    }
+    friend System;
 
     s32 getFrame() const { return mFrame; }
     f32 getFPS() const { return mFPS; }

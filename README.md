@@ -30,7 +30,7 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - Trigger colliders
 - X axis momentum is weird
     - jumping off platform gives very little x momentum 
-    - moving in same direction as momentum gives too much speed
+    - moving in same direction as momentum gives too much speed AND is inconsistent -> use 2 players overlapped and i get completely different speeds
     - moving in opposite direction as momentum completely negates it 
     - trying to walk off platform in same direction it's moving is buggy
 
@@ -45,13 +45,11 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
         - hot reloading
 - text rendering\*\*
 - Level editor\*\*
-- RNG
 
 ## Misc
 - ECS lib tasks
 - make this an actual framework 
     - move stuff in main.cpp into game class
-- Sys class (WIP name) that holds deltatime, frameNum, etc. so calling them is less annoying
 - Logger queue that runs on another thread
 
 ## Bugs

@@ -3,7 +3,6 @@
 #include <optional>
 #include <unordered_map>
 
-#include "ECS/Components/Animator.h"
 #include "Gfx/IUseOpenGLHandle.h"
 #include "Util/Expected.h"
 #include "Util/Image.h"

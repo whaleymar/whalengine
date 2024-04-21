@@ -6,8 +6,7 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
 
-#include "Systems/Deltatime.h"
-#include "Systems/InputHandler.h"
+#include "Systems/System.h"
 #include "Util/MathUtil.h"
 
 namespace whal {
@@ -16,8 +15,8 @@ namespace whal {
 constexpr f32 APPROACH_SPEED_X = 7.5;  // 5 frames to max speed
 
 void ControllerSystemRB::update() {
-    auto& input = Input::getInstance();
-    f32 dt = Deltatime::getInstance().get();
+    auto& input = System::input;
+    f32 dt = System::dt();
 
     bool isJumpAvailable = input.isJumpAvailable();
     input.useJump();
@@ -125,7 +124,7 @@ void ControllerSystemRB::update() {
 }
 
 void ControllerSystemFree::update() {
-    auto& input = Input::getInstance();
+    auto& input = System::input;
     for (auto& [entityid, entity] : getEntities()) {
         Vector2f delta;
         if (input.isLeft()) {

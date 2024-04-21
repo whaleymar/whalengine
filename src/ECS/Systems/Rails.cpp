@@ -5,7 +5,7 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
 
-#include "Systems/Deltatime.h"
+#include "Systems/System.h"
 #include "Util/Print.h"
 #include "Util/Vector.h"
 
@@ -14,7 +14,7 @@ namespace whal {
 constexpr f32 CHECKPOINT_DISTANCE_THRESHOLD = 4;  // in pixels
 
 void RailsSystem::update() {
-    f32 dt = Deltatime::getInstance().get();
+    f32 dt = System::dt();
     f32 inv_dt = 1 / dt;
     for (auto& [entityid, entity] : getEntities()) {
         auto& rails = entity.get<RailsControl>();
