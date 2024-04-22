@@ -34,9 +34,6 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
     - moving in opposite direction as momentum completely negates it 
     - trying to walk off platform in same direction it's moving is buggy
 
-# Animation 
-- something to prevent syncing, maybe add a random amount of time to secondsPerFrame
-
 ## Non-ECS Systems
 - chunk loading/unloading
 - loading entity/map from file

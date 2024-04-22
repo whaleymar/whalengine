@@ -1,7 +1,9 @@
-// clang-format off
 #include <glad/gl.h>
-#include <GLFW/glfw3.h>  // always include after glad
-// clang-format on
+
+// #include <GLFW/glfw3.h>  // always include after glad
+
+#include <SDL2/SDL.h>
+// #include <SDL2/SDL_opengl.h>
 
 #include "ECS/Lib/ECS.h"
 #include "ECS/Systems/Animation.h"
@@ -14,7 +16,9 @@
 
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
+#include "Gfx/Window.h"
 
+#include "SDL_video.h"
 #include "Systems/System.h"
 
 #include "Util/Print.h"
@@ -23,7 +27,8 @@
 
 using namespace whal;
 
-void MainLoop(GLFWwindow* window) {
+// void MainLoop(GLFWwindow* window) {
+void MainLoop(Window& window) {
     auto& ecs = ecs::ECS::getInstance();
     auto controlSystemRB = ecs.registerSystem<ControllerSystemRB>();
     auto controlSystemFree = ecs.registerSystem<ControllerSystemFree>();
@@ -48,12 +53,13 @@ void MainLoop(GLFWwindow* window) {
     }
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // GL_FILL to go back to normal
-    while (!glfwWindowShouldClose(window)) {
+    // while (!glfwWindowShouldClose(window)) {
+    while (true) {
         // check inputs
 
-        glfwPollEvents();
+        // glfwPollEvents();
         if (System::input.isPause()) {
-            glfwSetWindowShouldClose(window, GL_TRUE);
+            break;
         }
 
         // update systems
@@ -85,34 +91,36 @@ void MainLoop(GLFWwindow* window) {
 #endif
 
         // Swap the screen buffers
-        glfwSwapBuffers(window);
+        // glfwSwapBuffers(window);
+        window.swapBuffers();
     }
 }
 
 int main() {
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    // glfwInit();
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    //
+    // GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH_PIXELS_ACTUAL, WINDOW_HEIGHT_PIXELS_ACTUAL, WINDOW_TITLE, NULL, NULL);
+    // glfwMakeContextCurrent(window);
+    // if (window == NULL) {
+    //     print("Failed to create GLFW window");
+    //     glfwTerminate();
+    //     return -1;
+    // }
 
-    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH_PIXELS_ACTUAL, WINDOW_HEIGHT_PIXELS_ACTUAL, WINDOW_TITLE, NULL, NULL);
-    glfwMakeContextCurrent(window);
-    if (window == NULL) {
-        print("Failed to create GLFW window");
-        glfwTerminate();
+    // glfwSetKeyCallback(window, key_callback);
+
+    auto window = Window(WINDOW_TITLE);
+    if (!window.init(0, 0, WINDOW_WIDTH_PIXELS_ACTUAL, WINDOW_HEIGHT_PIXELS_ACTUAL)) {
         return -1;
     }
 
-    glfwSetKeyCallback(window, key_callback);
+    // int version = gladLoadGL(glfwGetProcAddress);
 
-    int version = gladLoadGL(glfwGetProcAddress);
-    if (version == 0) {
-        print("Failed to initialize OpenGL context");
-        return -1;
-    }
-
-    print<Format({"", "\n"})>("Loaded OpenGL ", GLAD_VERSION_MAJOR(version), ".", GLAD_VERSION_MINOR(version));
+    // print<Format({"", "\n"})>("Loaded OpenGL ", GLAD_VERSION_MAJOR(version), ".", GLAD_VERSION_MINOR(version));
 
     // Load Shaders
     auto err = createAndRegisterShader(VERTEX_RGBUV_SHADER_PATH, FRAG_SPRITE_RGB_SHADER_PATH, ShaderType::SpriteRGB, VertexInfo::RGBUV);
@@ -153,6 +161,6 @@ int main() {
     MainLoop(window);
 
     // clear resources
-    glfwTerminate();
+    // glfwTerminate();
     return 0;
 }

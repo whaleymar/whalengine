@@ -1,6 +1,6 @@
 #include "InputHandler.h"
 
-#include <GLFW/glfw3.h>
+// #include <GLFW/glfw3.h>
 
 #include "System.h"
 
@@ -112,37 +112,37 @@ void InputHandler::loadMappings() const {
 
     KeyMap.clear();
 
-    KeyMap.insert({GLFW_KEY_A, InputType::LEFT});
-    KeyMap.insert({GLFW_KEY_D, InputType::RIGHT});
-    KeyMap.insert({GLFW_KEY_W, InputType::UP});
-    KeyMap.insert({GLFW_KEY_S, InputType::DOWN});
-    KeyMap.insert({GLFW_KEY_SPACE, InputType::JUMP});
-    KeyMap.insert({GLFW_KEY_ESCAPE, InputType::PAUSE});
-    KeyMap.insert({GLFW_KEY_0, InputType::DEBUG});
-
-#ifndef NDEBUG
-    KeyMap.insert({GLFW_KEY_LEFT, InputType::SHRINKX});
-    KeyMap.insert({GLFW_KEY_RIGHT, InputType::GROWX});
-    KeyMap.insert({GLFW_KEY_DOWN, InputType::SHRINKY});
-    KeyMap.insert({GLFW_KEY_UP, InputType::GROWY});
-#endif
+    //     KeyMap.insert({GLFW_KEY_A, InputType::LEFT});
+    //     KeyMap.insert({GLFW_KEY_D, InputType::RIGHT});
+    //     KeyMap.insert({GLFW_KEY_W, InputType::UP});
+    //     KeyMap.insert({GLFW_KEY_S, InputType::DOWN});
+    //     KeyMap.insert({GLFW_KEY_SPACE, InputType::JUMP});
+    //     KeyMap.insert({GLFW_KEY_ESCAPE, InputType::PAUSE});
+    //     KeyMap.insert({GLFW_KEY_0, InputType::DEBUG});
+    //
+    // #ifndef NDEBUG
+    //     KeyMap.insert({GLFW_KEY_LEFT, InputType::SHRINKX});
+    //     KeyMap.insert({GLFW_KEY_RIGHT, InputType::GROWX});
+    //     KeyMap.insert({GLFW_KEY_DOWN, InputType::SHRINKY});
+    //     KeyMap.insert({GLFW_KEY_UP, InputType::GROWY});
+    // #endif
 }
 
 void InputHandler::useJump() {
     mIsJumpPressed = false;
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-    auto search = InputHandler::KeyMap.find(key);
-    if (search == InputHandler::KeyMap.end()) {
-        return;
-    }
-    InputType input = search->second;
-
-    if (action == GLFW_PRESS) {
-        System::input.set(input);
-    } else if (action == GLFW_RELEASE) {
-        System::input.reset(input);
-    }
-}
+// void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+//     auto search = InputHandler::KeyMap.find(key);
+//     if (search == InputHandler::KeyMap.end()) {
+//         return;
+//     }
+//     InputType input = search->second;
+//
+//     if (action == GLFW_PRESS) {
+//         System::input.set(input);
+//     } else if (action == GLFW_RELEASE) {
+//         System::input.reset(input);
+//     }
+// }
 }  // namespace whal

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
+// #include <GLFW/glfw3.h>
 #include <unordered_map>
 
 namespace whal {
@@ -9,7 +9,7 @@ struct System;
 
 enum class InputType { LEFT, RIGHT, UP, DOWN, JUMP, PAUSE, DEBUG, GROWX, GROWY, SHRINKX, SHRINKY };
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+// void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 class InputHandler {
 public:

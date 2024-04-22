@@ -4,10 +4,12 @@ cmake_policy(SET CMP0079 NEW)
 
 set(CMAKE_DEBUG_POSTFIX d)
 
-add_subdirectory(lib/glm) # needs to be here to avoid recursive variable-setting
+add_subdirectory(lib/glm) # needs to be before add_executable to avoid recursive variable-setting
 # add_subdirectory(lib/LibNerve)
 add_subdirectory(lib/glad)
-add_subdirectory(lib/glfw)
+add_subdirectory(lib/SDL)
+# add_subdirectory(lib/glfw)
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
@@ -26,12 +28,14 @@ target_include_directories(engine
     PUBLIC "${PROJECT_SOURCE_DIR}/lib/glad/include"
     PUBLIC "${PROJECT_SOURCE_DIR}/lib/stb"
     PUBLIC "${PROJECT_SOURCE_DIR}/lib/RapidXML"
+    PUBLIC "${PROJECT_SOURCE_DIR}/lib/SDL/include"
+    # PUBLIC "/usr/include"
     # PUBLIC "${PROJECT_SOURCE_DIR}/lib/LibNerve/Include"
     )
 
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+# set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+# set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+# set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 target_compile_options(engine PRIVATE "$<$<CONFIG:DEBUG>:${-g}>")
 target_compile_options(engine PRIVATE "$<$<CONFIG:RELEASE>:${-O2}>")
@@ -44,9 +48,15 @@ target_compile_options(engine PRIVATE -Wno-invalid-offsetof)
 include_directories(lib)
 
 target_link_libraries(engine glad)
-target_link_libraries(engine glfw)
+# target_link_libraries(engine glfw)
+target_link_libraries(engine SDL)
+target_link_libraries(engine SDL2)
 target_link_libraries(engine glm)
 # target_link_libraries(engine Nerve)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(engine OpenGL::GL)
+find_package(SDL2 REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
+
+
