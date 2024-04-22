@@ -1,12 +1,9 @@
 #include "Gfx/Window.h"
 
 #include <glad/gl.h>
-// #include <GL/gl.h>
-#include <SDL2/SDL.h>
-// #include <SDL2/SDL_opengl.h>
-// #include <SDL2/SDL_video.h>
 
-#include "SDL_video.h"
+#include <SDL2/SDL.h>
+
 #include "Util/Print.h"
 
 namespace whal {
@@ -26,7 +23,7 @@ bool Window::init(s32 xPos, s32 yPos, s32 width, s32 height, bool isFullScreen) 
         flags |= SDL_WINDOW_FULLSCREEN;
     }
 
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         print("Failed to init SDL");
         print(SDL_GetError());
         return false;
@@ -41,7 +38,8 @@ bool Window::init(s32 xPos, s32 yPos, s32 width, s32 height, bool isFullScreen) 
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
-    mWindow = std::unique_ptr<SDL_Window, SDLWindowDestroyer>(SDL_CreateWindow(mTitle, xPos, yPos, width, height, flags));
+    mWindow = std::unique_ptr<SDL_Window, SDLWindowDestroyer>(
+        SDL_CreateWindow(mTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags));
 
     if (!mWindow) {
         print("Failed to initialize SDL window");
@@ -77,6 +75,10 @@ void Window::checkErrors() const {
     while ((err = glGetError()) != GL_NO_ERROR) {
         print(err);
     }
+}
+
+void Window::setFocus() const {
+    SDL_SetWindowInputFocus(mWindow.get());
 }
 
 }  // namespace whal

@@ -1,9 +1,6 @@
 #include <glad/gl.h>
 
-// #include <GLFW/glfw3.h>  // always include after glad
-
 #include <SDL2/SDL.h>
-// #include <SDL2/SDL_opengl.h>
 
 #include "ECS/Lib/ECS.h"
 #include "ECS/Systems/Animation.h"
@@ -18,7 +15,6 @@
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Window.h"
 
-#include "SDL_video.h"
 #include "Systems/System.h"
 
 #include "Util/Print.h"
@@ -27,7 +23,6 @@
 
 using namespace whal;
 
-// void MainLoop(GLFWwindow* window) {
 void MainLoop(Window& window) {
     auto& ecs = ecs::ECS::getInstance();
     auto controlSystemRB = ecs.registerSystem<ControllerSystemRB>();
@@ -52,13 +47,23 @@ void MainLoop(Window& window) {
         return;
     }
 
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);  // GL_FILL to go back to normal
-    // while (!glfwWindowShouldClose(window)) {
+    window.setFocus();
+
+    // SDL_Event event;
     while (true) {
         // check inputs
 
         // glfwPollEvents();
-        if (System::input.isPause()) {
+        pollEvents();
+        // while (SDL_PollEvent(&event) != 0) {
+        //     print("got event");
+        //     if (event.type == SDL_QUIT) {
+        //         System::input.set(InputType::QUIT);
+        //         break;
+        //     }
+        //     keyCallback(event);
+        // }
+        if (System::input.isQuit()) {
             break;
         }
 
@@ -90,37 +95,21 @@ void MainLoop(Window& window) {
         }
 #endif
 
-        // Swap the screen buffers
-        // glfwSwapBuffers(window);
         window.swapBuffers();
     }
 }
 
 int main() {
-    // glfwInit();
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-    //
-    // GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH_PIXELS_ACTUAL, WINDOW_HEIGHT_PIXELS_ACTUAL, WINDOW_TITLE, NULL, NULL);
-    // glfwMakeContextCurrent(window);
-    // if (window == NULL) {
-    //     print("Failed to create GLFW window");
-    //     glfwTerminate();
-    //     return -1;
-    // }
-
-    // glfwSetKeyCallback(window, key_callback);
-
     auto window = Window(WINDOW_TITLE);
     if (!window.init(0, 0, WINDOW_WIDTH_PIXELS_ACTUAL, WINDOW_HEIGHT_PIXELS_ACTUAL)) {
         return -1;
     }
 
-    // int version = gladLoadGL(glfwGetProcAddress);
-
-    // print<Format({"", "\n"})>("Loaded OpenGL ", GLAD_VERSION_MAJOR(version), ".", GLAD_VERSION_MINOR(version));
+    // doesn't work
+    // auto prevState = SDL_EventState(SDL_KEYDOWN, SDL_ENABLE);
+    // if (prevState == 0) {
+    //     print("was false");
+    // }
 
     // Load Shaders
     auto err = createAndRegisterShader(VERTEX_RGBUV_SHADER_PATH, FRAG_SPRITE_RGB_SHADER_PATH, ShaderType::SpriteRGB, VertexInfo::RGBUV);

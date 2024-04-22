@@ -23,6 +23,7 @@ public:
     bool init(s32 xPos, s32 yPos, s32 width, s32 height, bool isFullScreen = false);
     void swapBuffers() const;
     void checkErrors() const;
+    void setFocus() const;
 
 private:
     std::unique_ptr<SDL_Window, SDLWindowDestroyer> mWindow;

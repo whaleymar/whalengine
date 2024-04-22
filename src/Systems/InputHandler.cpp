@@ -1,8 +1,10 @@
 #include "InputHandler.h"
 
-// #include <GLFW/glfw3.h>
+#include <SDL2/SDL.h>
 
+#include "SDL_keycode.h"
 #include "System.h"
+#include "Util/Print.h"
 
 namespace whal {
 
@@ -35,6 +37,10 @@ void InputHandler::set(InputType input) {
 
     case InputType::PAUSE:
         mIsPause = mIsPause != true;
+        break;
+
+    case InputType::QUIT:
+        mIsQuit = true;
         break;
 
     case InputType::DEBUG:
@@ -111,6 +117,13 @@ void InputHandler::loadMappings() const {
     // EVENTUALLY load from file once i have, like, menus working
 
     KeyMap.clear();
+    KeyMap.insert({SDLK_a, InputType::LEFT});
+    KeyMap.insert({SDLK_d, InputType::RIGHT});
+    KeyMap.insert({SDLK_w, InputType::UP});
+    KeyMap.insert({SDLK_s, InputType::DOWN});
+    KeyMap.insert({SDLK_SPACE, InputType::JUMP});
+    KeyMap.insert({SDLK_ESCAPE, InputType::QUIT});
+    KeyMap.insert({SDLK_0, InputType::DEBUG});
 
     //     KeyMap.insert({GLFW_KEY_A, InputType::LEFT});
     //     KeyMap.insert({GLFW_KEY_D, InputType::RIGHT});
@@ -130,6 +143,46 @@ void InputHandler::loadMappings() const {
 
 void InputHandler::useJump() {
     mIsJumpPressed = false;
+}
+
+void keyCallback(SDL_Event& event) {
+    print("running keyCallback");
+    System::input.set(InputType::QUIT);
+    if (event.type == SDL_KEYDOWN && event.key.repeat != 0) {
+        return;
+    }
+    auto search = InputHandler::KeyMap.find(event.key.keysym.scancode);
+    if (search == InputHandler::KeyMap.end()) {
+        return;
+    }
+
+    InputType input = search->second;
+    if (event.type == SDL_KEYDOWN) {
+        System::input.set(input);
+    } else if (event.type == SDL_KEYUP) {
+        System::input.reset(input);
+    }
+}
+
+void pollEvents() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        print("got event:", event.key.keysym.scancode);
+        if (event.type == SDL_QUIT) {
+            System::input.set(InputType::QUIT);
+            break;
+        }
+        keyCallback(event);
+    }
+    // SDL_Event event;
+    // SDL_PollEvent(&event);
+    // switch (event.type) {
+    // case SDL_QUIT:
+    //     System::input.set(InputType::QUIT);
+    //     break;
+    // default:
+    //     break;
+    // }
 }
 
 // void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {

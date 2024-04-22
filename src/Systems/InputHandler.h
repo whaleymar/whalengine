@@ -1,14 +1,17 @@
 #pragma once
 
 // #include <GLFW/glfw3.h>
+#include <SDL2/SDL.h>
 #include <unordered_map>
 
 namespace whal {
 
 struct System;
 
-enum class InputType { LEFT, RIGHT, UP, DOWN, JUMP, PAUSE, DEBUG, GROWX, GROWY, SHRINKX, SHRINKY };
+enum class InputType { LEFT, RIGHT, UP, DOWN, JUMP, PAUSE, QUIT, DEBUG, GROWX, GROWY, SHRINKX, SHRINKY };
 
+void pollEvents();
+void keyCallback(SDL_Event& event);
 // void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 class InputHandler {
@@ -26,6 +29,7 @@ public:
     bool isDown() const { return mIsDown; }
     bool isJump() const { return mIsJump; }
     bool isPause() const { return mIsPause; }
+    bool isQuit() const { return mIsQuit; }
     bool isDebug() const { return mIsDebug; }
 
     bool isJumpAvailable() const { return mIsJumpPressed; }
@@ -50,6 +54,7 @@ private:
     bool mIsDown = false;
     bool mIsJump = false;
     bool mIsPause = false;
+    bool mIsQuit = false;
     bool mIsDebug = false;
 
     bool mIsJumpPressed = false;
