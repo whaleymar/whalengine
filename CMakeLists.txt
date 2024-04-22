@@ -2,9 +2,12 @@ cmake_minimum_required(VERSION 3.13)
 project(engine CXX C)
 cmake_policy(SET CMP0079 NEW)
 
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 set(CMAKE_DEBUG_POSTFIX d)
 
 find_package(SDL2 REQUIRED)
+find_package(SDL2_mixer REQUIRED)
 
 add_subdirectory(lib/glm) # needs to be before add_executable to avoid recursive variable-setting
 # add_subdirectory(lib/LibNerve)
@@ -46,6 +49,7 @@ include_directories(lib)
 
 target_link_libraries(engine glad)
 target_link_libraries(engine ${SDL2_LIBRARIES})
+target_link_libraries(engine ${SDL2_MIXER_LIBRARIES})
 target_link_libraries(engine glm)
 # target_link_libraries(engine Nerve)
 
