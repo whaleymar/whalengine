@@ -53,6 +53,7 @@ A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple 
 - isNearZero not working
 - cppcheck issues
 - depth test broken for Draw components (low priority)
+- Railscontrol timer not working right. Is always synced to others regardless of speed/distance
 
 ## Research
 - things i might want to reconsider in the future -- ctrl+f for "RESEARCH" 

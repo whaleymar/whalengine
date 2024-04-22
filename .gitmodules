@@ -11,7 +11,3 @@
 [submodule "lib/crunch"]
 	path = lib/crunch
 	url = https://github.com/Nebulaxin/crunch.git
-[submodule "lib/SDL"]
-	path = lib/SDL
-	url = https://github.com/libsdl-org/SDL.git
-	branch = release-2.28.x

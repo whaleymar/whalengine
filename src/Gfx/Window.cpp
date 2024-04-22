@@ -4,6 +4,8 @@
 
 #include <SDL2/SDL.h>
 
+// #include "SDL_hints.h"
+#include "SDL_hints.h"
 #include "Util/Print.h"
 
 namespace whal {
@@ -23,7 +25,10 @@ bool Window::init(s32 xPos, s32 yPos, s32 width, s32 height, bool isFullScreen) 
         flags |= SDL_WINDOW_FULLSCREEN;
     }
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    // SDL_SetHintWithPriority(SDL_HINT_XINPUT_ENABLED, "1", SDL_HINT_OVERRIDE);
+
+    // if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         print("Failed to init SDL");
         print(SDL_GetError());
         return false;

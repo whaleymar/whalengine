@@ -18,6 +18,9 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(SDL_XINPUT ON)
+
+
 file(GLOB_RECURSE SOURCES_BASE ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/*.c ${PROJECT_SOURCE_DIR}/src/*.hpp ${PROJECT_SOURCE_DIR}/src/*.h)
 
 add_executable(engine ${SOURCES_BASE})
@@ -51,6 +54,7 @@ target_link_libraries(engine glad)
 # target_link_libraries(engine glfw)
 target_link_libraries(engine SDL)
 target_link_libraries(engine SDL2)
+set(SDL_XINPUT ON)
 target_link_libraries(engine glm)
 # target_link_libraries(engine Nerve)
 
@@ -58,5 +62,6 @@ find_package(OpenGL REQUIRED)
 target_link_libraries(engine OpenGL::GL)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
+set(SDL_XINPUT ON)
 
 
