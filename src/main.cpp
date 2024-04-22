@@ -49,20 +49,8 @@ void MainLoop(Window& window) {
 
     window.setFocus();
 
-    // SDL_Event event;
     while (true) {
-        // check inputs
-
-        // glfwPollEvents();
         pollEvents();
-        // while (SDL_PollEvent(&event) != 0) {
-        //     print("got event");
-        //     if (event.type == SDL_QUIT) {
-        //         System::input.set(InputType::QUIT);
-        //         break;
-        //     }
-        //     keyCallback(event);
-        // }
         if (System::input.isQuit()) {
             break;
         }
@@ -101,15 +89,9 @@ void MainLoop(Window& window) {
 
 int main() {
     auto window = Window(WINDOW_TITLE);
-    if (!window.init(0, 0, WINDOW_WIDTH_PIXELS_ACTUAL, WINDOW_HEIGHT_PIXELS_ACTUAL)) {
+    if (!window.init(SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH_PIXELS_ACTUAL, WINDOW_HEIGHT_PIXELS_ACTUAL)) {
         return -1;
     }
-
-    // doesn't work
-    // auto prevState = SDL_EventState(SDL_KEYDOWN, SDL_ENABLE);
-    // if (prevState == 0) {
-    //     print("was false");
-    // }
 
     // Load Shaders
     auto err = createAndRegisterShader(VERTEX_RGBUV_SHADER_PATH, FRAG_SPRITE_RGB_SHADER_PATH, ShaderType::SpriteRGB, VertexInfo::RGBUV);
@@ -149,7 +131,5 @@ int main() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     MainLoop(window);
 
-    // clear resources
-    // glfwTerminate();
     return 0;
 }

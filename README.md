@@ -1,12 +1,10 @@
 # unnamed engine
-A WIP 2D game framework written in C++ with OpenGL and GLFW, backed by a simple Entity Component System
+A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple Entity Component System
 
 # To Do 
 
 ## Current Goal: 
-
-## Graphics
-- glfw -> sdl (for text and audio)
+- text and audio systems
 
 ## Systems
 - sound\*

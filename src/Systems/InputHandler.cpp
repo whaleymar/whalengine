@@ -2,9 +2,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "SDL_keycode.h"
 #include "System.h"
-#include "Util/Print.h"
 
 namespace whal {
 
@@ -125,13 +123,6 @@ void InputHandler::loadMappings() const {
     KeyMap.insert({SDLK_ESCAPE, InputType::QUIT});
     KeyMap.insert({SDLK_0, InputType::DEBUG});
 
-    //     KeyMap.insert({GLFW_KEY_A, InputType::LEFT});
-    //     KeyMap.insert({GLFW_KEY_D, InputType::RIGHT});
-    //     KeyMap.insert({GLFW_KEY_W, InputType::UP});
-    //     KeyMap.insert({GLFW_KEY_S, InputType::DOWN});
-    //     KeyMap.insert({GLFW_KEY_SPACE, InputType::JUMP});
-    //     KeyMap.insert({GLFW_KEY_ESCAPE, InputType::PAUSE});
-    //     KeyMap.insert({GLFW_KEY_0, InputType::DEBUG});
     //
     // #ifndef NDEBUG
     //     KeyMap.insert({GLFW_KEY_LEFT, InputType::SHRINKX});
@@ -146,12 +137,10 @@ void InputHandler::useJump() {
 }
 
 void keyCallback(SDL_Event& event) {
-    print("running keyCallback");
-    System::input.set(InputType::QUIT);
     if (event.type == SDL_KEYDOWN && event.key.repeat != 0) {
         return;
     }
-    auto search = InputHandler::KeyMap.find(event.key.keysym.scancode);
+    auto search = InputHandler::KeyMap.find(event.key.keysym.sym);
     if (search == InputHandler::KeyMap.end()) {
         return;
     }
@@ -167,35 +156,12 @@ void keyCallback(SDL_Event& event) {
 void pollEvents() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        print("got event:", event.key.keysym.scancode);
         if (event.type == SDL_QUIT) {
             System::input.set(InputType::QUIT);
             break;
         }
         keyCallback(event);
     }
-    // SDL_Event event;
-    // SDL_PollEvent(&event);
-    // switch (event.type) {
-    // case SDL_QUIT:
-    //     System::input.set(InputType::QUIT);
-    //     break;
-    // default:
-    //     break;
-    // }
 }
 
-// void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-//     auto search = InputHandler::KeyMap.find(key);
-//     if (search == InputHandler::KeyMap.end()) {
-//         return;
-//     }
-//     InputType input = search->second;
-//
-//     if (action == GLFW_PRESS) {
-//         System::input.set(input);
-//     } else if (action == GLFW_RELEASE) {
-//         System::input.reset(input);
-//     }
-// }
 }  // namespace whal

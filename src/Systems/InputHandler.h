@@ -1,6 +1,5 @@
 #pragma once
 
-// #include <GLFW/glfw3.h>
 #include <SDL2/SDL.h>
 #include <unordered_map>
 
@@ -12,7 +11,6 @@ enum class InputType { LEFT, RIGHT, UP, DOWN, JUMP, PAUSE, QUIT, DEBUG, GROWX, G
 
 void pollEvents();
 void keyCallback(SDL_Event& event);
-// void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 class InputHandler {
 public:
