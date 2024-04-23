@@ -288,6 +288,7 @@ public:
     std::unordered_map<EntityID, Entity> getEntities() const { return mEntities; }
 
 private:
+    // TODO storing id:entity pairs is just duplicating data. I should make this a hash set with Entity
     std::unordered_map<EntityID, Entity> mEntities;
 };
 

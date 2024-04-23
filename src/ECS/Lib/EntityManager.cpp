@@ -3,9 +3,6 @@
 namespace whal::ecs {
 
 EntityManager::EntityManager() {
-    // mAvailableIDs = {};
-    // mPatterns = {};
-
     for (u32 entity = 0; entity < MAX_ENTITIES; entity++) {
         mAvailableIDs.push(entity);
     }

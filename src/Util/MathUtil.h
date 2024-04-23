@@ -7,7 +7,7 @@
 
 namespace whal {
 
-static constexpr f32 PI = 3.14159265358979323846;
+inline constexpr f32 PI = 3.14159265358979323846;
 
 template <class T>
 concept SignedNumber = std::signed_integral<T> || std::floating_point<T>;

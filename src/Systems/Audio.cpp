@@ -22,6 +22,12 @@ std::optional<Error> Music::load(const char* path) {
     return std::nullopt;
 }
 
+AudioClip::AudioClip(const char* path) {
+    if (auto errOpt = load(path); errOpt) {
+        print("Failed to load audio clip:", path, "\nGot error:", errOpt.value());
+    }
+}
+
 AudioClip::~AudioClip() {
     if (mData) {
         Mix_FreeChunk(mData);
@@ -29,6 +35,9 @@ AudioClip::~AudioClip() {
 }
 
 std::optional<Error> AudioClip::load(const char* path) {
+    if (isValid()) {
+        return Error("Cannot load path into already loaded AudioClip");
+    }
     mPath = path;
     // can be mp3 or wav (or others?)
     mData = Mix_LoadWAV(path);
@@ -43,6 +52,10 @@ AudioPlayer::AudioPlayer() {
         return;
     }
     mIsValid = true;
+
+    if (auto errOpt = Sfx::instance().load(); errOpt) {
+        print(errOpt);
+    }
 }
 
 AudioPlayer::~AudioPlayer() {
@@ -64,7 +77,7 @@ void AudioPlayer::end() {
     mCondition.notify_one();
 }
 
-void AudioPlayer::play(Music& music) {
+void AudioPlayer::play(const Music& music) {
     if (!music.isValid()) {
         return;
     }
@@ -73,7 +86,7 @@ void AudioPlayer::play(Music& music) {
     mCondition.notify_one();
 }
 
-void AudioPlayer::play(AudioClip& clip) const {
+void AudioPlayer::play(const AudioClip& clip) const {
     if (!clip.isValid()) {
         return;
     }
@@ -118,6 +131,21 @@ void AudioPlayer::playerThread() {
         Mix_PlayMusic(mQueuedMusic->get(), 0);
         mQueuedMusic = nullptr;
     }
+}
+
+std::optional<Error> Sfx::load() {
+    if (mIsLoaded) {
+        print("Already loaded sound effects. Skipping reload");
+        return std::nullopt;
+    }
+    mIsLoaded = true;
+    std::optional<Error> errOpt;
+
+    errOpt = GAMEOVER.load("data/zeldaGameOverSound.mp3");
+    if (errOpt)
+        return errOpt;
+
+    return std::nullopt;
 }
 
 }  // namespace whal

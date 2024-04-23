@@ -14,7 +14,7 @@
 
 namespace whal {
 
-static constexpr int LOG_LENGTH = 512;
+inline constexpr int LOG_LENGTH = 512;
 
 constexpr u32 getStride(VertexInfo vInfo) {
     switch (vInfo) {

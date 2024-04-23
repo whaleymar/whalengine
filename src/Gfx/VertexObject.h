@@ -8,11 +8,11 @@
 
 namespace whal {
 
-static constexpr u32 STRIDE_SIZE_RGBUV = 8;
-static constexpr u32 STRIDE_SIZE_RGB = 6;
-static constexpr u32 STRIDE_SIZE_UV = 5;
-static constexpr u32 STRIDE_SIZE_XYZ = 3;
-static constexpr u32 N_VERTS_RECT = 4;
+inline constexpr u32 STRIDE_SIZE_RGBUV = 8;
+inline constexpr u32 STRIDE_SIZE_RGB = 6;
+inline constexpr u32 STRIDE_SIZE_UV = 5;
+inline constexpr u32 STRIDE_SIZE_XYZ = 3;
+inline constexpr u32 N_VERTS_RECT = 4;
 
 using VertArrayRectRGBUV = std::array<f32, STRIDE_SIZE_RGBUV * N_VERTS_RECT>;
 using VertArrayRectRGB = std::array<f32, STRIDE_SIZE_RGB * N_VERTS_RECT>;

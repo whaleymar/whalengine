@@ -28,7 +28,7 @@ void ActorsManager::update() {
     }
 
     if (isUpdateNeeded) {
-        mActors = newActorList;
+        mActors = std::move(newActorList);
     }
 }
 
@@ -50,7 +50,7 @@ void SolidsManager::update() {
         auto pCollider = &entity.get<SolidCollider>();
         newSolidList.push_back({entity, pCollider});
     }
-    mSolids = newSolidList;
+    mSolids = std::move(newSolidList);
     mIsUpdateNeeded = false;
 }
 

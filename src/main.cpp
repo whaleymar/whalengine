@@ -55,9 +55,10 @@ void MainLoop(Window& window) {
         print("Error initializing audio manager");
         return;
     }
-    // auto clip = Music("/home/whaley/code/unnamed-engine/data/zeldaGameOverSound.mp3");
+
+    std::optional<Error> errOpt;
     // auto clip = AudioClip();
-    // auto errOpt = clip.load("/home/whaley/code/unnamed-engine/data/zeldaGameOverSound.mp3");
+    // errOpt = clip.load("/home/whaley/code/unnamed-engine/data/zeldaGameOverSound.mp3");
     // if (errOpt) {
     //     print(errOpt.value());
     // } else {
@@ -74,7 +75,7 @@ void MainLoop(Window& window) {
 
     Music music;
     // errOpt = music.load("/home/whaley/code/unnamed-engine/data/heavyBreathingSound.mp3");
-    auto errOpt = music.load("data/provingGroundsTheme.mp3");
+    errOpt = music.load("data/provingGroundsTheme.mp3");
     if (errOpt) {
         print(errOpt.value());
         return;
@@ -82,6 +83,7 @@ void MainLoop(Window& window) {
 
     audioMgr.start();
     audioMgr.play(music);
+    audioMgr.play(Sfx::GAMEOVER);
 
     while (true) {
         pollEvents();
@@ -165,11 +167,13 @@ int main() {
         return -1;
     }
 
+    // TODO move to window
     // glViewport(0, 0, WINDOW_WIDTH_PIXELS, WINDOW_HEIGHT_PIXELS); idk what this does
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     // glEnable(GL_DEPTH_TEST);  // not working right
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     MainLoop(window);
 
     return 0;
