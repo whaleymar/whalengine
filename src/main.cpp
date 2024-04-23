@@ -56,25 +56,25 @@ void MainLoop(Window& window) {
         return;
     }
     // auto clip = Music("/home/whaley/code/unnamed-engine/data/zeldaGameOverSound.mp3");
-    auto clip = AudioClip();
-    auto errOpt = clip.load("/home/whaley/code/unnamed-engine/data/zeldaGameOverSound.mp3");
-    if (errOpt) {
-        print(errOpt.value());
-    } else {
-        audioMgr.play(clip);
-    }
-
-    auto clip2 = AudioClip();
-    errOpt = clip2.load("/home/whaley/code/unnamed-engine/data/minecwaftZombieBruh.mp3");
-    if (errOpt) {
-        print(errOpt.value());
-    } else {
-        audioMgr.play(clip2);
-    }
+    // auto clip = AudioClip();
+    // auto errOpt = clip.load("/home/whaley/code/unnamed-engine/data/zeldaGameOverSound.mp3");
+    // if (errOpt) {
+    //     print(errOpt.value());
+    // } else {
+    //     audioMgr.play(clip);
+    // }
+    //
+    // auto clip2 = AudioClip();
+    // errOpt = clip2.load("/home/whaley/code/unnamed-engine/data/minecwaftZombieBruh.mp3");
+    // if (errOpt) {
+    //     print(errOpt.value());
+    // } else {
+    //     audioMgr.play(clip2);
+    // }
 
     Music music;
     // errOpt = music.load("/home/whaley/code/unnamed-engine/data/heavyBreathingSound.mp3");
-    errOpt = music.load("data/provingGroundsTheme.mp3");
+    auto errOpt = music.load("data/provingGroundsTheme.mp3");
     if (errOpt) {
         print(errOpt.value());
         return;
@@ -115,6 +115,7 @@ void MainLoop(Window& window) {
 #ifndef NDEBUG
         if (System::input.isMusicDebug()) {
             System::input.reset(InputType::MUSICTEST);
+            // audioMgr.stopMusic();
             audioMgr.play(music);
         }
         if (System::input.isDebug()) {

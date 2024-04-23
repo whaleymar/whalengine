@@ -60,7 +60,8 @@ void AudioPlayer::await() {
 }
 
 void AudioPlayer::end() {
-    mIsValid = false;
+    mIsTerminated = true;
+    mCondition.notify_one();
 }
 
 void AudioPlayer::play(Music& music) {
@@ -88,10 +89,25 @@ void AudioPlayer::play(AudioClip& clip) const {
     }
 }
 
+void AudioPlayer::stopMusic() {
+    mIsMusicStopSignal = true;
+    mCondition.notify_one();
+}
+
+void AudioPlayer::stopAll() {
+    stopMusic();
+    // TODO stop clips
+}
+
 void AudioPlayer::playerThread() {
-    while (mIsValid) {
+    while (!mIsTerminated) {
         std::unique_lock<std::mutex> lock(mMutex);
-        mCondition.wait(lock, [this] { return mQueuedMusic != nullptr || !mIsValid; });
+        mCondition.wait(lock, [this] { return mQueuedMusic != nullptr || mIsTerminated || mIsMusicStopSignal; });
+        if (mIsMusicStopSignal && Mix_PlayingMusic()) {
+            Mix_HaltMusic();
+            mQueuedMusic = nullptr;
+            mIsMusicStopSignal = false;
+        }
         if (mQueuedMusic == nullptr || !mQueuedMusic->isValid()) {
             mQueuedMusic = nullptr;
             continue;
@@ -101,12 +117,6 @@ void AudioPlayer::playerThread() {
         // -1 == play forever?
         Mix_PlayMusic(mQueuedMusic->get(), 0);
         mQueuedMusic = nullptr;
-        while (Mix_PlayingMusic()) {
-            if (mQueuedMusic || !mIsValid) {
-                break;
-            }
-            SDL_Delay(100);
-        }
     }
 }
 
