@@ -56,7 +56,7 @@ void Animator::nextFrame() {
 void Animator::resetAnimation() {
     curAnimDuration = 0;
     curFrameIx = 0;
-    curFrameDuration = System::rng.uniform() - 0.5;
+    curFrameDuration = System::rng.uniform() * 0.5;
 }
 
 Animation::Animation() : frames({}), id(-1){};

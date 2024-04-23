@@ -17,6 +17,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - lifetime
 - Trigger
 - collision callback (move object, kill player, play animation, etc.)
+- Respawn
 
 ## Entity Prefabs
 - particle

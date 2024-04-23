@@ -61,6 +61,10 @@ void InputHandler::set(InputType input) {
     case InputType::GROWY:
         mIsGrowY = true;
         break;
+
+    case InputType::MUSICTEST:
+        mIsMusicTest = true;
+        break;
 #endif
     }
 }
@@ -104,6 +108,10 @@ void InputHandler::reset(InputType input) {
     case InputType::GROWY:
         mIsGrowY = false;
         break;
+
+    case InputType::MUSICTEST:
+        mIsMusicTest = false;
+        break;
 #endif
 
     default:
@@ -123,13 +131,13 @@ void InputHandler::loadMappings() const {
     KeyMap.insert({SDLK_ESCAPE, InputType::QUIT});
     KeyMap.insert({SDLK_0, InputType::DEBUG});
 
-    //
-    // #ifndef NDEBUG
-    //     KeyMap.insert({GLFW_KEY_LEFT, InputType::SHRINKX});
-    //     KeyMap.insert({GLFW_KEY_RIGHT, InputType::GROWX});
-    //     KeyMap.insert({GLFW_KEY_DOWN, InputType::SHRINKY});
-    //     KeyMap.insert({GLFW_KEY_UP, InputType::GROWY});
-    // #endif
+#ifndef NDEBUG
+    KeyMap.insert({SDLK_m, InputType::MUSICTEST});
+//     KeyMap.insert({GLFW_KEY_LEFT, InputType::SHRINKX});
+//     KeyMap.insert({GLFW_KEY_RIGHT, InputType::GROWX});
+//     KeyMap.insert({GLFW_KEY_DOWN, InputType::SHRINKY});
+//     KeyMap.insert({GLFW_KEY_UP, InputType::GROWY});
+#endif
 }
 
 void InputHandler::useJump() {

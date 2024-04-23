@@ -15,6 +15,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Window.h"
 
+#include "Systems/Audio.h"
 #include "Systems/System.h"
 
 #include "Util/Print.h"
@@ -49,9 +50,43 @@ void MainLoop(Window& window) {
 
     window.setFocus();
 
+    auto& audioMgr = AudioPlayer::instance();
+    if (!audioMgr.isValid()) {
+        print("Error initializing audio manager");
+        return;
+    }
+    // auto clip = Music("/home/whaley/code/unnamed-engine/data/zeldaGameOverSound.mp3");
+    auto clip = AudioClip();
+    auto errOpt = clip.load("/home/whaley/code/unnamed-engine/data/zeldaGameOverSound.mp3");
+    if (errOpt) {
+        print(errOpt.value());
+    } else {
+        audioMgr.play(clip);
+    }
+
+    auto clip2 = AudioClip();
+    errOpt = clip2.load("/home/whaley/code/unnamed-engine/data/minecwaftZombieBruh.mp3");
+    if (errOpt) {
+        print(errOpt.value());
+    } else {
+        audioMgr.play(clip2);
+    }
+
+    Music music;
+    // errOpt = music.load("/home/whaley/code/unnamed-engine/data/heavyBreathingSound.mp3");
+    errOpt = music.load("data/provingGroundsTheme.mp3");
+    if (errOpt) {
+        print(errOpt.value());
+        return;
+    }
+
+    audioMgr.start();
+    audioMgr.play(music);
+
     while (true) {
         pollEvents();
         if (System::input.isQuit()) {
+            audioMgr.end();
             break;
         }
 
@@ -78,6 +113,10 @@ void MainLoop(Window& window) {
         drawSystem->drawEntities();
         spriteSystem->drawEntities();
 #ifndef NDEBUG
+        if (System::input.isMusicDebug()) {
+            System::input.reset(InputType::MUSICTEST);
+            audioMgr.play(music);
+        }
         if (System::input.isDebug()) {
             drawColliders();
         }
@@ -85,6 +124,7 @@ void MainLoop(Window& window) {
 
         window.swapBuffers();
     }
+    audioMgr.await();
 }
 
 int main() {
