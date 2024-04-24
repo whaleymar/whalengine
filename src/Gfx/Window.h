@@ -24,6 +24,7 @@ public:
     void swapBuffers() const;
     void checkErrors() const;
     void setFocus() const;
+    void updateFPS(f32 dt);
 
 private:
     std::unique_ptr<SDL_Window, SDLWindowDestroyer> mWindow;

@@ -11,6 +11,7 @@
 #include "ECS/Systems/Physics.h"
 #include "ECS/Systems/Rails.h"
 
+#include "Game/EventListeners.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Window.h"
@@ -50,61 +51,42 @@ void MainLoop(Window& window) {
 
     window.setFocus();
 
-    auto& audioMgr = AudioPlayer::instance();
-    if (!audioMgr.isValid()) {
+    if (!System::audio.isValid()) {
         print("Error initializing audio manager");
         return;
     }
+    System::audio.start();
+    startListeners();
 
-    std::optional<Error> errOpt;
-    // auto clip = AudioClip();
-    // errOpt = clip.load("/home/whaley/code/unnamed-engine/data/zeldaGameOverSound.mp3");
+    // std::optional<Error> errOpt;
+    // Music music;
+    // errOpt = music.load("data/provingGroundsTheme.mp3");
     // if (errOpt) {
     //     print(errOpt.value());
-    // } else {
-    //     audioMgr.play(clip);
+    //     return;
     // }
-    //
-    // auto clip2 = AudioClip();
-    // errOpt = clip2.load("/home/whaley/code/unnamed-engine/data/minecwaftZombieBruh.mp3");
-    // if (errOpt) {
-    //     print(errOpt.value());
-    // } else {
-    //     audioMgr.play(clip2);
-    // }
-
-    Music music;
-    // errOpt = music.load("/home/whaley/code/unnamed-engine/data/heavyBreathingSound.mp3");
-    errOpt = music.load("data/provingGroundsTheme.mp3");
-    if (errOpt) {
-        print(errOpt.value());
-        return;
-    }
-
-    audioMgr.start();
-    audioMgr.play(music);
-    audioMgr.play(Sfx::GAMEOVER);
+    // System::audio.play(music);
 
     while (true) {
         pollEvents();
         if (System::input.isQuit()) {
-            audioMgr.end();
+            System::audio.end();
             break;
         }
 
         // update systems
         System::dt.update();
-        System::frame.update();
+        window.updateFPS(System::frame.update());
         controlSystemRB->update();
         controlSystemFree->update();
         pathSystem->update();
         physicsSystem->update();
 
-        // these don't need to run every frame:
-        // they sync the collision manager
-        // and kill crushed actors
-        actorsMgr->update();
-        solidsMgr->update();
+        // these sync the collision manager
+        if (System::frame.getFrame() % 10 == 0) {
+            actorsMgr->update();
+            solidsMgr->update();
+        }
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -117,8 +99,8 @@ void MainLoop(Window& window) {
 #ifndef NDEBUG
         if (System::input.isMusicDebug()) {
             System::input.reset(InputType::MUSICTEST);
-            // audioMgr.stopMusic();
-            audioMgr.play(music);
+            // System::audio.stopMusic();
+            // System::audio.play(music);
         }
         if (System::input.isDebug()) {
             drawColliders();
@@ -127,7 +109,8 @@ void MainLoop(Window& window) {
 
         window.swapBuffers();
     }
-    audioMgr.await();
+    System::audio.await();
+    killListeners();
 }
 
 int main() {

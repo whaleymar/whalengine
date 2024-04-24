@@ -11,6 +11,8 @@
 
 namespace whal {
 
+struct System;
+
 class Music {
 public:
     Music() = default;
@@ -49,10 +51,7 @@ private:
 // TODO should be able to set volume
 class AudioPlayer {
 public:
-    static AudioPlayer& instance() {
-        static AudioPlayer instance;
-        return instance;
-    }
+    friend System;
 
     void start();
     void await();
@@ -90,6 +89,7 @@ public:
     }
 
     inline static AudioClip GAMEOVER;
+    inline static AudioClip ENEMY_CRY;
 
     std::optional<Error> load();
 

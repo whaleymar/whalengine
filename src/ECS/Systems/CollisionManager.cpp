@@ -1,6 +1,7 @@
 #include "CollisionManager.h"
 
 #include "ECS/Components/Collision.h"
+#include "Game/Events.h"
 #include "Util/Print.h"
 
 #include <glad/gl.h>
@@ -10,26 +11,19 @@
 namespace whal {
 
 void ActorsManager::update() {
-    if (mIsUpdateNeeded == true) {
-        print("Updating actors list");
+    if (!mIsUpdateNeeded) {
+        return;
     }
+    print("Updating actors list");
     std::vector<std::tuple<ecs::Entity, ActorCollider*>> newActorList;
-
-    bool isUpdateNeeded = mIsUpdateNeeded;
-    mIsUpdateNeeded = false;  // might change if we kill entities
 
     for (auto& [entityid, entity] : getEntities()) {
         auto pCollider = &entity.get<ActorCollider>();
-        if (!pCollider->isAlive()) {
-            entity.kill();
-        } else if (isUpdateNeeded) {
-            newActorList.push_back({entity, pCollider});
-        }
+        newActorList.push_back({entity, pCollider});
     }
 
-    if (isUpdateNeeded) {
-        mActors = std::move(newActorList);
-    }
+    mActors = std::move(newActorList);
+    mIsUpdateNeeded = false;
 }
 
 void ActorsManager::onAdd(ecs::Entity entity) {

@@ -14,7 +14,7 @@ public:
 
     s32 getFrame() const { return mFrame; }
     f32 getFPS() const { return mFPS; }
-    void update();
+    f32 update();
 
 private:
     Frametracker();

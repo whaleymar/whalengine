@@ -6,6 +6,7 @@
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/PlayerControl.h"
 #include "ECS/Components/RigidBody.h"
+#include "ECS/Components/Tags.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
@@ -100,6 +101,7 @@ Expected<ecs::Entity> createPlayer() {
     auto player = expected.value();
     Transform transform = Transform::tiles(15, 10);
     player.add(transform);
+    player.add<Player>();
     player.add<Velocity>();
     player.add<PlayerControlRB>();
     // player.add<PlayerControlFree>();

@@ -54,7 +54,7 @@ AudioPlayer::AudioPlayer() {
     mIsValid = true;
 
     if (auto errOpt = Sfx::instance().load(); errOpt) {
-        print(errOpt);
+        print(errOpt.value());
     }
 }
 
@@ -142,6 +142,10 @@ std::optional<Error> Sfx::load() {
     std::optional<Error> errOpt;
 
     errOpt = GAMEOVER.load("data/zeldaGameOverSound.mp3");
+    if (errOpt)
+        return errOpt;
+
+    errOpt = ENEMY_CRY.load("data/minecwaftZombieBruh.mp3");
     if (errOpt)
         return errOpt;
 

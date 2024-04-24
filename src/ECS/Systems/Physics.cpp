@@ -171,6 +171,11 @@ void PhysicsSystem::update() {
         Transform& trans = entity.get<Transform>();
         ActorCollider& actor = entity.get<ActorCollider>();
 
+        if (!actor.isAlive()) {
+            entity.kill();
+            continue;
+        }
+
         // position is bottom-middle of collider
         trans.position = actor.getCollider().getPositionEdge(Vector2i::unitDown);
     }

@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Game/Events.h"
+#include "Systems/System.h"
 #include "Util/Expected.h"
 #include "Util/Traits.h"
 #include "Util/Types.h"
@@ -343,6 +345,7 @@ public:
     }
 
     void entityDestroyed(const Entity entity) const {
+        System::eventMgr.triggerEvent(Event::DEATH_EVENT, entity);
         // TODO make thread safe
         for (const auto& system : mSystems) {
             auto const ix = system->mEntities.find(entity.id());

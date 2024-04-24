@@ -6,9 +6,12 @@
 
 namespace whal {
 
-using EventId = s32;
-using ListenerId = s32;
+// These aren't going to overflow so why would I check
+using EventId = u32;
+using ListenerId = u32;
+
 class EventManager;
+struct System;
 
 class EventBase {
 public:
@@ -21,9 +24,9 @@ private:
 };
 
 template <typename... T>
-class Event : public EventBase {
+class IEvent : public EventBase {
 public:
-    Event() : EventBase() {}
+    IEvent() : EventBase() {}
 };
 
 template <typename... T>
@@ -43,16 +46,16 @@ private:
 
 class EventManager {
 public:
-    EventManager() = default;
+    friend System;
 
     template <typename... T>
-    void registerListener(Event<T...> event, EventListener<T...>& listener) {
+    void registerListener(IEvent<T...> event, EventListener<T...>& listener) {
         listener.mId = S_LISTENER_ID++;
         mEvents.push_back({event, &listener});
     }
 
     template <typename... T>
-    void stopListening(Event<T...> event, EventListener<T...>& listener) {
+    void stopListening(IEvent<T...> event, EventListener<T...>& listener) {
         for (size_t i = 0; i < mEvents.size(); i++) {
             EventListener<T...>* eventListener = static_cast<EventListener<T...>*>(mEvents[i].second);
             if (mEvents[i].first.id() == event.id() && eventListener->id() == listener.id()) {
@@ -62,7 +65,7 @@ public:
     }
 
     template <typename... T>
-    void triggerEvent(Event<T...> newEvent, T... args) {
+    void triggerEvent(IEvent<T...> newEvent, T... args) {
         for (auto& [event, listener] : mEvents) {
             if (event.id() != newEvent.id()) {
                 continue;
@@ -74,6 +77,8 @@ public:
     }
 
 private:
+    EventManager() = default;
+    EventManager(EventManager& other) = delete;
     void removeListenerAt(int ix) {
         std::pair<EventBase, void*> last = mEvents.back();
         mEvents[ix] = last;
@@ -82,7 +87,7 @@ private:
 
     // RESEARCH can do a std::unordered_map<EventBase, std::vector<void*>> if this gets too slow
     std::vector<std::pair<EventBase, void*>> mEvents;
-    inline static ListenerId S_LISTENER_ID = 1;
+    inline static ListenerId S_LISTENER_ID = 1;  // 0 is invalid id;
 };
 
 }  // namespace whal

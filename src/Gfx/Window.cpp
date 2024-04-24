@@ -80,4 +80,14 @@ void Window::setFocus() const {
     SDL_SetWindowInputFocus(mWindow.get());
 }
 
+void Window::updateFPS(f32 fps) {
+    char buf[128];
+#if __linux__
+    sprintf(buf, "%s @ fps: %.2f", mTitle, fps);
+#else
+    sprintf_s(buf, "%s @ fps: %.2f", mTitle, fps);
+#endif
+    SDL_SetWindowTitle(mWindow.get(), buf);
+}
+
 }  // namespace whal
