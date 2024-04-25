@@ -19,12 +19,21 @@ void killEntity(ecs::Entity entity) {
     entity.kill();
 }
 
-void randomFallingTile() {
+void randomFallingTile(s32 i = 1) {
+    if (i == 0) {
+        return;
+    }
     f32 r = System::rng.uniform();
     f32 x = r * WINDOW_WIDTH_TEXELS;
     static RGB colorOpts[4] = {Color::RED, Color::WHITE, Color::EMERALD, Color::MAGENTA};
-    RGB color = colorOpts[static_cast<s32>(4.99 * r)];
-    auto trans = Transform::texels(x, WINDOW_HEIGHT_TEXELS);
+    RGB color = colorOpts[static_cast<s32>(r * 100) % 3];
+    auto trans = Transform::texels(x, WINDOW_HEIGHT_TEXELS / 2);
+
+    bool isActor = System::rng.uniform() > 0.5;
+    if (isActor) {
+        color = Color::MAGENTA;
+    }
+
     auto draw = Draw(color);
     Expected<ecs::Entity> eBlock = createBlock(trans, draw);
     if (!eBlock.isExpected()) {
@@ -32,13 +41,20 @@ void randomFallingTile() {
     } else {
         auto block = eBlock.value();
         block.add<RigidBody>();
-        block.add<Velocity>();
-        // block.remove<SolidCollider>();
-        block.add(Lifetime(1.5));
+        f32 yVel = System::rng.uniform();
+        if (!isActor) {
+            block.add(Lifetime(1.5));
+            block.add<Velocity>(Velocity({0, yVel * 50}));
+        } else {
+            block.remove<SolidCollider>();
+            block.add<ActorCollider>();
+            block.add<Velocity>(Velocity({0, -20}));
+        }
         // System::schedule.after(&killEntity, 1.5, block);
         // System::schedule.after(&ecs::Entity::kill, 1.5, &block);
         // System::schedule.after(&ecs::ECS::kill, 1.5, ecs::ECS::getInstance(), block);
     }
+    randomFallingTile(i - 1);
 }
 
 }  // namespace whal

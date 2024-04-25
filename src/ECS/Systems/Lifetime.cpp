@@ -1,6 +1,5 @@
 #include "Lifetime.h"
 #include "ECS/Components/Lifetime.h"
-#include "Util/Print.h"
 
 namespace whal {
 
@@ -11,7 +10,6 @@ void LifetimeSystem::update() {
         auto& lifetime = entity.get<Lifetime>();
         lifetime.secondsRemaining -= dt;
         if (lifetime.secondsRemaining <= 0) {
-            // print("killing entity", entityid);
             entity.kill();
         }
     }
