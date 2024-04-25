@@ -29,7 +29,7 @@ void randomFallingTile(s32 i = 1) {
     RGB color = colorOpts[static_cast<s32>(r * 100) % 3];
     auto trans = Transform::texels(x, WINDOW_HEIGHT_TEXELS / 2);
 
-    bool isActor = System::rng.uniform() > 0.5;
+    bool isActor = System::rng.uniform() > 0.9;
     if (isActor) {
         color = Color::MAGENTA;
     }
