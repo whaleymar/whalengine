@@ -33,4 +33,8 @@ Expected<Entity> ECS::copy(Entity prefab) const {
     return newEntity;
 }
 
+u32 ECS::getEntityCount() const {
+    return mEntityManager->getEntityCount();
+}
+
 }  // namespace whal::ecs

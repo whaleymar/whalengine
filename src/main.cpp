@@ -8,6 +8,7 @@
 #include "ECS/Systems/Controller.h"
 #include "ECS/Systems/DrawManager.h"
 #include "ECS/Systems/Gfx.h"
+#include "ECS/Systems/Lifetime.h"
 #include "ECS/Systems/Physics.h"
 #include "ECS/Systems/Rails.h"
 
@@ -22,6 +23,7 @@
 #include "Util/Print.h"
 
 #include "Game/DebugScene.h"
+#include "Game/StressTest.h"
 
 using namespace whal;
 
@@ -34,6 +36,7 @@ void MainLoop(Window& window) {
     auto spriteSystem = ecs.registerSystem<SpriteSystem>();
     auto drawSystem = ecs.registerSystem<DrawSystem>();
     auto animationSystem = ecs.registerSystem<AnimationSystem>();
+    auto lifetimeSystem = ecs.registerSystem<LifetimeSystem>();
 
     // single-component systems for running psuedo-destructors / updating some global var
     auto actorsMgr = ActorsManager::getInstance();
@@ -75,6 +78,10 @@ void MainLoop(Window& window) {
             System::schedule.end();
             break;
         }
+        randomFallingTile();
+        if (System::frame.getFrame() == 0) {
+            print(ecs.getEntityCount());
+        }
 
         // update systems
         System::dt.update();
@@ -110,6 +117,7 @@ void MainLoop(Window& window) {
         }
 #endif
 
+        lifetimeSystem->update();
         window.swapBuffers();
     }
     System::audio.await();

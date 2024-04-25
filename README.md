@@ -12,14 +12,12 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     4. creates simple text gui : {Resume, Restart, Quit} -- each of these send their own events
 
 ## Systems
-- sound\*
 - lighting\*
 - ui\*
 
 ## Components
 - Follow
 - Light 
-- lifetime
 - Trigger
 - collision callback (move object, kill player, play animation, etc.)
 - Tile

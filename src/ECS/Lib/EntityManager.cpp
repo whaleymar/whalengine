@@ -9,7 +9,7 @@ EntityManager::EntityManager() {
 }
 
 Expected<Entity> EntityManager::createEntity() {
-    if (mEntityCount + 1 == MAX_ENTITIES) {
+    if (mEntityCount + 1 >= MAX_ENTITIES) {
         return Expected<Entity>::error("Cannot allocate any more entities");
     }
     EntityID id = mAvailableIDs.front();

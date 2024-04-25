@@ -15,6 +15,9 @@ class JobScheduler {
     using BoundFunction = std::function<void()>;
     using Job = std::pair<BoundFunction, f32>;
 
+    // template <typename Obj, typename... T>
+    // using ObjFunc = void (Obj::*)(T...);
+
 public:
     friend System;
 
@@ -24,6 +27,10 @@ public:
 
     template <typename... T>
     void after(void(func)(T...), f32 delaySeconds, T... args);
+
+    // template <typename O, typename... T>
+    // void after(ObjFunc<O, T...>, f32 delaySeconds, T... args);
+
     void tick(f32 dt);
     void tryExecuteJobs();
 
@@ -49,5 +56,15 @@ void JobScheduler::after(void(func)(T...), f32 delaySeconds, T... args) {
     BoundFunction bf = std::bind(func, args...);  // boyfriend :3
     mQueue.insert(it, {bf, delaySeconds});
 }
+
+// template <typename O, typename... T>
+// void JobScheduler::after(ObjFunc<O, T...> func, f32 delaySeconds, T... args) {
+//     auto it = mQueue.begin();
+//     while (it != mQueue.end() && it->second < delaySeconds) {
+//         ++it;
+//     }
+//     BoundFunction bf = std::bind(func, args...);  // boyfriend :3
+//     mQueue.insert(it, {bf, delaySeconds});
+// }
 
 }  // namespace whal

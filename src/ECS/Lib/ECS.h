@@ -166,6 +166,7 @@ public:
     void destroyEntity(Entity entity);
     void setPattern(Entity entity, Pattern pattern);
     Pattern getPattern(Entity entity) const;
+    u32 getEntityCount() const { return mEntityCount; }
 
 private:
     std::queue<EntityID> mAvailableIDs;
@@ -347,6 +348,7 @@ public:
     void entityDestroyed(const Entity entity) const {
         System::eventMgr.triggerEvent(Event::DEATH_EVENT, entity);
         // TODO make thread safe
+        // TODO it should run at the end of a frame/gametick; o.w. systems that kill entities fuck themselves
         for (const auto& system : mSystems) {
             auto const ix = system->mEntities.find(entity.id());
             if (ix != system->mEntities.end()) {
@@ -401,6 +403,8 @@ public:
     void kill(Entity entity) const;
 
     Expected<Entity> copy(Entity entity) const;
+
+    u32 getEntityCount() const;
 
     // COMPONENT
     template <typename T>
