@@ -4,7 +4,12 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 # To Do 
 
 ## Current Goal: 
-- text and audio systems
+- text system
+- for text: build basic pause menu which
+    1. is triggered with a pause event 
+    2. makes music quieter
+    3. pauses all sfx (minus one channel used in pause menu)
+    4. creates simple text gui : {Resume, Restart, Quit} -- each of these send their own events
 
 ## Systems
 - sound\*
@@ -17,11 +22,12 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - lifetime
 - Trigger
 - collision callback (move object, kill player, play animation, etc.)
-- Respawn
+- Tile
 
 ## Entity Prefabs
 - particle
-    - draw, position, velocity, lifetime
+    - draw(?), position, velocity, lifetime
+    - instead of draw, could do custom component & instance it
 - camera
 - death plane
 
@@ -32,9 +38,10 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     - moving in same direction as momentum gives too much speed AND is inconsistent -> use 2 players overlapped and i get completely different speeds
     - moving in opposite direction as momentum completely negates it 
     - trying to walk off platform in same direction it's moving is buggy
+- "Static" tag that I can give TILE solids which will never move -- I can combine these into a collision mesh?
 
 ## Non-ECS Systems
-- chunk loading/unloading
+- chunk loading/unloading (quad tree?)
 - loading entity/map from file
     - definitely figure out level editor first
     - Scenes
@@ -47,6 +54,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - make this an actual framework 
     - move stuff in main.cpp into game class
 - Logger queue that runs on another thread
+- rework controller system to be manually called by Event
 
 ## Bugs
 - isNearZero not working

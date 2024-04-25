@@ -56,6 +56,7 @@ void MainLoop(Window& window) {
         return;
     }
     System::audio.start();
+    System::schedule.start();
     startListeners();
 
     // std::optional<Error> errOpt;
@@ -71,11 +72,13 @@ void MainLoop(Window& window) {
         pollEvents();
         if (System::input.isQuit()) {
             System::audio.end();
+            System::schedule.end();
             break;
         }
 
         // update systems
         System::dt.update();
+        System::schedule.tick(System::dt());
         window.updateFPS(System::frame.update());
         controlSystemRB->update();
         controlSystemFree->update();
@@ -110,6 +113,7 @@ void MainLoop(Window& window) {
         window.swapBuffers();
     }
     System::audio.await();
+    System::schedule.await();
     killListeners();
 }
 

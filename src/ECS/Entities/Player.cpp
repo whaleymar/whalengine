@@ -91,7 +91,7 @@ bool brain(Animator& animator, ecs::Entity entity) {
 
 }  // namespace PlayerAnim
 
-Expected<ecs::Entity> createPlayer() {
+Expected<ecs::Entity> createPlayerWithSprite(Sprite sprite) {
     auto& ecs = ecs::ECS::getInstance();
 
     auto expected = ecs.entity();
@@ -112,7 +112,10 @@ Expected<ecs::Entity> createPlayer() {
     animator.brain = &PlayerAnim::brain;
     player.add(animator);
 
-    Sprite sprite = Sprite(Depth::Player, animator.getFrame());
+    Frame frame = animator.getFrame();
+    sprite.depth = Depth::Player;
+    sprite.setFrameSize(frame.dimensionsTexels.x(), frame.dimensionsTexels.y());
+    sprite.atlasPositionTexels = frame.atlasPositionTexels;
     player.add(sprite);
 
     constexpr s32 width = 16;
@@ -123,6 +126,20 @@ Expected<ecs::Entity> createPlayer() {
     player.add<RigidBody>();
 
     return player;
+}
+
+Expected<ecs::Entity> createPlayer() {
+    print("called createPlayer");
+    Sprite sprite;
+    return createPlayerWithSprite(sprite);
+}
+
+// use sprite with pre-constructed vao/vbo created on main thread
+void createPlayerAsynch(Sprite sprite) {
+    Expected<ecs::Entity> player = createPlayerWithSprite(sprite);
+    if (!player.isExpected()) {
+        print(player.error());
+    }
 }
 
 }  // namespace whal
