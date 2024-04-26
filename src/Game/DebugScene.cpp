@@ -10,9 +10,17 @@
 #include "Gfx/Color.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
+#include "Map/Tiled.h"
+
+std::optional<Error> loadMap() {
+    const char* filepath = "data/map/testmap.tmj";
+    whal::TiledMap map = whal::TiledMap::parse(filepath);
+    return std::nullopt;
+}
 
 std::optional<Error> loadDebugScene() {
     using namespace whal;
+    // loadMap();
 
     // auto player = createPlayer().value();
     // player.remove<PlayerControlRB>();

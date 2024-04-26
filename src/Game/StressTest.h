@@ -12,6 +12,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/System.h"
 #include "Util/Print.h"
+#include "Util/Vector.h"
 
 namespace whal {
 
@@ -47,8 +48,12 @@ void randomFallingTile(s32 i = 1) {
             block.add<Velocity>(Velocity({0, yVel * 50}));
         } else {
             block.remove<SolidCollider>();
-            block.add<ActorCollider>();
+            const s32 widthTileHL = PIXELS_PER_TEXEL * 8 / 2;
+            const s32 heightTileHL = PIXELS_PER_TEXEL * 8 / 2;
+            // block.add(SolidCollider(toFloatVec(trans.position) + Vector2f(0, heightTileHL), Vector2i(widthTileHL, heightTileHL)));
+            block.add(ActorCollider(toFloatVec(trans.position) + Vector2f(0, heightTileHL), Vector2i(widthTileHL, heightTileHL)));
             block.add<Velocity>(Velocity({0, -20}));
+            block.add(Lifetime(1.5));
         }
         // System::schedule.after(&killEntity, 1.5, block);
         // System::schedule.after(&ecs::Entity::kill, 1.5, &block);

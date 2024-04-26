@@ -82,7 +82,7 @@ void MainLoop(Window& window) {
             print(ecs.getEntityCount());
         }
 
-        // randomFallingTile(1);
+        randomFallingTile(1);
 
         // update systems
         System::dt.update();

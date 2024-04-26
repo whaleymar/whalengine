@@ -2,7 +2,6 @@
 
 #include "ECS/Components/Collision.h"
 #include "Game/Events.h"
-#include "Util/Print.h"
 
 #include <glad/gl.h>
 
@@ -14,7 +13,6 @@ void ActorsManager::update() {
     if (!mIsUpdateNeeded) {
         return;
     }
-    print("Updating actors list");
     std::vector<std::tuple<ecs::Entity, ActorCollider*>> newActorList;
 
     for (auto& [entityid, entity] : getEntities()) {
@@ -46,7 +44,6 @@ void SolidsManager::update() {
     if (!mIsUpdateNeeded) {
         return;
     }
-    print("updating solids list");
     std::vector<std::tuple<ecs::Entity, SolidCollider*>> newSolidList;
     for (auto& [entityid, entity] : getEntities()) {
         auto pCollider = &entity.get<SolidCollider>();
