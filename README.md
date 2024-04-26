@@ -4,16 +4,16 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 # To Do 
 
 ## Current Goal: 
-- text system
-- for text: build basic pause menu which
+- text system (on hold)
+- tiled parser
+
+## Systems
+- lighting\*
+- text/ui -- try building pause menu which\*
     1. is triggered with a pause event 
     2. makes music quieter
     3. pauses all sfx (minus one channel used in pause menu)
     4. creates simple text gui : {Resume, Restart, Quit} -- each of these send their own events
-
-## Systems
-- lighting\*
-- ui\*
 
 ## Components
 - Follow

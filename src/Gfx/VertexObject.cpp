@@ -4,7 +4,7 @@
 
 namespace whal {
 
-Vao::Vao() {
+void Vao::initArray() {
     glGenVertexArrays(1, &mHandle);
 }
 
@@ -12,11 +12,11 @@ void Vao::bind() const {
     glBindVertexArray(mHandle);
 }
 
-void Vao::free() {
+void Vao::freeArray() {
     glDeleteVertexArrays(1, &mHandle);
 }
 
-Vbo::Vbo() {
+void Vbo::initBuffer() {
     glGenBuffers(1, &mHandle);
 }
 
@@ -29,7 +29,7 @@ void Vbo::buffer(f32* vertices, u32 sizeBytes) const {
     glBufferData(GL_ARRAY_BUFFER, sizeBytes, vertices, GL_STATIC_DRAW);
 }
 
-void Vbo::free() {
+void Vbo::freeBuffer() {
     glDeleteBuffers(1, &mHandle);
 }
 

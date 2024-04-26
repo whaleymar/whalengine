@@ -21,19 +21,21 @@ using VertArrayRect = std::array<f32, STRIDE_SIZE_XYZ * N_VERTS_RECT>;
 
 class Vao : IUseOpenGLHandle {
 public:
-    Vao();
+    Vao() = default;
 
+    void initArray();
     void bind() const;
-    void free();
+    void freeArray();
 };
 
 class Vbo : IUseOpenGLHandle {
 public:
-    Vbo();
+    Vbo() = default;
 
+    void initBuffer();
     void bind() const;
     void buffer(f32* vertices, u32 sizeBytes) const;
-    void free();
+    void freeBuffer();
 };
 
 enum class Depth {

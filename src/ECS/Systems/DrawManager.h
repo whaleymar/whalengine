@@ -9,11 +9,13 @@ struct Draw;
 
 class SpriteManager : public ecs::ISystem<Sprite> {
 public:
+    void onAdd(ecs::Entity entity) override;
     void onRemove(ecs::Entity entity) override;
 };
 
 class DrawManager : public ecs::ISystem<Draw> {
 public:
+    void onAdd(ecs::Entity entity) override;
     void onRemove(ecs::Entity entity) override;
 };
 

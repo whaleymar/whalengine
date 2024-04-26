@@ -13,6 +13,7 @@
 #include "ECS/Systems/Rails.h"
 
 #include "Game/EventListeners.h"
+#include "Game/StressTest.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Window.h"
@@ -23,7 +24,6 @@
 #include "Util/Print.h"
 
 #include "Game/DebugScene.h"
-#include "Game/StressTest.h"
 
 using namespace whal;
 
@@ -78,10 +78,11 @@ void MainLoop(Window& window) {
             System::schedule.end();
             break;
         }
-        randomFallingTile();
         if (System::frame.getFrame() == 0) {
             print(ecs.getEntityCount());
         }
+
+        // randomFallingTile(1);
 
         // update systems
         System::dt.update();
