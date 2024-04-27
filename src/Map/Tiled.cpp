@@ -2,8 +2,11 @@
 
 #include <format>
 #include <memory>
+#include "Gfx/GLResourceManager.h"
+#include "Gfx/GfxUtil.h"
 #include "json.hpp"
 
+#include "Gfx/Texture.h"
 #include "Util/FileIO.h"
 #include "Util/Print.h"
 
@@ -85,8 +88,54 @@ Expected<TileSet> parseTileset(std::string basename, s32 firstgid) {
 
     const auto& name = data["image"];
     std::string sourceFilePath = name;
-    s32 lastIx = std::max<s32>(sourceFilePath.find("/"), sourceFilePath.find("\\"));
-    return TileSet(firstgid, data["tilecount"], basename, sourceFilePath.substr(lastIx + 1));
+    s32 firstIx = std::max<s32>(sourceFilePath.find("/"), sourceFilePath.find("\\")) + 1;
+    s32 lastIx = sourceFilePath.find(".", firstIx);
+    std::string sourceFileBasenameNoExt = sourceFilePath.substr(firstIx, lastIx - firstIx);
+
+    s32 tileWidth = data["tilewidth"];
+    s32 tileHeight = data["tileheight"];
+    s32 widthTexels = data["imagewidth"];
+    s32 heightTexels = data["imageheight"];
+
+    s32 widthTiles = widthTexels / tileWidth;
+    s32 heightTiles = heightTexels / tileHeight;
+
+    return TileSet(firstgid, data["tilecount"], tileWidth, tileHeight, widthTiles, heightTiles, data["margin"], data["spacing"], basename,
+                   sourceFileBasenameNoExt);
+}
+
+TileSet getTileSet(const TiledMap& map, s32 blockIx) {
+    for (size_t i = 0; i < map.tilesets.size(); i++) {
+        s32 firstgid = map.tilesets[i].firstgid;
+        if (firstgid <= blockIx && blockIx < firstgid + map.tilesets[i].tilecount) {
+            return map.tilesets[i];
+        }
+    }
+    print("error getting tileset for blockIx", blockIx, "\nReturning first tileset instead");
+    return map.tilesets[0];
+}
+
+Expected<Frame> getTileFrame(const TiledMap& map, s32 blockIx) {
+    TileSet tset = getTileSet(map, blockIx);
+    std::string spritePath = std::format("{}/{}", "map", tset.spriteFileName);
+    std::optional<Frame> tsetFrameOpt = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame(spritePath.c_str());
+
+    if (!tsetFrameOpt) {
+        return Error(std::format("Couldn't find {} in sprite table", spritePath));
+    }
+
+    // ASSUMING 0 MARGIN && SPACING
+
+    s32 rowIx = blockIx / tset.heightTiles;
+    s32 colIx = blockIx % tset.widthTiles;
+
+    s32 widthTexels = tset.widthTiles * tset.tileWidthTexels;
+    s32 heightTexels = tset.heightTiles * tset.tileHeightTexels;
+
+    Frame fullFrame = tsetFrameOpt.value();
+    Frame newFrame = {{fullFrame.atlasPositionTexels.x() + colIx * widthTexels, fullFrame.atlasPositionTexels.y() + rowIx * heightTexels},
+                      {tset.tileWidthTexels, tset.tileHeightTexels}};
+    return newFrame;
 }
 
 }  // namespace whal

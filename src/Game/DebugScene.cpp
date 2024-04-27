@@ -11,6 +11,7 @@
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Map/Tiled.h"
+#include "Util/Print.h"
 
 std::optional<Error> loadMap() {
     using namespace whal;
@@ -22,8 +23,18 @@ std::optional<Error> loadMap() {
         for (s32 y = 0; y < map.height; y++) {
             s32 ix = map.width * y + x;
             s32 blockID = map.baseLayer.data.get()[ix];
+
             if (blockID != 0) {
-                createBlock(Transform::tiles(x, map.height - y));
+                // bool isCollisionOn = map.collisionLayer.data.get()[ix];
+                // if (isCollisionOn)
+                Expected<Frame> frame = getTileFrame(map, blockID);
+                if (!frame.isExpected()) {
+                    print(frame.error());
+                    createBlock(Transform::tiles(x, map.height - y));
+                } else {
+                    Sprite sprite = Sprite(Depth::Player, frame.value());
+                    createBlock(Transform::tiles(x, map.height - y), sprite);
+                }
             }
         }
     }
