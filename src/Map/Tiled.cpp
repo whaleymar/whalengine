@@ -115,8 +115,8 @@ TileSet getTileSet(const TiledMap& map, s32 blockIx) {
     return map.tilesets[0];
 }
 
-Expected<Frame> getTileFrame(const TiledMap& map, s32 blockIx) {
-    TileSet tset = getTileSet(map, blockIx);
+Expected<Frame> getTileFrame(const TiledMap& map, s32 blockId) {
+    TileSet tset = getTileSet(map, blockId);
     std::string spritePath = std::format("{}/{}", "map", tset.spriteFileName);
     std::optional<Frame> tsetFrameOpt = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame(spritePath.c_str());
 
@@ -126,15 +126,15 @@ Expected<Frame> getTileFrame(const TiledMap& map, s32 blockIx) {
 
     // ASSUMING 0 MARGIN && SPACING
 
+    s32 blockIx = blockId - 1;  // id is 1-indexed
+
     s32 rowIx = blockIx / tset.heightTiles;
     s32 colIx = blockIx % tset.widthTiles;
 
-    s32 widthTexels = tset.widthTiles * tset.tileWidthTexels;
-    s32 heightTexels = tset.heightTiles * tset.tileHeightTexels;
-
     Frame fullFrame = tsetFrameOpt.value();
-    Frame newFrame = {{fullFrame.atlasPositionTexels.x() + colIx * widthTexels, fullFrame.atlasPositionTexels.y() + rowIx * heightTexels},
-                      {tset.tileWidthTexels, tset.tileHeightTexels}};
+    Frame newFrame = {
+        {fullFrame.atlasPositionTexels.x() + colIx * tset.tileWidthTexels, fullFrame.atlasPositionTexels.y() + rowIx * tset.tileHeightTexels},
+        {tset.tileWidthTexels, tset.tileHeightTexels}};
     return newFrame;
 }
 
