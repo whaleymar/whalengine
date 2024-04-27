@@ -15,5 +15,6 @@ struct Sprite;
 Expected<ecs::Entity> createBlock(Transform transform);
 Expected<ecs::Entity> createBlock(Transform transform, Draw draw);
 Expected<ecs::Entity> createBlock(Transform transform, Sprite sprite);
+Expected<ecs::Entity> createDecal(Transform transform, Sprite sprite);
 
 }  // namespace whal

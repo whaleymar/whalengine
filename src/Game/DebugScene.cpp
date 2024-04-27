@@ -27,6 +27,8 @@ std::optional<Error> loadMap() {
             if (blockID != 0) {
                 // bool isCollisionOn = map.collisionLayer.data.get()[ix];
                 // if (isCollisionOn)
+
+                // for now, am assuming everything in the base layer has collision
                 Expected<Frame> frame = getTileFrame(map, blockID);
                 if (!frame.isExpected()) {
                     print(frame.error());
@@ -36,6 +38,28 @@ std::optional<Error> loadMap() {
                     createBlock(Transform::tiles(x, map.height - y), sprite);
                 }
             }
+
+            blockID = map.backgroundLayer.data.get()[ix];
+            if (blockID != 0) {
+                Expected<Frame> frame = getTileFrame(map, blockID);
+                if (!frame.isExpected()) {
+                    print(frame.error());
+                } else {
+                    Sprite sprite = Sprite(Depth::BackgroundNoParallax, frame.value());
+                    createDecal(Transform::tiles(x, map.height - y), sprite);
+                }
+            }
+
+            blockID = map.foregroundLayer.data.get()[ix];
+            if (blockID != 0) {
+                Expected<Frame> frame = getTileFrame(map, blockID);
+                if (!frame.isExpected()) {
+                    print(frame.error());
+                } else {
+                    Sprite sprite = Sprite(Depth::Foreground, frame.value());
+                    createDecal(Transform::tiles(x, map.height - y), sprite);
+                }
+            }
         }
     }
 
@@ -43,6 +67,7 @@ std::optional<Error> loadMap() {
 }
 
 std::optional<Error> loadTestMap() {
+    auto player = whal::createPlayer();
     return loadMap();
 }
 
