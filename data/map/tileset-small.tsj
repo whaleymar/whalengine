@@ -1,0 +1,14 @@
+{ "columns":5,
+ "image":"tileset-small\/reduced_tiledset.png",
+ "imageheight":40,
+ "imagewidth":40,
+ "margin":0,
+ "name":"tileset-small",
+ "spacing":0,
+ "tilecount":25,
+ "tiledversion":"1.10.2",
+ "tileheight":8,
+ "tilewidth":8,
+ "type":"tileset",
+ "version":"1.10"
+}

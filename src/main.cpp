@@ -13,7 +13,7 @@
 #include "ECS/Systems/Rails.h"
 
 #include "Game/EventListeners.h"
-#include "Game/StressTest.h"
+// #include "Game/StressTest.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Window.h"
@@ -46,7 +46,8 @@ void MainLoop(Window& window) {
     auto drawMgr = ecs.registerSystem<DrawManager>();
 
     // load scene
-    auto err = loadDebugScene();
+    // auto err = loadDebugScene();
+    auto err = loadTestMap();
     if (err) {
         print("Error loading debug scene: ", err.value());
         return;
@@ -78,11 +79,12 @@ void MainLoop(Window& window) {
             System::schedule.end();
             break;
         }
-        if (System::frame.getFrame() == 0) {
-            print(ecs.getEntityCount());
-        }
 
-        randomFallingTile(1);
+        // if (System::frame.getFrame() == 0) {
+        //     print(ecs.getEntityCount());
+        // }
+
+        // randomFallingTile(1);
 
         // update systems
         System::dt.update();

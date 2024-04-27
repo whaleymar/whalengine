@@ -13,14 +13,30 @@
 #include "Map/Tiled.h"
 
 std::optional<Error> loadMap() {
+    using namespace whal;
+
     const char* filepath = "data/map/testmap.tmj";
     whal::TiledMap map = whal::TiledMap::parse(filepath);
+
+    for (s32 x = 0; x < map.width; x++) {
+        for (s32 y = 0; y < map.height; y++) {
+            s32 ix = map.width * y + x;
+            s32 blockID = map.baseLayer.data.get()[ix];
+            if (blockID != 0) {
+                createBlock(Transform::tiles(x, map.height - y));
+            }
+        }
+    }
+
     return std::nullopt;
+}
+
+std::optional<Error> loadTestMap() {
+    return loadMap();
 }
 
 std::optional<Error> loadDebugScene() {
     using namespace whal;
-    // loadMap();
 
     // auto player = createPlayer().value();
     // player.remove<PlayerControlRB>();
@@ -74,25 +90,26 @@ std::optional<Error> loadDebugScene() {
         invisBlock2.remove<SolidCollider>();
     }
 
-    // createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8}));
-    // createBlock(Transform::tiles(6, 16), Draw(Color::RED, {8, 8}));
-    // auto myBlock = createBlock(Transform::tiles(6, 15), Draw(Color::RED, {8, 8})).value();
-    //
-    // myBlock.add<RigidBody>();
-    // myBlock.add<Velocity>();
-    //
-    // myBlock.add<PlayerControlFree>();
-    // myBlock.add<Velocity>();
-
     auto platform = createBlock(Transform::tiles(5, 1)).value();
-    auto pathControl = RailsControl(14,
-                                    {
-                                        {Transform::tiles(5, 1).position, RailsControl::Movement::LINEAR},
-                                        // {Transform::tiles(5, 15).position, RailsControl::Movement::EASEIO_BEZIER},
-                                        {Transform::tiles(15, 15).position, RailsControl::Movement::EASEI_CUBE},
-                                    },
-                                    2, true);
+    auto pathControl = RailsControl(
+        14,
+        {
+            {Transform::tiles(5, 1).position, RailsControl::Movement::LINEAR}, {Transform::tiles(5, 15).position, RailsControl::Movement::EASEI_CUBE},
+            // {Transform::tiles(15, 15).position, RailsControl::Movement::EASEI_CUBE},
+        },
+        2, true);
     platform.add<RailsControl>(pathControl);
+
+    auto platformClone = createBlock(Transform::tiles(6, 1)).value();
+    auto pathControlClone = RailsControl(
+        14,
+        {
+            {Transform::tiles(6, 1).position, RailsControl::Movement::LINEAR}, {Transform::tiles(6, 15).position, RailsControl::Movement::LINEAR},
+            // {Transform::tiles(5, 15).position, RailsControl::Movement::EASEIO_BEZIER},
+            // {Transform::tiles(15, 15).position, RailsControl::Movement::EASEI_CUBE},
+        },
+        2, true);
+    platformClone.add<RailsControl>(pathControlClone);
 
     auto rightPlatform = createBlock(Transform::tiles(36, 1)).value();
     rightPlatform.add(RailsControl(4,

@@ -2,16 +2,18 @@
 	<trim>false</trim>
 	<rotate>false</trim>
 	<tex n="atlas0">
-		<img n="actor/player-fall1" x="0" y="0" w="16" h="16" />
-		<img n="actor/player-jump1" x="0" y="0" w="16" h="16" />
-		<img n="actor/player-idle2" x="0" y="17" w="16" h="16" />
-		<img n="actor/player-idle1" x="0" y="0" w="16" h="16" />
-		<img n="actor/player-run4" x="0" y="34" w="16" h="16" />
-		<img n="actor/player-run3" x="0" y="51" w="16" h="16" />
-		<img n="actor/player-run2" x="0" y="68" w="16" h="16" />
-		<img n="actor/player-run1" x="0" y="51" w="16" h="16" />
-		<img n="tile/dirtblock" x="0" y="85" w="8" h="8" />
-		<img n="tile/translucent" x="0" y="94" w="8" h="8" />
-		<img n="tile/purpledirt" x="0" y="103" w="8" h="8" />
+		<img n="map/reduced_tiledset" x="0" y="0" w="40" h="40" />
+		<img n="actor/player-jump1" x="0" y="41" w="16" h="16" />
+		<img n="actor/player-fall1" x="0" y="41" w="16" h="16" />
+		<img n="actor/player-idle2" x="0" y="58" w="16" h="16" />
+		<img n="actor/player-idle1" x="0" y="41" w="16" h="16" />
+		<img n="actor/player-run4" x="0" y="75" w="16" h="16" />
+		<img n="actor/player-run3" x="0" y="92" w="16" h="16" />
+		<img n="actor/player-run2" x="0" y="109" w="16" h="16" />
+		<img n="actor/player-run1" x="0" y="92" w="16" h="16" />
+		<img n="map/collision-binary-tile" x="0" y="126" w="8" h="8" />
+		<img n="tile/translucent" x="0" y="135" w="8" h="8" />
+		<img n="tile/dirtblock" x="0" y="144" w="8" h="8" />
+		<img n="tile/purpledirt" x="0" y="153" w="8" h="8" />
 	</tex>
 </atlas>
