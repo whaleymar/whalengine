@@ -69,6 +69,7 @@ void RailsSystem::update() {
 
             entity.remove<Velocity>();
             rails.isWaiting = true;
+            rails.curActionTime = 0;
             rails.isVelocityUpdateNeeded = false;
 
         } else {
