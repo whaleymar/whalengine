@@ -76,6 +76,8 @@ void drawCollider(ShaderProgram program, const IUseCollision* collider, const RG
 
     Vector2f floatPos(aabb.left(), aabb.top());
     glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
+    Vector2f size = Vector2f(aabb.half.x(), aabb.half.y()) * 2;
+    glUniform2fv(program.sizeUniform, 1, size.e);
 
     aabb.vao.bind();
     auto vertices = MakeRectVerticesRGBUV(aabb.half.x() * 2, aabb.half.y() * 2, Depth::Debug, color);

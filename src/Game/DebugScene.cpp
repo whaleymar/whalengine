@@ -10,57 +10,15 @@
 #include "Gfx/Color.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
-#include "Map/Tiled.h"
-#include "Util/Print.h"
+#include "Map/Level.h"
 
 std::optional<Error> loadMap() {
     using namespace whal;
 
     const char* filepath = "data/map/testmap.tmj";
-    whal::TiledMap map = whal::TiledMap::parse(filepath);
-
-    for (s32 x = 0; x < map.width; x++) {
-        for (s32 y = 0; y < map.height; y++) {
-            s32 ix = map.width * y + x;
-            s32 blockID = map.baseLayer.data.get()[ix];
-
-            if (blockID != 0) {
-                // bool isCollisionOn = map.collisionLayer.data.get()[ix];
-                // if (isCollisionOn)
-
-                // for now, am assuming everything in the base layer has collision
-                Expected<Frame> frame = getTileFrame(map, blockID);
-                if (!frame.isExpected()) {
-                    print(frame.error());
-                    createBlock(Transform::tiles(x, map.height - y));
-                } else {
-                    Sprite sprite = Sprite(Depth::Player, frame.value());
-                    createBlock(Transform::tiles(x, map.height - y), sprite);
-                }
-            }
-
-            blockID = map.backgroundLayer.data.get()[ix];
-            if (blockID != 0) {
-                Expected<Frame> frame = getTileFrame(map, blockID);
-                if (!frame.isExpected()) {
-                    print(frame.error());
-                } else {
-                    Sprite sprite = Sprite(Depth::BackgroundNoParallax, frame.value());
-                    createDecal(Transform::tiles(x, map.height - y), sprite);
-                }
-            }
-
-            blockID = map.foregroundLayer.data.get()[ix];
-            if (blockID != 0) {
-                Expected<Frame> frame = getTileFrame(map, blockID);
-                if (!frame.isExpected()) {
-                    print(frame.error());
-                } else {
-                    Sprite sprite = Sprite(Depth::Foreground, frame.value());
-                    createDecal(Transform::tiles(x, map.height - y), sprite);
-                }
-            }
-        }
+    Expected<Level> lvl = loadLevel(filepath);
+    if (!lvl.isExpected()) {
+        return lvl.error();
     }
 
     return std::nullopt;

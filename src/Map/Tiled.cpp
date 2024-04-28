@@ -17,12 +17,12 @@ inline const char* TSET_SPRITE_DIR = "data/sprite/map";
 
 Expected<TileSet> parseTileset(std::string basename, s32 firstgid);
 
-TiledMap TiledMap::parse(const char* path) {
+TileMap TileMap::parse(const char* path) {
     // TODO
     // - layer type (tilelayer, object)
     // - visibility?
     // -
-    TiledMap map;
+    TileMap map;
     using json = nlohmann::json;
 
     Expected<std::string> jString = readFile(path);
@@ -33,8 +33,8 @@ TiledMap TiledMap::parse(const char* path) {
 
     json data = json::parse(jString.value());
 
-    map.width = data["width"];
-    map.height = data["height"];
+    map.widthTiles = data["width"];
+    map.heightTiles = data["height"];
     map.tileSize = data["tilewidth"];
 
     for (auto& layer : data["layers"]) {
@@ -44,7 +44,7 @@ TiledMap TiledMap::parse(const char* path) {
         std::string tname = name;
 
         std::vector<s32> layerData = layer["data"].get<std::vector<s32>>();
-        TiledLayer tLayer = {tname, width, height, std::unique_ptr<s32[]>(new s32[width * height]())};
+        TileLayer tLayer = {tname, width, height, std::unique_ptr<s32[]>(new s32[width * height]())};
         memcpy(tLayer.data.get(), layerData.data(), layerData.size() * sizeof(s32));
 
         if (tname == "Collision") {
@@ -104,7 +104,7 @@ Expected<TileSet> parseTileset(std::string basename, s32 firstgid) {
                    sourceFileBasenameNoExt);
 }
 
-TileSet getTileSet(const TiledMap& map, s32 blockIx) {
+TileSet getTileSet(const TileMap& map, s32 blockIx) {
     for (size_t i = 0; i < map.tilesets.size(); i++) {
         s32 firstgid = map.tilesets[i].firstgid;
         if (firstgid <= blockIx && blockIx < firstgid + map.tilesets[i].tilecount) {
@@ -115,7 +115,7 @@ TileSet getTileSet(const TiledMap& map, s32 blockIx) {
     return map.tilesets[0];
 }
 
-Expected<Frame> getTileFrame(const TiledMap& map, s32 blockId) {
+Expected<Frame> getTileFrame(const TileMap& map, s32 blockId) {
     TileSet tset = getTileSet(map, blockId);
     std::string spritePath = std::format("{}/{}", "map", tset.spriteFileName);
     std::optional<Frame> tsetFrameOpt = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame(spritePath.c_str());

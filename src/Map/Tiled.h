@@ -8,11 +8,11 @@
 namespace whal {
 
 struct Frame;
-struct TiledMap;
+struct TileMap;
 
-Expected<Frame> getTileFrame(const TiledMap& map, s32 blockIx);
+Expected<Frame> getTileFrame(const TileMap& map, s32 blockIx);
 
-struct TiledLayer {
+struct TileLayer {
     std::string name;
     s32 width;
     s32 height;
@@ -32,19 +32,18 @@ struct TileSet {
     std::string spriteFileName;
 };
 
-struct TiledMap {
-    // static Expected<TiledMap> parse(const char* file);
-    static TiledMap parse(const char* file);
+struct TileMap {
+    static TileMap parse(const char* file);
 
-    s32 width;
-    s32 height;
+    s32 widthTiles;
+    s32 heightTiles;
     s32 tileSize;
 
     // maybe a vector would be better...
-    TiledLayer baseLayer;
-    TiledLayer collisionLayer;
-    TiledLayer foregroundLayer;
-    TiledLayer backgroundLayer;
+    TileLayer baseLayer;
+    TileLayer collisionLayer;
+    TileLayer foregroundLayer;
+    TileLayer backgroundLayer;
     std::vector<TileSet> tilesets;
 };
 

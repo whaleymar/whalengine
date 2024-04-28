@@ -3,6 +3,7 @@
 uniform mat4 projection;
 
 uniform vec2 offset;
+uniform vec2 objSize;
 
 in vec3 vert;
 in vec3 vertColor;
@@ -10,6 +11,7 @@ in vec2 vertTexCoord;
 
 out vec3 fragColor;
 out vec2 fragTexCoord;
+out vec2 fragObjSize;
 
 void main() {
     // idk why i need to flip the y coord
@@ -19,6 +21,7 @@ void main() {
 
     fragColor = vertColor;
     fragTexCoord = vertTexCoord;
+    fragObjSize = objSize;
 }
 
 

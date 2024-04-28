@@ -105,6 +105,7 @@ void ShaderProgram::init() {
 
     if (uvOffset > 0) {
         textureUniform = glGetUniformLocation(mHandle, "tex");
+        sizeUniform = glGetUniformLocation(mHandle, "objSize");
     }
 
     // millis = glGetUniformLocation(mHandle, "millis");

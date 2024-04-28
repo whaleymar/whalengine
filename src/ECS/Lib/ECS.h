@@ -42,6 +42,7 @@ public:
 
     EntityID operator()() const { return mId; }
     bool operator==(Entity other) const { return mId == other.mId; }
+    bool operator<(Entity other) const { return mId < other.mId; }
 
     template <typename T>
     void add(T component);

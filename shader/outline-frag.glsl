@@ -2,17 +2,20 @@
 
 in vec3 fragColor;
 in vec2 fragTexCoord;
+in vec2 fragObjSize;
 
 out vec4 outputColor;
 
 float inborder(vec2 vec) {
-    // TODO i think i need to normalize based on entity size. Lines have varying thickness
-    float width = 0.05;
-    float maxV = 1. - width;
-    float minV = width;
+    float widthX = 1. / fragObjSize.x;
+    float widthY = 1. / fragObjSize.y;
+    float maxVX = 1. - widthX;
+    float maxVY = 1. - widthY;
+    float minVX = widthX;
+    float minVY = widthY;
 
-    float inX = (1 - step(maxV, vec.x) ) * step(minV, vec.x);
-    float inY = (1 - step(maxV, vec.y)) * step(minV, vec.y);
+    float inX = (1 - step(maxVX, vec.x) ) * step(minVX, vec.x);
+    float inY = (1 - step(maxVY, vec.y)) * step(minVY, vec.y);
     return 1 - inX * inY;
 }
 
