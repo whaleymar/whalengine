@@ -9,6 +9,7 @@
 #include "Gfx/Shader.h"
 #include "Gfx/Window.h"
 #include "Systems/Event.h"
+#include "Systems/InputHandler.h"
 #include "Util/Print.h"
 
 #include "ECS/Lib/ECS.h"
@@ -162,6 +163,10 @@ void Game::mainloop() {
             // System::audio.stopMusic();
             System::audio.play(music);
         }
+        if (System::input.isReloadScene()) {
+            System::input.reset(InputType::RELOADSCENE);
+            reloadScene();
+        }
         if (System::input.isDebug()) {
             drawColliders();
         }
@@ -179,6 +184,10 @@ void Game::end() {
 }
 
 std::optional<Error> Game::loadScene(const char* filename) {
+    if (mIsSceneLoaded) {
+        unloadScene();
+    }
+
     auto errOpt = parseWorld(filename, mActiveScene);
     if (errOpt) {
         mIsSceneLoaded = false;
@@ -189,6 +198,19 @@ std::optional<Error> Game::loadScene(const char* filename) {
 
     mIsSceneLoaded = true;
     return std::nullopt;
+}
+
+void Game::unloadScene() {
+    while (!mActiveScene.loadedLevels.empty()) {
+        auto& lvl = mActiveScene.loadedLevels.back();
+        unloadLevel(lvl);
+        mActiveScene.loadedLevels.pop_back();
+    }
+    mIsSceneLoaded = false;
+}
+
+std::optional<Error> Game::reloadScene() {
+    return loadScene(mActiveScene.name.c_str());
 }
 
 Scene& Game::getScene() {
@@ -208,7 +230,7 @@ void Game::updateLoadedLevels(Vector2f cameraWorldPosTexels) {
                 continue;
             }
         } else if (!shouldLoad && isLevelLoaded) {
-            unloadLevel(*it);
+            unloadAndRemoveLevel(*it);
         }
     }
 }

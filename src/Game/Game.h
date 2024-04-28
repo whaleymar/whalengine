@@ -21,6 +21,8 @@ public:
     void end();
 
     std::optional<Error> loadScene(const char* name);
+    void unloadScene();
+    std::optional<Error> reloadScene();
     Scene& getScene();
     void updateLoadedLevels(Vector2f cameraWorldPosTexels);
 

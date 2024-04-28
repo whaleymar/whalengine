@@ -9,14 +9,14 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     - parse map data (DONE)
     - display correct sprites (DONE)
     - bake collision mesh (DONE)
-    - level name and world coordinates
-    - stitching levels together
-    - enable hot-reloading
+    - level name and world coordinates (DONE)
+    - stitching levels together (DONE)
+    - enable hot-reloading (DONE)
     - store tile material data 
     - object layers
     - parallax
-    - move tiled map(s) and tilesets into data/ directory
-- game class
+    - move tiled map(s) and tilesets into data/ directory (DONE)
+- game class (DONE)
 
 ## Systems
 - lighting\*
@@ -59,7 +59,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 ## Misc
 - ECS lib tasks
 - make this an actual framework 
-    - move stuff in main.cpp into game class
 - Logger queue that runs on another thread
 - rework controller system to be manually called by Event
 - hot-reloading code (youtube video is bookmarked)

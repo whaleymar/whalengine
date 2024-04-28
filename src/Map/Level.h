@@ -33,6 +33,7 @@ struct Scene {
 };
 
 std::optional<Error> loadLevel(const Level level);
+void unloadAndRemoveLevel(ActiveLevel& level);
 void unloadLevel(ActiveLevel& level);
 void removeEntityFromLevel(ecs::Entity entity);
 void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel& lvl);

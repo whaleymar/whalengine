@@ -104,7 +104,8 @@ Expected<TileSet> parseTileset(std::string basename, s32 firstgid) {
 
     const auto& name = data["image"];
     std::string sourceFilePath = name;
-    s32 firstIx = std::max<s32>(sourceFilePath.find("/"), sourceFilePath.find("\\")) + 1;
+
+    s32 firstIx = std::max<s32>(sourceFilePath.find_last_of('/'), sourceFilePath.find_last_of('\\')) + 1;
     s32 lastIx = sourceFilePath.find(".", firstIx);
     std::string sourceFileBasenameNoExt = sourceFilePath.substr(firstIx, lastIx - firstIx);
 

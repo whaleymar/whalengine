@@ -1,5 +1,5 @@
 { "columns":1,
- "image":"tileset-small\/collision-binary-tile.png",
+ "image":"..\/sprite\/map\/collision-binary-tile.png",
  "imageheight":8,
  "imagewidth":8,
  "margin":0,

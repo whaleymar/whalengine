@@ -1,5 +1,5 @@
 { "columns":5,
- "image":"tileset-small\/reduced_tiledset.png",
+ "image":"..\/sprite\/map\/reduced_tiledset.png",
  "imageheight":40,
  "imagewidth":40,
  "margin":0,

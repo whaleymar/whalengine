@@ -41,11 +41,11 @@ void InputHandler::set(InputType input) {
         mIsQuit = true;
         break;
 
+#ifndef NDEBUG
     case InputType::DEBUG:
         mIsDebug = mIsDebug != true;
         break;
 
-#ifndef NDEBUG
     case InputType::SHRINKX:
         mIsShrinkX = true;
         break;
@@ -64,6 +64,10 @@ void InputHandler::set(InputType input) {
 
     case InputType::MUSICTEST:
         mIsMusicTest = true;
+        break;
+
+    case whal::InputType::RELOADSCENE:
+        mIsReloadScene = true;
         break;
 #endif
     }
@@ -112,6 +116,10 @@ void InputHandler::reset(InputType input) {
     case InputType::MUSICTEST:
         mIsMusicTest = false;
         break;
+
+    case InputType::RELOADSCENE:
+        mIsReloadScene = false;
+        break;
 #endif
 
     default:
@@ -129,10 +137,11 @@ void InputHandler::loadMappings() const {
     KeyMap.insert({SDLK_s, InputType::DOWN});
     KeyMap.insert({SDLK_SPACE, InputType::JUMP});
     KeyMap.insert({SDLK_ESCAPE, InputType::QUIT});
-    KeyMap.insert({SDLK_0, InputType::DEBUG});
 
 #ifndef NDEBUG
+    KeyMap.insert({SDLK_0, InputType::DEBUG});
     KeyMap.insert({SDLK_m, InputType::MUSICTEST});
+    KeyMap.insert({SDLK_r, InputType::RELOADSCENE});
 //     KeyMap.insert({GLFW_KEY_LEFT, InputType::SHRINKX});
 //     KeyMap.insert({GLFW_KEY_RIGHT, InputType::GROWX});
 //     KeyMap.insert({GLFW_KEY_DOWN, InputType::SHRINKY});

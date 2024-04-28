@@ -102,7 +102,7 @@ std::optional<Error> loadLevel(const Level level) {
     return std::nullopt;
 }
 
-void unloadLevel(ActiveLevel& level) {
+void unloadAndRemoveLevel(ActiveLevel& level) {
     // remove from Scene's list of loaded levels first,
     // so the EntityKilled listener doesn't mutate the list we're iterating
 
@@ -116,6 +116,10 @@ void unloadLevel(ActiveLevel& level) {
             break;
         }
     }
+    unloadLevel(level);
+}
+
+void unloadLevel(ActiveLevel& level) {
     for (auto entity : level.childEntities) {
         entity.kill();
     }
