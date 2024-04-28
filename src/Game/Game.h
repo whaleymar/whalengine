@@ -2,12 +2,17 @@
 
 #include "Gfx/Window.h"
 #include "Map/Level.h"
+#include "Systems/Event.h"
 
 using namespace whal;
 
 class Game {
 public:
-    Game() = default;
+    static Game& instance() {
+        static Game instance_;
+        return instance_;
+    }
+
     Game(const Game& other) = delete;
     void operator=(const Game&) = delete;
 
@@ -15,10 +20,14 @@ public:
     void mainloop();
     void end();
 
-    void loadScene(std::string_view name);
+    std::optional<Error> loadScene(const char* name);
+    Scene& getScene();
+    void updateLoadedLevels(Vector2f cameraWorldPosTexels);
 
 private:
+    Game();
     std::unique_ptr<Window> mWindow;
     Scene mActiveScene;
-    bool mIsRunning;
+    EventListener<ecs::Entity> mEntityDeathListener;
+    bool mIsSceneLoaded;
 };

@@ -7,6 +7,7 @@
 #include "ECS/Entities/Block.h"
 #include "ECS/Entities/Player.h"
 #include "ECS/Lib/ECS.h"
+#include "Game/Game.h"
 #include "Gfx/Color.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
@@ -15,13 +16,8 @@
 std::optional<Error> loadMap() {
     using namespace whal;
 
-    const char* filepath = "data/map/testmap.tmj";
-    Expected<ActiveLevel> lvl = loadLevel(filepath);
-    if (!lvl.isExpected()) {
-        return lvl.error();
-    }
-
-    return std::nullopt;
+    const char* scenefile = "testworld.world";
+    return Game::instance().loadScene(scenefile);
 }
 
 std::optional<Error> loadTestMap() {

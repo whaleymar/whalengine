@@ -5,6 +5,7 @@
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Entities/Block.h"
+#include "Game/Game.h"
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Texture.h"
 #include "Gfx/VertexObject.h"
@@ -13,18 +14,28 @@
 
 namespace whal {
 
-Expected<ActiveLevel> loadLevel(const char* levelPath) {
-    TileMap map = TileMap::parse(levelPath);
-    ActiveLevel lvl = {{"asdf",  // TODO
-                        levelPath,
-                        {0, 0},  // TODO
-                        Vector2f(map.widthTiles * map.tileSize, map.heightTiles * map.tileSize)},
-                       {}};
+std::optional<Level> Scene::getLevelAt(Vector2f worldPosTexels) {
+    for (Level lvl : allLevels) {
+        if (worldPosTexels.x() >= lvl.worldPosOrigin.x() && worldPosTexels.x() < (lvl.worldPosOrigin.x() + lvl.sizeTexels.x()) &&
+            worldPosTexels.y() < lvl.worldPosOrigin.y() && worldPosTexels.y() >= (lvl.worldPosOrigin.y() - lvl.sizeTexels.y())) {
+            return lvl;
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<Error> loadLevel(const Level level) {
+    TileMap map = TileMap::parse(level.filepath.c_str());
+    print("loaded", map.name);
+    ActiveLevel lvl = {level, map.name, {}};
+
+    Vector2i worldOffset = Transform::texels(lvl.worldPosOrigin.x(), lvl.worldPosOrigin.y()).position;
 
     std::vector<std::vector<s32>> collisionGrid;
     for (s32 x = 0; x < map.widthTiles; x++) {
         std::vector<s32> collisionColumn;
         for (s32 y = 0; y < map.heightTiles; y++) {
+            Transform trans = Transform(Transform::tiles(x, map.heightTiles - y).position + worldOffset);
             s32 ix = map.widthTiles * y + x;
             s32 blockID = map.baseLayer.data.get()[ix];
 
@@ -35,13 +46,13 @@ Expected<ActiveLevel> loadLevel(const char* levelPath) {
                 Expected<Frame> frame = getTileFrame(map, blockID);
                 if (!frame.isExpected()) {
                     print(frame.error());
-                    auto eEntity = createBlock(Transform::tiles(x, map.heightTiles - y));
+                    auto eEntity = createBlock(trans);
                     if (eEntity.isExpected()) {
                         lvl.childEntities.insert(eEntity.value());
                     }
                 } else {
                     Sprite sprite = Sprite(Depth::Player, frame.value());
-                    auto eEntity = createDecal(Transform::tiles(x, map.heightTiles - y), sprite);
+                    auto eEntity = createDecal(trans, sprite);
                     if (eEntity.isExpected()) {
                         lvl.childEntities.insert(eEntity.value());
                     }
@@ -57,7 +68,7 @@ Expected<ActiveLevel> loadLevel(const char* levelPath) {
                     print(frame.error());
                 } else {
                     Sprite sprite = Sprite(Depth::BackgroundNoParallax, frame.value());
-                    auto eEntity = createDecal(Transform::tiles(x, map.heightTiles - y), sprite);
+                    auto eEntity = createDecal(trans, sprite);
                     if (eEntity.isExpected()) {
                         lvl.childEntities.insert(eEntity.value());
                     }
@@ -71,7 +82,7 @@ Expected<ActiveLevel> loadLevel(const char* levelPath) {
                     print(frame.error());
                 } else {
                     Sprite sprite = Sprite(Depth::Foreground, frame.value());
-                    auto eEntity = createDecal(Transform::tiles(x, map.heightTiles - y), sprite);
+                    auto eEntity = createDecal(trans, sprite);
                     if (eEntity.isExpected()) {
                         lvl.childEntities.insert(eEntity.value());
                     }
@@ -83,52 +94,43 @@ Expected<ActiveLevel> loadLevel(const char* levelPath) {
 
     std::vector<SolidCollider> mesh;
     // auto now = std::chrono::steady_clock::now();
-    makeCollisionMesh(collisionGrid, mesh, map);
-    for (auto collider : mesh) {
-        auto eEntity = ecs::ECS::getInstance().entity();
-        if (!eEntity.isExpected()) {
-            print("Error creating entity for mesh");
-            continue;
-        }
-        auto entity = eEntity.value();
-        entity.add(collider);
-        lvl.childEntities.insert(entity);
-    }
-
+    makeCollisionMesh(collisionGrid, lvl);
     // print("mesh creation time: ", std::chrono::duration<f32>(std::chrono::steady_clock::now() - now).count());
 
-    return lvl;
+    Game::instance().getScene().loadedLevels.push_back(lvl);
+
+    return std::nullopt;
 }
 
 void unloadLevel(ActiveLevel& level) {
     // remove from Scene's list of loaded levels first,
     // so the EntityKilled listener doesn't mutate the list we're iterating
 
-    // Scene scene = game.getScene();
-    // for (auto it = scene.loadedLevels.begin(); it != scene.loadedLevels.end(); ++it) {
-    //     auto& lvl = *it;
-    //     if (lvl.filepath == level.filepath) {
-    //         scene.loadedLevels.erase(it);
-    //         break;
-    //     }
-    // }
-    // for (auto entity : level.childEntities) {
-    //     entity.kill();
-    // }
+    print("unloading", level.name);
+
+    Scene& scene = Game::instance().getScene();
+    for (auto it = scene.loadedLevels.begin(); it != scene.loadedLevels.end(); ++it) {
+        auto& lvl = *it;
+        if (lvl == level) {
+            scene.loadedLevels.erase(it);
+            break;
+        }
+    }
+    for (auto entity : level.childEntities) {
+        entity.kill();
+    }
 }
 
 void removeEntityFromLevel(ecs::Entity entity) {
-    // TODO
-
-    // Scene scene = game.getScene();
-    // for (auto& lvl : scene.loadedLevels) {
-    //     if (lvl.childEntities.erase(entity)) {
-    //         break;
-    //     }
-    // }
+    Scene& scene = Game::instance().getScene();
+    for (auto& lvl : scene.loadedLevels) {
+        if (lvl.childEntities.erase(entity)) {
+            break;
+        }
+    }
 }
 
-void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, std::vector<SolidCollider>& dstColliders, const TileMap& map) {
+void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel& lvl) {
     // could be a LOT faster with std::vector<bool> + bitwise ops
     // timed @ 0.004 seconds for 1 level (quarter frame; can be asynch?)
 
@@ -181,15 +183,29 @@ void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, std::vector
                         }
                         s32 meshWidthTiles = endPoint.first - startPoint.first + 1;
                         s32 meshHeightTiles = endPoint.second - startPoint.second + 1;
-                        constexpr f32 pixelsPerTile = static_cast<f32>(PIXELS_PER_TEXEL) * TEXELS_PER_TILE;
+                        constexpr f32 pixelsPerTexel = static_cast<f32>(PIXELS_PER_TEXEL);
+                        constexpr f32 pixelsPerTile = pixelsPerTexel * TEXELS_PER_TILE;
                         constexpr s32 s_pixelsPerTile = static_cast<s32>(TEXELS_PER_TILE) * static_cast<s32>(PIXELS_PER_TEXEL);
 
-                        f32 centerX = static_cast<f32>(startPoint.first) * pixelsPerTile + static_cast<f32>(meshWidthTiles - 1) * pixelsPerTile * 0.5;
-                        f32 centerY = static_cast<f32>(map.heightTiles) * pixelsPerTile - static_cast<f32>(startPoint.second) * pixelsPerTile -
+                        f32 centerX = lvl.worldPosOrigin.x() * pixelsPerTexel + static_cast<f32>(startPoint.first) * pixelsPerTile +
+                                      static_cast<f32>(meshWidthTiles - 1) * pixelsPerTile * 0.5;
+                        f32 centerY = lvl.worldPosOrigin.y() * pixelsPerTexel + lvl.sizeTexels.y() * static_cast<f32>(PIXELS_PER_TEXEL) -
+                                      static_cast<f32>(startPoint.second) * pixelsPerTile -
                                       static_cast<f32>(meshHeightTiles - 2) * pixelsPerTile * 0.5;
+
                         Vector2f center = {centerX, centerY};
                         Vector2i halflen = {meshWidthTiles * s_pixelsPerTile / 2, meshHeightTiles * s_pixelsPerTile / 2};
-                        dstColliders.push_back(SolidCollider(center, halflen));
+                        SolidCollider collider = SolidCollider(center, halflen);
+
+                        auto eEntity = ecs::ECS::getInstance().entity();
+                        if (!eEntity.isExpected()) {
+                            print("Error creating entity for mesh");
+                        } else {
+                            auto entity = eEntity.value();
+                            entity.add(collider);
+                            entity.add(Transform(collider.getCollider().getPositionEdge(Vector2i::unitDown)));
+                            lvl.childEntities.insert(entity);
+                        }
 
                         break;
                     } else {

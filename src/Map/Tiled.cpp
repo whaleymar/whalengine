@@ -4,6 +4,7 @@
 #include <memory>
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
+#include "Map/Level.h"
 #include "json.hpp"
 
 #include "Gfx/Texture.h"
@@ -12,7 +13,7 @@
 
 namespace whal {
 
-inline const char* TSET_DIR = "data/map";
+inline const char* MAP_DIR = "data/map";
 inline const char* TSET_SPRITE_DIR = "data/sprite/map";
 
 Expected<TileSet> parseTileset(std::string basename, s32 firstgid);
@@ -21,13 +22,14 @@ TileMap TileMap::parse(const char* path) {
     // TODO
     // - layer type (tilelayer, object)
     // - visibility?
-    // -
+    // - BETTER ERROR HANDLING (bad bc copy constructor removed so can't put it in expected container)
+
     TileMap map;
     using json = nlohmann::json;
 
-    Expected<std::string> jString = readFile(path);
+    Expected<std::string> jString = readFile(std::format("{}/{}", MAP_DIR, path).c_str());
     if (!jString.isExpected()) {
-        print("error parsing json");
+        print("error parsing json:", jString.error());
         return map;
     }
 
@@ -73,13 +75,27 @@ TileMap TileMap::parse(const char* path) {
         map.tilesets.push_back(tset);
     }
 
+    bool isNameFound = false;
+    for (auto& property : data["properties"]) {
+        std::string propName = property["name"];
+        if (propName == "Name") {
+            std::string mapName = property["value"];
+            map.name = mapName.c_str();
+            isNameFound = true;
+        }
+    }
+    if (!isNameFound) {
+        print("A `Name` Property wasn't found in ", path);
+        map.name = "Unknown";
+    }
+
     return map;
 }
 
 Expected<TileSet> parseTileset(std::string basename, s32 firstgid) {
     using json = nlohmann::json;
 
-    Expected<std::string> jString = readFile(std::format("{}/{}", TSET_DIR, basename).c_str());
+    Expected<std::string> jString = readFile(std::format("{}/{}", MAP_DIR, basename).c_str());
     if (!jString.isExpected()) {
         return jString.error();
     }
@@ -136,6 +152,35 @@ Expected<Frame> getTileFrame(const TileMap& map, s32 blockId) {
         {fullFrame.atlasPositionTexels.x() + colIx * tset.tileWidthTexels, fullFrame.atlasPositionTexels.y() + rowIx * tset.tileHeightTexels},
         {tset.tileWidthTexels, tset.tileHeightTexels}};
     return newFrame;
+}
+
+std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene) {
+    using json = nlohmann::json;
+
+    Expected<std::string> jString = readFile(std::format("{}/{}", MAP_DIR, mapfile).c_str());
+    if (!jString.isExpected()) {
+        return jString.error();
+    }
+
+    json data = json::parse(jString.value());
+
+    std::string type = data["type"];
+    if (type != "world") {
+        return Error("Not a world file");
+    }
+
+    dstScene.name = mapfile;
+    for (auto& map : data["maps"]) {
+        std::string filename = map["fileName"];
+        s32 x = map["x"];
+        s32 y = map["y"];
+        s32 width = map["width"];
+        s32 height = map["height"];
+        Level lvl = {filename, Vector2f(x, y), Vector2f(width, height)};
+        dstScene.allLevels.push_back(lvl);
+    }
+    // TODO get startPos
+    return std::nullopt;
 }
 
 }  // namespace whal

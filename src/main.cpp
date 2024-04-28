@@ -1,7 +1,8 @@
 #include "Game/Game.h"
 
 int main() {
-    Game game;
+    Game& game = Game::instance();
+
     bool startupFailed = game.startup();
     if (startupFailed) {
         return -1;

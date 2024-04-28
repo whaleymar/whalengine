@@ -8,6 +8,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Shader.h"
 #include "Gfx/Window.h"
+#include "Systems/Event.h"
 #include "Util/Print.h"
 
 #include "ECS/Lib/ECS.h"
@@ -23,8 +24,15 @@
 #include "Game/DebugScene.h"
 #include "Game/EventListeners.h"
 
+#include "Map/Level.h"
+#include "Map/Tiled.h"
+
 #include "Systems/Audio.h"
 #include "Systems/System.h"
+
+constexpr f32 MAX_LOAD_DISTANCE_TEXELS = WINDOW_WIDTH_TEXELS * 3;
+
+Game::Game() : mEntityDeathListener(EventListener<ecs::Entity>(&removeEntityFromLevel)) {}
 
 bool Game::startup() {
     mWindow = std::make_unique<Window>(WINDOW_TITLE);
@@ -118,9 +126,10 @@ void Game::mainloop() {
             break;
         }
 
-        // if (System::frame.getFrame() == 0) {
-        //     print(ecs.getEntityCount());
-        // }
+        if (System::frame.getFrame() == 0) {
+            // updateLoadedLevels(ecs.query<Player>()[0]); // TODO need to test this, but don't have a way to get player pos
+            //     print(ecs.getEntityCount());
+        }
 
         // randomFallingTile(1);
 
@@ -167,4 +176,39 @@ void Game::end() {
     System::audio.await();
     System::schedule.await();
     killListeners();
+}
+
+std::optional<Error> Game::loadScene(const char* filename) {
+    auto errOpt = parseWorld(filename, mActiveScene);
+    if (errOpt) {
+        mIsSceneLoaded = false;
+        return errOpt;
+    }
+    updateLoadedLevels({0, 0});  // TODO stubbed arg
+    // TODO spawn player at start pos?
+
+    mIsSceneLoaded = true;
+    return std::nullopt;
+}
+
+Scene& Game::getScene() {
+    return mActiveScene;
+}
+
+void Game::updateLoadedLevels(Vector2f cameraWorldPosTexels) {
+    for (auto lvl : mActiveScene.allLevels) {
+        const bool shouldLoad = (lvl.worldPosOrigin - cameraWorldPosTexels).len() <= MAX_LOAD_DISTANCE_TEXELS;
+        auto it = std::find(mActiveScene.loadedLevels.begin(), mActiveScene.loadedLevels.end(), lvl);
+        const bool isLevelLoaded = it != mActiveScene.loadedLevels.end();
+
+        if (shouldLoad && !isLevelLoaded) {
+            std::optional<Error> errOpt = loadLevel(lvl);
+            if (errOpt) {
+                print(*errOpt);
+                continue;
+            }
+        } else if (!shouldLoad && isLevelLoaded) {
+            unloadLevel(*it);
+        }
+    }
 }

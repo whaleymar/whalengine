@@ -11,31 +11,30 @@ class SolidCollider;
 struct TileMap;
 
 struct Level {
-    const char* name;
     std::string filepath;     // used for level comparisons
     Vector2f worldPosOrigin;  // top left
     Vector2f sizeTexels;
+
+    bool operator==(const Level& other) const { return filepath == other.filepath; }
 };
 
-// TODO subscribe to death event
-// TODO private constructor so levels are only created through loadLevel?
 struct ActiveLevel : public Level {
+    const char* name;
     std::set<ecs::Entity> childEntities;
 };
 
-// TODO game should have a currentScene member which is used for hot reloading
 struct Scene {
     std::string name;
     std::vector<Level> allLevels;
     std::vector<ActiveLevel> loadedLevels;
     Vector2f startPos;
 
-    Expected<Level> getLevelAt(Vector2f worldPosTexels);
+    std::optional<Level> getLevelAt(Vector2f worldPosTexels);
 };
 
-Expected<ActiveLevel> loadLevel(const char* levelPath);
+std::optional<Error> loadLevel(const Level level);
 void unloadLevel(ActiveLevel& level);
 void removeEntityFromLevel(ecs::Entity entity);
-void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, std::vector<SolidCollider>& dstColliders, const TileMap& map);
+void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel& lvl);
 
 }  // namespace whal
