@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <ostream>
 #include "Util/MathUtil.h"
 #include "Util/Types.h"
 
@@ -73,6 +74,11 @@ struct Vector2 {
         return Vector2<T>(e[0] * divisor, e[1] * divisor);
     }
 };
+
+template <typename T>
+std::ostream& operator<<(std::ostream& out, Vector2<T> const& self) {
+    return out << "(" << self.e[0] << ", " << self.e[1] << ")";
+}
 
 typedef Vector2<f32> Vector2f;
 typedef Vector2<s32> Vector2i;
