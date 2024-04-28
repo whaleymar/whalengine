@@ -13,13 +13,13 @@
 
 namespace whal {
 
-Expected<Level> loadLevel(const char* levelPath) {
+Expected<ActiveLevel> loadLevel(const char* levelPath) {
     TileMap map = TileMap::parse(levelPath);
-    Level lvl = {"asdf",  // TODO
-                 levelPath,
-                 {0, 0},  // TODO
-                 Vector2f(map.widthTiles * map.tileSize, map.heightTiles * map.tileSize),
-                 {}};
+    ActiveLevel lvl = {{"asdf",  // TODO
+                        levelPath,
+                        {0, 0},  // TODO
+                        Vector2f(map.widthTiles * map.tileSize, map.heightTiles * map.tileSize)},
+                       {}};
 
     std::vector<std::vector<s32>> collisionGrid;
     for (s32 x = 0; x < map.widthTiles; x++) {
@@ -100,7 +100,7 @@ Expected<Level> loadLevel(const char* levelPath) {
     return lvl;
 }
 
-void unloadLevel(Level& level) {
+void unloadLevel(ActiveLevel& level) {
     // remove from Scene's list of loaded levels first,
     // so the EntityKilled listener doesn't mutate the list we're iterating
 

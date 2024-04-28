@@ -9,6 +9,8 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     - parse map data (DONE)
     - display correct sprites (DONE)
     - bake collision mesh (DONE)
+    - level name and world coordinates
+    - stitching levels together
     - enable hot-reloading
     - store tile material data 
     - object layers

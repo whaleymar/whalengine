@@ -16,7 +16,7 @@ std::optional<Error> loadMap() {
     using namespace whal;
 
     const char* filepath = "data/map/testmap.tmj";
-    Expected<Level> lvl = loadLevel(filepath);
+    Expected<ActiveLevel> lvl = loadLevel(filepath);
     if (!lvl.isExpected()) {
         return lvl.error();
     }
