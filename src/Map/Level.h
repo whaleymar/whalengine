@@ -11,8 +11,8 @@ class SolidCollider;
 struct TileMap;
 
 struct Level {
-    std::string filepath;     // used for level comparisons
-    Vector2f worldPosOrigin;  // top left
+    std::string filepath;           // used for level comparisons
+    Vector2f worldPosOriginTexels;  // top left
     Vector2f sizeTexels;
 
     bool operator==(const Level& other) const { return filepath == other.filepath; }

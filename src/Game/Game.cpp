@@ -207,7 +207,8 @@ std::optional<Error> Game::loadScene(const char* filename) {
         mIsSceneLoaded = false;
         return errOpt;
     }
-    updateLoadedLevels({0, 0});  // TODO stubbed arg
+    Vector2f cameraPos = toFloatVec(getCamera().value().get<Transform>().position);
+    updateLoadedLevels(cameraPos);
     // TODO spawn player at start pos?
 
     mIsSceneLoaded = true;
@@ -231,9 +232,12 @@ Scene& Game::getScene() {
     return mActiveScene;
 }
 
-void Game::updateLoadedLevels(Vector2f cameraWorldPosTexels) {
+void Game::updateLoadedLevels(Vector2f cameraWorldPosPixels) {
+    Vector2f cameraWorldPosTexels = cameraWorldPosPixels * TEXELS_PER_PIXEL;
     for (auto lvl : mActiveScene.allLevels) {
-        const bool shouldLoad = (lvl.worldPosOrigin - cameraWorldPosTexels).len() <= MAX_LOAD_DISTANCE_TEXELS;
+        Vector2f lvlCenterPos = lvl.worldPosOriginTexels - lvl.sizeTexels * Vector2f(-0.5, 0.5);
+        print((lvlCenterPos - cameraWorldPosTexels).len());
+        const bool shouldLoad = (lvlCenterPos - cameraWorldPosTexels).len() <= MAX_LOAD_DISTANCE_TEXELS;
         auto it = std::find(mActiveScene.loadedLevels.begin(), mActiveScene.loadedLevels.end(), lvl);
         const bool isLevelLoaded = it != mActiveScene.loadedLevels.end();
 

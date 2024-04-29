@@ -16,8 +16,8 @@ namespace whal {
 
 std::optional<Level> Scene::getLevelAt(Vector2f worldPosTexels) {
     for (Level lvl : allLevels) {
-        if (worldPosTexels.x() >= lvl.worldPosOrigin.x() && worldPosTexels.x() < (lvl.worldPosOrigin.x() + lvl.sizeTexels.x()) &&
-            worldPosTexels.y() < lvl.worldPosOrigin.y() && worldPosTexels.y() >= (lvl.worldPosOrigin.y() - lvl.sizeTexels.y())) {
+        if (worldPosTexels.x() >= lvl.worldPosOriginTexels.x() && worldPosTexels.x() < (lvl.worldPosOriginTexels.x() + lvl.sizeTexels.x()) &&
+            worldPosTexels.y() < lvl.worldPosOriginTexels.y() && worldPosTexels.y() >= (lvl.worldPosOriginTexels.y() - lvl.sizeTexels.y())) {
             return lvl;
         }
     }
@@ -30,7 +30,7 @@ std::optional<Error> loadLevel(const Level level) {
     ActiveLevel lvl = {level, map.name, {}};
     // print("copied name: ", lvl.name);
 
-    Vector2i worldOffset = Transform::texels(lvl.worldPosOrigin.x(), lvl.worldPosOrigin.y()).position;
+    Vector2i worldOffset = Transform::texels(lvl.worldPosOriginTexels.x(), lvl.worldPosOriginTexels.y()).position;
 
     std::vector<std::vector<s32>> collisionGrid;
     for (s32 x = 0; x < map.widthTiles; x++) {
@@ -143,9 +143,9 @@ void addCollider(ActiveLevel& lvl, std::pair<s32, s32> startPoint, std::pair<s32
     constexpr f32 pixelsPerTile = pixelsPerTexel * TEXELS_PER_TILE;
     constexpr s32 s_pixelsPerTile = static_cast<s32>(TEXELS_PER_TILE) * static_cast<s32>(PIXELS_PER_TEXEL);
 
-    f32 centerX = lvl.worldPosOrigin.x() * pixelsPerTexel + static_cast<f32>(startPoint.first) * pixelsPerTile +
+    f32 centerX = lvl.worldPosOriginTexels.x() * pixelsPerTexel + static_cast<f32>(startPoint.first) * pixelsPerTile +
                   static_cast<f32>(meshWidthTiles - 1) * pixelsPerTile * 0.5;
-    f32 centerY = lvl.worldPosOrigin.y() * pixelsPerTexel + lvl.sizeTexels.y() * static_cast<f32>(PIXELS_PER_TEXEL) -
+    f32 centerY = lvl.worldPosOriginTexels.y() * pixelsPerTexel + lvl.sizeTexels.y() * static_cast<f32>(PIXELS_PER_TEXEL) -
                   static_cast<f32>(startPoint.second) * pixelsPerTile - static_cast<f32>(meshHeightTiles - 2) * pixelsPerTile * 0.5;
 
     Vector2f center = {centerX, centerY};
