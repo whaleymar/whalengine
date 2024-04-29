@@ -136,6 +136,33 @@ void removeEntityFromLevel(ecs::Entity entity) {
     }
 }
 
+void addCollider(ActiveLevel& lvl, std::pair<s32, s32> startPoint, std::pair<s32, s32> endPoint) {
+    s32 meshWidthTiles = endPoint.first - startPoint.first + 1;
+    s32 meshHeightTiles = endPoint.second - startPoint.second + 1;
+    constexpr f32 pixelsPerTexel = static_cast<f32>(PIXELS_PER_TEXEL);
+    constexpr f32 pixelsPerTile = pixelsPerTexel * TEXELS_PER_TILE;
+    constexpr s32 s_pixelsPerTile = static_cast<s32>(TEXELS_PER_TILE) * static_cast<s32>(PIXELS_PER_TEXEL);
+
+    f32 centerX = lvl.worldPosOrigin.x() * pixelsPerTexel + static_cast<f32>(startPoint.first) * pixelsPerTile +
+                  static_cast<f32>(meshWidthTiles - 1) * pixelsPerTile * 0.5;
+    f32 centerY = lvl.worldPosOrigin.y() * pixelsPerTexel + lvl.sizeTexels.y() * static_cast<f32>(PIXELS_PER_TEXEL) -
+                  static_cast<f32>(startPoint.second) * pixelsPerTile - static_cast<f32>(meshHeightTiles - 2) * pixelsPerTile * 0.5;
+
+    Vector2f center = {centerX, centerY};
+    Vector2i halflen = {meshWidthTiles * s_pixelsPerTile / 2, meshHeightTiles * s_pixelsPerTile / 2};
+    SolidCollider collider = SolidCollider(center, halflen);
+
+    auto eEntity = ecs::ECS::getInstance().entity();
+    if (!eEntity.isExpected()) {
+        print("Error creating entity for mesh");
+    } else {
+        auto entity = eEntity.value();
+        entity.add(collider);
+        entity.add(Transform(collider.getCollider().getPositionEdge(Vector2i::unitDown)));
+        lvl.childEntities.insert(entity);
+    }
+}
+
 void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel& lvl) {
     // could be a LOT faster with std::vector<bool> + bitwise ops
     // timed @ 0.004 seconds for 1 level (quarter frame; can be asynch?)
@@ -155,13 +182,18 @@ void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel
             }
             visited.insert(point);
 
-            if (collisionGrid[rowIx][colIx]) {
+            bool isCollisionTile = collisionGrid[rowIx][colIx] > 0;
+            if (isCollisionTile) {
                 if (!isStarted) {
+                    if (lvl.name != "DebugLevel") {
+                        print("starting at ", rowIx, colIx);
+                    }
                     isStarted = true;
                     startPoint = point;
                 }
                 endPoint = point;
-            } else {
+            }
+            if (!isCollisionTile || colIx == (collisionGrid[0].size() - 1) || (rowIx == (collisionGrid.size() - 1))) {
                 if (!isStarted) {
                     continue;
                 }
@@ -169,6 +201,7 @@ void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel
                 bool isDone = false;
                 bool endedEarly = false;
                 Point newPoint;
+
                 for (size_t newRowIx = endPoint.first + 1; newRowIx < collisionGrid.size(); newRowIx++) {
                     std::vector<Point> toInsert;
                     for (size_t newColIx = startPoint.second; newColIx <= static_cast<size_t>(endPoint.second); newColIx++) {
@@ -178,7 +211,7 @@ void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel
                             endedEarly = true;
                             break;
                         }
-                        isDone = newRowIx == collisionGrid.size();
+                        isDone = (newRowIx == collisionGrid.size() - 1);
                     }
                     if (isDone || endedEarly) {
                         if (isDone) {
@@ -187,32 +220,6 @@ void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel
                                 visited.insert(p);
                             }
                         }
-                        s32 meshWidthTiles = endPoint.first - startPoint.first + 1;
-                        s32 meshHeightTiles = endPoint.second - startPoint.second + 1;
-                        constexpr f32 pixelsPerTexel = static_cast<f32>(PIXELS_PER_TEXEL);
-                        constexpr f32 pixelsPerTile = pixelsPerTexel * TEXELS_PER_TILE;
-                        constexpr s32 s_pixelsPerTile = static_cast<s32>(TEXELS_PER_TILE) * static_cast<s32>(PIXELS_PER_TEXEL);
-
-                        f32 centerX = lvl.worldPosOrigin.x() * pixelsPerTexel + static_cast<f32>(startPoint.first) * pixelsPerTile +
-                                      static_cast<f32>(meshWidthTiles - 1) * pixelsPerTile * 0.5;
-                        f32 centerY = lvl.worldPosOrigin.y() * pixelsPerTexel + lvl.sizeTexels.y() * static_cast<f32>(PIXELS_PER_TEXEL) -
-                                      static_cast<f32>(startPoint.second) * pixelsPerTile -
-                                      static_cast<f32>(meshHeightTiles - 2) * pixelsPerTile * 0.5;
-
-                        Vector2f center = {centerX, centerY};
-                        Vector2i halflen = {meshWidthTiles * s_pixelsPerTile / 2, meshHeightTiles * s_pixelsPerTile / 2};
-                        SolidCollider collider = SolidCollider(center, halflen);
-
-                        auto eEntity = ecs::ECS::getInstance().entity();
-                        if (!eEntity.isExpected()) {
-                            print("Error creating entity for mesh");
-                        } else {
-                            auto entity = eEntity.value();
-                            entity.add(collider);
-                            entity.add(Transform(collider.getCollider().getPositionEdge(Vector2i::unitDown)));
-                            lvl.childEntities.insert(entity);
-                        }
-
                         break;
                     } else {
                         endPoint = newPoint;
@@ -221,6 +228,7 @@ void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel
                         }
                     }
                 }
+                addCollider(lvl, startPoint, endPoint);
                 isStarted = false;
             }
         }
