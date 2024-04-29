@@ -1,5 +1,6 @@
 #include "ECS/Systems/Gfx.h"
 
+#include "ECS/Systems/TagTrackers.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Shader.h"
@@ -47,8 +48,15 @@ void drawEntity(ShaderProgram& program, Transform& trans, IDraw& draw, f32* pVer
 
 void SpriteSystem::drawEntities() {
     auto program = GLResourceManager::getInstance().getProgram(ShaderType::SpriteRGB);
-    GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).bind();
     program.useProgram();
+
+    auto cameraOpt = getCamera();
+    if (cameraOpt) {
+        auto cameraPosF = toFloatVec(cameraOpt.value().get<Transform>().position);
+        glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
+    }
+
+    GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).bind();
     for (auto const& entity : mSorted) {
         Transform& trans = entity.get<Transform>();
         Sprite& sprite = entity.get<Sprite>();
@@ -62,6 +70,13 @@ void SpriteSystem::drawEntities() {
 void DrawSystem::drawEntities() {
     auto program = GLResourceManager::getInstance().getProgram(ShaderType::RGBonly);
     program.useProgram();
+
+    auto cameraOpt = getCamera();
+    if (cameraOpt) {
+        auto cameraPosF = toFloatVec(cameraOpt.value().get<Transform>().position);
+        glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
+    }
+
     // sorting not required since Draw components don't have transparency
     for (auto const& [entityid, entity] : getEntities()) {
         Transform& trans = entity.get<Transform>();

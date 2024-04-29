@@ -19,7 +19,7 @@ struct Level {
 };
 
 struct ActiveLevel : public Level {
-    const char* name;
+    std::string name;
     std::set<ecs::Entity> childEntities;
 };
 

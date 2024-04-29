@@ -1,6 +1,8 @@
 #include "CollisionManager.h"
 
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/Transform.h"
+#include "ECS/Systems/TagTrackers.h"
 #include "Game/Events.h"
 
 #include <glad/gl.h>
@@ -90,6 +92,12 @@ void drawCollider(ShaderProgram program, const IUseCollision* collider, const RG
 void drawColliders() {
     auto program = GLResourceManager::getInstance().getProgram(ShaderType::Debug);
     program.useProgram();
+
+    auto cameraOpt = getCamera();
+    if (cameraOpt) {
+        auto cameraPosF = toFloatVec(cameraOpt.value().get<Transform>().position);
+        glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
+    }
 
     for (const auto& [entity, collider] : ActorsManager::getInstance()->getAllActors()) {
         drawCollider(program, collider, Color::MAGENTA);

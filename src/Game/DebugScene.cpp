@@ -5,6 +5,7 @@
 #include "ECS/Components/RailsControl.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Entities/Block.h"
+#include "ECS/Entities/Camera.h"
 #include "ECS/Entities/Player.h"
 #include "ECS/Lib/ECS.h"
 #include "Game/Game.h"
@@ -22,6 +23,13 @@ std::optional<Error> loadMap() {
 
 std::optional<Error> loadTestMap() {
     auto player = whal::createPlayer();
+    if (!player.isExpected()) {
+        return player.error();
+    }
+    auto camera = whal::createCamera();
+    if (!camera.isExpected()) {
+        return camera.error();
+    }
     return loadMap();
 }
 

@@ -17,6 +17,12 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     - parallax
     - move tiled map(s) and tilesets into data/ directory (DONE)
 - game class (DONE)
+- moving camera (DONE)
+
+## Camera / Follow
+- different movement types (easein/out stuff)
+- min distance before moving (per axis)
+- bake camera strategy into level
 
 ## Systems
 - lighting\*
@@ -27,7 +33,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     4. creates simple text gui : {Resume, Restart, Quit} -- each of these send their own events
 
 ## Components
-- Follow
 - Light 
 - Trigger
 - collision callback (move object, kill player, play animation, etc.)
@@ -36,7 +41,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - particle
     - draw(?), position, velocity, lifetime
     - instead of draw, could do custom component & instance it
-- camera
 - death plane
 
 ## Physics

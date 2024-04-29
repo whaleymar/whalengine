@@ -4,6 +4,9 @@
 
 #include <SDL2/SDL.h>
 
+#include "ECS/Components/Transform.h"
+#include "ECS/Systems/RelationshipManager.h"
+#include "ECS/Systems/TagTrackers.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Shader.h"
@@ -98,9 +101,13 @@ void Game::mainloop() {
     // single-component systems for running psuedo-destructors / updating some global var
     auto actorsMgr = ActorsManager::getInstance();
     auto solidsMgr = SolidsManager::getInstance();
+    auto followMgr = ecs.registerSystem<FollowSystem>();
     // these don't have update methods:
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
     auto drawMgr = ecs.registerSystem<DrawManager>();
+    auto playerMgr = PlayerSystem::instance();
+    auto cameraMgr = CameraSystem::instance();
+    auto childMgr = ecs.registerSystem<EntityChildSystem>();
 
     // load scene // TODO separate function
     auto err = loadTestMap();
@@ -128,7 +135,13 @@ void Game::mainloop() {
         }
 
         if (System::frame.getFrame() == 0) {
-            // updateLoadedLevels(ecs.query<Player>()[0]); // TODO need to test this, but don't have a way to get player pos
+            // Vector2f playerPos = toFloatVec(playerMgr->getEntities()[0].get<Transform>().position);
+            Vector2f cameraPos = toFloatVec(getCamera().value().get<Transform>().position);
+            // print("player:", playerPos);
+            // print("camera:", cameraPos);
+            // print("");
+
+            updateLoadedLevels(cameraPos);
             //     print(ecs.getEntityCount());
         }
 
@@ -141,10 +154,11 @@ void Game::mainloop() {
         controlSystemRB->update();
         controlSystemFree->update();
         pathSystem->update();
+        followMgr->update();
         physicsSystem->update();
 
-        // these sync the collision manager
         if (System::frame.getFrame() % 10 == 0) {
+            // these sync the collision manager
             actorsMgr->update();
             solidsMgr->update();
         }

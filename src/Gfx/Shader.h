@@ -24,6 +24,7 @@ public:
     const u32 uvOffset;
     const u32 rgbOffset;
     u32 drawOffsetUniform;
+    u32 cameraPositionUniform;
     u32 sizeUniform;
     u32 textureUniform;
     u32 rgbUniform;

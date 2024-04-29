@@ -28,6 +28,7 @@ std::optional<Error> loadLevel(const Level level) {
     TileMap map = TileMap::parse(level.filepath.c_str());
     print("loaded", map.name);
     ActiveLevel lvl = {level, map.name, {}};
+    // print("copied name: ", lvl.name);
 
     Vector2i worldOffset = Transform::texels(lvl.worldPosOrigin.x(), lvl.worldPosOrigin.y()).position;
 
@@ -105,9 +106,9 @@ std::optional<Error> loadLevel(const Level level) {
 void unloadAndRemoveLevel(ActiveLevel& level) {
     // remove from Scene's list of loaded levels first,
     // so the EntityKilled listener doesn't mutate the list we're iterating
+    // also copy it so erasing it doesn't invalidate our pointer
 
-    print("unloading", level.name);
-
+    ActiveLevel copy = level;
     Scene& scene = Game::instance().getScene();
     for (auto it = scene.loadedLevels.begin(); it != scene.loadedLevels.end(); ++it) {
         auto& lvl = *it;
@@ -116,13 +117,14 @@ void unloadAndRemoveLevel(ActiveLevel& level) {
             break;
         }
     }
-    unloadLevel(level);
+    unloadLevel(copy);
 }
 
 void unloadLevel(ActiveLevel& level) {
     for (auto entity : level.childEntities) {
         entity.kill();
     }
+    print("unloaded level:", level.name);
 }
 
 void removeEntityFromLevel(ecs::Entity entity) {

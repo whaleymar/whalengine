@@ -237,6 +237,9 @@ public:
     bool hasComponent(const Entity entity) const {
         const ComponentType type = getComponentID<T>();
         auto it = std::find(mComponentTypes.begin(), mComponentTypes.end(), type);
+        if (it == mComponentTypes.end()) {
+            return false;
+        }
         int ix = std::distance(mComponentTypes.begin(), it);
         return getComponentArray<T>(ix)->hasData(entity);
     }
@@ -292,7 +295,7 @@ public:
     std::unordered_map<EntityID, Entity> getEntities() const { return mEntities; }
 
 private:
-    // TODO storing id:entity pairs is just duplicating data. I should make this a hash set with Entity
+    // TODO storing id:entity pairs is just duplicating data. I should make this an unordered_set of Entities?
     std::unordered_map<EntityID, Entity> mEntities;
 };
 
