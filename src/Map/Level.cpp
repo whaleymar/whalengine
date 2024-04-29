@@ -11,6 +11,7 @@
 #include "Gfx/VertexObject.h"
 #include "Tiled.h"
 #include "Util/Print.h"
+#include "Util/Vector.h"
 
 namespace whal {
 
@@ -30,13 +31,13 @@ std::optional<Error> loadLevel(const Level level) {
     ActiveLevel lvl = {level, map.name, {}};
     // print("copied name: ", lvl.name);
 
-    Vector2i worldOffset = Transform::texels(lvl.worldPosOriginTexels.x(), lvl.worldPosOriginTexels.y()).position;
+    Vector2i worldOffsetTexels = Transform::texels(lvl.worldPosOriginTexels.x(), lvl.worldPosOriginTexels.y() - lvl.sizeTexels.y()).position;
 
     std::vector<std::vector<s32>> collisionGrid;
     for (s32 x = 0; x < map.widthTiles; x++) {
         std::vector<s32> collisionColumn;
         for (s32 y = 0; y < map.heightTiles; y++) {
-            Transform trans = Transform(Transform::tiles(x, map.heightTiles - y).position + worldOffset);
+            Transform trans = Transform(Transform::tiles(x, map.heightTiles - y).position + worldOffsetTexels);
             s32 ix = map.widthTiles * y + x;
             s32 blockID = map.baseLayer.data.get()[ix];
 
@@ -145,8 +146,8 @@ void addCollider(ActiveLevel& lvl, std::pair<s32, s32> startPoint, std::pair<s32
 
     f32 centerX = lvl.worldPosOriginTexels.x() * pixelsPerTexel + static_cast<f32>(startPoint.first) * pixelsPerTile +
                   static_cast<f32>(meshWidthTiles - 1) * pixelsPerTile * 0.5;
-    f32 centerY = lvl.worldPosOriginTexels.y() * pixelsPerTexel + lvl.sizeTexels.y() * static_cast<f32>(PIXELS_PER_TEXEL) -
-                  static_cast<f32>(startPoint.second) * pixelsPerTile - static_cast<f32>(meshHeightTiles - 2) * pixelsPerTile * 0.5;
+    f32 centerY = lvl.worldPosOriginTexels.y() * pixelsPerTexel - static_cast<f32>(startPoint.second) * pixelsPerTile -
+                  static_cast<f32>(meshHeightTiles - 2) * pixelsPerTile * 0.5;
 
     Vector2f center = {centerX, centerY};
     Vector2i halflen = {meshWidthTiles * s_pixelsPerTile / 2, meshHeightTiles * s_pixelsPerTile / 2};
