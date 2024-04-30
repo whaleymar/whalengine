@@ -50,11 +50,8 @@ void SpriteSystem::drawEntities() {
     auto program = GLResourceManager::getInstance().getProgram(ShaderType::SpriteRGB);
     program.useProgram();
 
-    auto cameraOpt = getCamera();
-    if (cameraOpt) {
-        auto cameraPosF = toFloatVec(cameraOpt.value().get<Transform>().position);
-        glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
-    }
+    auto cameraPosF = toFloatVec(getCameraPosition());
+    glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
 
     GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).bind();
     for (auto const& entity : mSorted) {
@@ -71,11 +68,8 @@ void DrawSystem::drawEntities() {
     auto program = GLResourceManager::getInstance().getProgram(ShaderType::RGBonly);
     program.useProgram();
 
-    auto cameraOpt = getCamera();
-    if (cameraOpt) {
-        auto cameraPosF = toFloatVec(cameraOpt.value().get<Transform>().position);
-        glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
-    }
+    auto cameraPosF = toFloatVec(getCameraPosition());
+    glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
 
     // sorting not required since Draw components don't have transparency
     for (auto const& [entityid, entity] : getEntities()) {

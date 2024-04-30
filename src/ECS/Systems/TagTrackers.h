@@ -2,6 +2,8 @@
 
 #include "ECS/Components/Tags.h"
 #include "ECS/Lib/ECS.h"
+#include "Util/Vector.h"
+
 namespace whal {
 
 class PlayerSystem : public ecs::ISystem<Player> {
@@ -21,5 +23,6 @@ public:
 };
 
 std::optional<ecs::Entity> getCamera();
+Vector2i getCameraPosition();
 
 }  // namespace whal

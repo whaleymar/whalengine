@@ -5,27 +5,24 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
-#include "ECS/Systems/TagTrackers.h"
+#include "Util/Print.h"
 
 namespace whal {
 
-Expected<ecs::Entity> createCamera() {
+Expected<ecs::Entity> createCamera(ecs::Entity target) {
     auto& ecs = ecs::ECS::getInstance();
 
     auto expected = ecs.entity();
     if (!expected.isExpected()) {
         return expected;
     }
+    print("created camera with id", expected.value().id());
 
     auto camera = expected.value();
-    if (PlayerSystem::instance()->getEntities().empty()) {
-        return Error("Could not find any entities with Player tag");
-    }
-    ecs::Entity player = PlayerSystem::instance()->getEntities()[0];
-    camera.add<Camera>();
-    camera.add(Follow(player, camera));
-    camera.add(player.get<Transform>());
+    camera.add(target.get<Transform>());
+    camera.add(Follow(target, camera));
     camera.add<Velocity>();
+    camera.add<Camera>();
 
     return camera;
 }

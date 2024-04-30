@@ -4,6 +4,8 @@
 #include <optional>
 #include <vector>
 
+#include "Map/ComponentFactory.h"
+#include "Map/Level.h"
 #include "Util/Expected.h"
 #include "Util/Types.h"
 
@@ -37,7 +39,9 @@ struct TileSet {
 };
 
 struct TileMap {
-    static TileMap parse(const char* file);
+    static TileMap parse(const char* file, ActiveLevel& level);
+
+    static inline ComponentFactory componentFactory;
 
     const char* name;
     s32 widthTiles;

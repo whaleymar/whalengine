@@ -8,6 +8,6 @@ namespace ecs {
 class Entity;
 }
 
-Expected<ecs::Entity> createCamera();
+Expected<ecs::Entity> createCamera(ecs::Entity target);
 
 }  // namespace whal

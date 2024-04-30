@@ -1,0 +1,149 @@
+{
+    "automappingRulesFile": "",
+    "commands": [
+    ],
+    "compatibilityVersion": 1100,
+    "extensionsPath": "extensions",
+    "folders": [
+        "."
+    ],
+    "properties": [
+    ],
+    "propertyTypes": [
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 4,
+            "members": [
+                {
+                    "name": "move1",
+                    "propertyType": "RailsMovement",
+                    "type": "int",
+                    "value": 0
+                },
+                {
+                    "name": "move2",
+                    "propertyType": "RailsMovement",
+                    "type": "int",
+                    "value": 3
+                }
+            ],
+            "name": "CheckpointsN2",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "tile",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 6,
+            "members": [
+                {
+                    "name": "Color",
+                    "type": "color",
+                    "value": ""
+                }
+            ],
+            "name": "Component_Draw",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "tile",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 1,
+            "members": [
+                {
+                    "name": "Checkpoints",
+                    "type": "object",
+                    "value": 0
+                },
+                {
+                    "name": "isCycle",
+                    "type": "bool",
+                    "value": true
+                },
+                {
+                    "name": "speed",
+                    "type": "float",
+                    "value": 5
+                },
+                {
+                    "name": "waitTime",
+                    "type": "float",
+                    "value": 0
+                }
+            ],
+            "name": "Component_RailsControl",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "tile",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 7,
+            "members": [
+                {
+                    "name": "halflenTexelsX",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "halflenTexelsY",
+                    "type": "float",
+                    "value": 0
+                }
+            ],
+            "name": "Component_SolidCollider",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "tile",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffffaaff",
+            "drawFill": true,
+            "id": 5,
+            "members": [
+            ],
+            "name": "Entity",
+            "type": "class",
+            "useAs": [
+                "object",
+                "tile",
+                "project"
+            ]
+        },
+        {
+            "id": 2,
+            "name": "RailsMovement",
+            "storageType": "int",
+            "type": "enum",
+            "values": [
+                "LINEAR",
+                "EASEIO_BEZIER",
+                "EASEIO_SINE",
+                "EASEI_QUAD",
+                "EASEI_CUBE"
+            ],
+            "valuesAsFlags": false
+        }
+    ]
+}

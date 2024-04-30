@@ -12,8 +12,14 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     - level name and world coordinates (DONE)
     - stitching levels together (DONE) 
     - enable hot-reloading (DONE)
+    - support rotations / flips?
     - store tile material data 
     - object layers
+        - parsing (DONE)
+        - component factory (DONE)
+        - component factory functions
+        - Tiled class default arguments
+        - Templates
     - parallax
     - move tiled map(s) and tilesets into data/ directory (DONE)
 - game class (DONE)
@@ -45,6 +51,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 
 ## Physics
 - Trigger colliders
+- one way collision (should be easy, just check that move axis and sign match the member var)
 - X axis momentum is weird
     - jumping off platform gives very little x momentum 
     - moving in same direction as momentum gives too much speed AND is inconsistent -> use 2 players overlapped and i get completely different speeds
@@ -66,8 +73,11 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - Logger queue that runs on another thread
 - rework controller system to be manually called by Event
 - hot-reloading code (youtube video is bookmarked)
+- convenience methods to get bottom position of a collider component && get center from transform + yhalf
+- a lot of physics stuff (like velocity) is stored as floats even though it could be fixed precision (like nearest tenth of a texel) --> I should use ints for this?
 
 ## Bugs
+- when player dies, camera dies, which causes a crash
 - isNearZero not working
 - cppcheck issues
 - depth test broken for Draw components (low priority)

@@ -2,8 +2,10 @@
 
 #include <format>
 #include <memory>
+#include "ECS/Components/Transform.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
+#include "Map/ComponentFactory.h"
 #include "Map/Level.h"
 #include "json.hpp"
 
@@ -17,10 +19,11 @@ inline const char* MAP_DIR = "data/map";
 inline const char* TSET_SPRITE_DIR = "data/sprite/map";
 
 Expected<TileSet> parseTileset(std::string basename, s32 firstgid);
+void parseTileLayer(nlohmann::json layer, TileMap& map);
+void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level);
 
-TileMap TileMap::parse(const char* path) {
+TileMap TileMap::parse(const char* path, ActiveLevel& level) {
     // TODO
-    // - layer type (tilelayer, object)
     // - visibility?
     // - BETTER ERROR HANDLING (bad bc copy constructor removed so can't put it in expected container)
 
@@ -40,25 +43,13 @@ TileMap TileMap::parse(const char* path) {
     map.tileSize = data["tilewidth"];
 
     for (auto& layer : data["layers"]) {
-        s32 width = layer["width"];
-        s32 height = layer["height"];
-        const auto& name = layer["name"];
-        std::string tname = name;
-
-        std::vector<s32> layerData = layer["data"].get<std::vector<s32>>();
-        TileLayer tLayer = {tname, width, height, std::unique_ptr<s32[]>(new s32[width * height]())};
-        memcpy(tLayer.data.get(), layerData.data(), layerData.size() * sizeof(s32));
-
-        if (tname == "Collision") {
-            map.collisionLayer = std::move(tLayer);
-        } else if (tname == "Base") {
-            map.baseLayer = std::move(tLayer);
-        } else if (tname == "Foreground") {
-            map.foregroundLayer = std::move(tLayer);
-        } else if (tname == "Background") {
-            map.backgroundLayer = std::move(tLayer);
+        std::string type = layer["type"];
+        if (type == "tilelayer") {
+            parseTileLayer(layer, map);
+        } else if (type == "objectgroup") {
+            parseObjectLayer(layer, map, level);
         } else {
-            print("unrecognized layer name: ", tname);
+            print("unrecognized layer: ", type, "\nSkipping for now");
         }
     }
 
@@ -88,8 +79,80 @@ TileMap TileMap::parse(const char* path) {
         print("A `Name` Property wasn't found in ", path);
         map.name = "Unknown";
     }
+    level.name = map.name;
 
     return map;
+}
+
+void parseTileLayer(nlohmann::json layer, TileMap& map) {
+    s32 width = layer["width"];
+    s32 height = layer["height"];
+    const auto& name = layer["name"];
+    std::string tname = name;
+
+    std::vector<s32> layerData = layer["data"].get<std::vector<s32>>();
+    TileLayer tLayer = {tname, width, height, std::unique_ptr<s32[]>(new s32[width * height]())};
+    memcpy(tLayer.data.get(), layerData.data(), layerData.size() * sizeof(s32));
+
+    if (tname == "Collision") {
+        map.collisionLayer = std::move(tLayer);
+    } else if (tname == "Base") {
+        map.baseLayer = std::move(tLayer);
+    } else if (tname == "Foreground") {
+        map.foregroundLayer = std::move(tLayer);
+    } else if (tname == "Background") {
+        map.backgroundLayer = std::move(tLayer);
+    } else {
+        print("unrecognized layer name: ", tname);
+    }
+}
+
+void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
+    // this will create entities immediately and add them to the level
+    auto& ecs = ecs::ECS::getInstance();
+
+    using json = nlohmann::json;
+    json& objects = layer["objects"];
+    std::unordered_map<s32, s32> idToIndex;
+    for (size_t ix = 0; ix < objects.size(); ix++) {
+        s32 id = objects[ix]["id"];
+        idToIndex.insert({id, ix});
+    }
+
+    for (auto& object : objects) {
+        std::string objType = object["type"];
+        if (objType != "Entity") {
+            continue;  // TODO check for special properties like respawn point
+        }
+
+        auto eEntity = ecs.entity();
+        if (!eEntity.isExpected()) {
+            continue;
+        }
+        ecs::Entity entity = eEntity.value();
+        level.childEntities.insert(entity);
+
+        // top left
+        auto positionTexels = Vector2i(object["x"], object["y"]);
+        auto dimensionsTexels = Vector2i(object["width"], object["height"]);
+        s32 thisId = object["id"];
+
+        Transform trans = Transform::texels(positionTexels.x() + dimensionsTexels.x() * 0.5,
+                                            level.sizeTexels.y() - (positionTexels.y() - dimensionsTexels.y() * 0.5));
+        trans.position += level.worldOffsetPixels;
+        entity.add(trans);
+
+        for (auto& property : object["properties"]) {
+            std::string componentName = property["propertytype"];
+            ComponentAdder creatorFunc = nullptr;
+            map.componentFactory.getEntryIndex(componentName.c_str(), &creatorFunc);
+            if (creatorFunc == nullptr) {
+                continue;
+            }
+
+            creatorFunc(property["value"], objects, idToIndex, thisId, level, entity);
+        }
+    }
 }
 
 Expected<TileSet> parseTileset(std::string basename, s32 firstgid) {

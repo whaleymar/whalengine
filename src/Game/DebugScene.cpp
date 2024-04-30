@@ -26,10 +26,6 @@ std::optional<Error> loadTestMap() {
     if (!player.isExpected()) {
         return player.error();
     }
-    auto camera = whal::createCamera();
-    if (!camera.isExpected()) {
-        return camera.error();
-    }
     return loadMap();
 }
 

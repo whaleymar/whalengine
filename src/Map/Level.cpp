@@ -1,5 +1,4 @@
 #include "Level.h"
-// #include <chrono>
 
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
@@ -26,18 +25,16 @@ std::optional<Level> Scene::getLevelAt(Vector2f worldPosTexels) {
 }
 
 std::optional<Error> loadLevel(const Level level) {
-    TileMap map = TileMap::parse(level.filepath.c_str());
+    Vector2i worldOffsetPixels = Transform::texels(level.worldPosOriginTexels.x(), level.worldPosOriginTexels.y() - level.sizeTexels.y()).position;
+    ActiveLevel lvl = {level, "", {}, worldOffsetPixels};
+    TileMap map = TileMap::parse(level.filepath.c_str(), lvl);
     print("loaded", map.name);
-    ActiveLevel lvl = {level, map.name, {}};
-    // print("copied name: ", lvl.name);
-
-    Vector2i worldOffsetTexels = Transform::texels(lvl.worldPosOriginTexels.x(), lvl.worldPosOriginTexels.y() - lvl.sizeTexels.y()).position;
 
     std::vector<std::vector<s32>> collisionGrid;
     for (s32 x = 0; x < map.widthTiles; x++) {
         std::vector<s32> collisionColumn;
         for (s32 y = 0; y < map.heightTiles; y++) {
-            Transform trans = Transform(Transform::tiles(x, map.heightTiles - y).position + worldOffsetTexels);
+            Transform trans = Transform(Transform::tiles(x, map.heightTiles - y).position + worldOffsetPixels);
             s32 ix = map.widthTiles * y + x;
             s32 blockID = map.baseLayer.data.get()[ix];
 
@@ -175,26 +172,23 @@ void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel
     Point startPoint;
     Point endPoint;
 
-    for (size_t rowIx = 0; rowIx < collisionGrid.size(); rowIx++) {
-        for (size_t colIx = 0; colIx < collisionGrid[0].size(); colIx++) {
-            Point point = {rowIx, colIx};
+    for (size_t x = 0; x < collisionGrid.size(); x++) {
+        for (size_t y = 0; y < collisionGrid[0].size(); y++) {
+            Point point = {x, y};
             if (visited.find(point) != visited.end()) {
                 continue;
             }
             visited.insert(point);
 
-            bool isCollisionTile = collisionGrid[rowIx][colIx] > 0;
+            bool isCollisionTile = collisionGrid[x][y] > 0;
             if (isCollisionTile) {
                 if (!isStarted) {
-                    if (lvl.name != "DebugLevel") {
-                        print("starting at ", rowIx, colIx);
-                    }
                     isStarted = true;
                     startPoint = point;
                 }
                 endPoint = point;
             }
-            if (!isCollisionTile || colIx == (collisionGrid[0].size() - 1) || (rowIx == (collisionGrid.size() - 1))) {
+            if (!isCollisionTile || y == (collisionGrid[0].size() - 1) || (x == (collisionGrid.size() - 1))) {
                 if (!isStarted) {
                     continue;
                 }
@@ -203,16 +197,16 @@ void makeCollisionMesh(std::vector<std::vector<s32>>& collisionGrid, ActiveLevel
                 bool endedEarly = false;
                 Point newPoint;
 
-                for (size_t newRowIx = endPoint.first + 1; newRowIx < collisionGrid.size(); newRowIx++) {
+                for (size_t xNew = endPoint.first + 1; xNew < collisionGrid.size(); xNew++) {
                     std::vector<Point> toInsert;
-                    for (size_t newColIx = startPoint.second; newColIx <= static_cast<size_t>(endPoint.second); newColIx++) {
-                        newPoint = {newRowIx, newColIx};  // pretty sure visit check is unecessary
+                    for (size_t yNew = startPoint.second; yNew <= static_cast<size_t>(endPoint.second); yNew++) {
+                        newPoint = {xNew, yNew};  // pretty sure visit check is unecessary
                         toInsert.push_back(newPoint);
-                        if (!collisionGrid[newRowIx][newColIx]) {
+                        if (!collisionGrid[xNew][yNew]) {
                             endedEarly = true;
                             break;
                         }
-                        isDone = (newRowIx == collisionGrid.size() - 1);
+                        isDone = (xNew == collisionGrid.size() - 1);
                     }
                     if (isDone || endedEarly) {
                         if (isDone) {

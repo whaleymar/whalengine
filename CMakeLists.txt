@@ -42,7 +42,7 @@ target_compile_options(engine PRIVATE "$<$<CONFIG:DEBUG>:${-g}>")
 target_compile_options(engine PRIVATE "$<$<CONFIG:RELEASE>:${-O2}>")
 target_compile_options(engine PRIVATE -fno-rtti -fno-exceptions)
 target_compile_options(engine PRIVATE -Wall -Wextra -Wdeprecated)
-target_compile_options(engine PRIVATE -Wno-unused-parameter -Wno-unused-private-field)
+target_compile_options(engine PRIVATE -Wno-unused-parameter -Wno-unused-private-field -Wno-macro-redefined)
 target_compile_options(engine PRIVATE -fno-strict-aliasing)
 target_compile_options(engine PRIVATE -Wno-invalid-offsetof)
 

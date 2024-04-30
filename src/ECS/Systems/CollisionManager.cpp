@@ -93,11 +93,8 @@ void drawColliders() {
     auto program = GLResourceManager::getInstance().getProgram(ShaderType::Debug);
     program.useProgram();
 
-    auto cameraOpt = getCamera();
-    if (cameraOpt) {
-        auto cameraPosF = toFloatVec(cameraOpt.value().get<Transform>().position);
-        glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
-    }
+    auto cameraPosF = toFloatVec(getCameraPosition());
+    glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
 
     for (const auto& [entity, collider] : ActorsManager::getInstance()->getAllActors()) {
         drawCollider(program, collider, Color::MAGENTA);

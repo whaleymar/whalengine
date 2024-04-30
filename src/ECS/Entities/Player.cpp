@@ -9,8 +9,10 @@
 #include "ECS/Components/Tags.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
+#include "ECS/Entities/Camera.h"
 #include "ECS/Lib/ECS.h"
 #include "ECS/Systems/Physics.h"
+#include "ECS/Systems/TagTrackers.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
 
@@ -105,6 +107,10 @@ Expected<ecs::Entity> createPlayerWithSprite(Sprite sprite) {
     player.add<Velocity>();
     player.add<PlayerControlRB>();
     // player.add<PlayerControlFree>();
+
+    if (!getCamera()) {
+        createCamera(player);
+    }
 
     // graphics
     Animator animator;
