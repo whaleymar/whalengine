@@ -9,7 +9,7 @@
     "openFiles": [
     ],
     "project": "project.tiled-project",
-    "property.type": "float",
+    "property.type": "Component_RigidBody",
     "recentFiles": [
     ]
 }

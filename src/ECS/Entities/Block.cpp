@@ -5,6 +5,7 @@
 #include "ECS/Components/Transform.h"
 #include "ECS/Lib/ECS.h"
 #include "Gfx/GfxUtil.h"
+#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {

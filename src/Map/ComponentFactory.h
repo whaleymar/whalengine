@@ -6,7 +6,6 @@
 
 #include "Map/Level.h"
 #include "Util/Factory.h"
-#include "Util/Vector.h"
 
 #include "ECS/Components/RailsControl.h"
 
@@ -23,24 +22,27 @@ public:
     ComponentFactory();
 };
 
+void addComponentVelocity(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
+                          ecs::Entity entity);
 void addComponentRailsControl(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                               ActiveLevel& level, ecs::Entity entity);
-// void addComponentAnimator(nlohmann::json& data, ecs::Entity entity);
-// void addComponentActorCollider(nlohmann::json& data, ecs::Entity entity);
+void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
+                               ActiveLevel& level, ecs::Entity entity);
 void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                                ActiveLevel& level, ecs::Entity entity);
+void addComponentRigidBody(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
+                           ActiveLevel& level, ecs::Entity entity);
 void addComponentDraw(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
                       ecs::Entity entity);
-// void addComponentSprite(nlohmann::json& data, ecs::Entity entity);
+void addComponentSprite(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
+                        ecs::Entity entity);
+// void addComponentAnimator(nlohmann::json& data, ecs::Entity entity);
 // void addComponentLifetime(nlohmann::json& data, ecs::Entity entity);
 // void addComponentPlayerControlRB(nlohmann::json& data, ecs::Entity entity);
 // void addComponentPlayerControlFree(nlohmann::json& data, ecs::Entity entity);
 // void addComponentChildren(nlohmann::json& data, ecs::Entity entity);
 // void addComponentFollow(nlohmann::json& data, ecs::Entity entity);
-// void addComponentRigidBody(nlohmann::json& data, ecs::Entity entity);
 // void addComponentTags(nlohmann::json& data, ecs::Entity entity);
-// void addComponentTransform(nlohmann::json& data, ecs::Entity entity);
-// void addComponentVelocity(nlohmann::json& data, ecs::Entity entity);
 
 void loadCheckpoints(nlohmann::json& checkpointData, std::vector<RailsControl::CheckPoint>& dstCheckpoints, ActiveLevel& level);
 void loadCheckpointN2(nlohmann::json& data, std::vector<RailsControl::CheckPoint>& dstCheckpoints, ActiveLevel& level);

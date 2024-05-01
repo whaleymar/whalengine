@@ -4,6 +4,7 @@
 #include <optional>
 #include <vector>
 
+#include "ECS/Components/Transform.h"
 #include "Map/ComponentFactory.h"
 #include "Map/Level.h"
 #include "Util/Expected.h"
@@ -17,6 +18,7 @@ struct Scene;
 
 Expected<Frame> getTileFrame(const TileMap& map, s32 blockIx);
 std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene);
+Transform getTransformFromMapPosition(Vector2i mapCenterPositionTexels, Vector2i dimensionsTexels, ActiveLevel& level);
 
 struct TileLayer {
     std::string name;

@@ -137,9 +137,7 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
         auto dimensionsTexels = Vector2i(object["width"], object["height"]);
         s32 thisId = object["id"];
 
-        Transform trans = Transform::texels(positionTexels.x() + dimensionsTexels.x() * 0.5,
-                                            level.sizeTexels.y() - (positionTexels.y() - dimensionsTexels.y() * 0.5));
-        trans.position += level.worldOffsetPixels;
+        Transform trans = getTransformFromMapPosition(positionTexels, dimensionsTexels, level);
         entity.add(trans);
 
         for (auto& property : object["properties"]) {
@@ -149,9 +147,11 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
             if (creatorFunc == nullptr) {
                 continue;
             }
+            print("Creating Component:", componentName);
 
             creatorFunc(property["value"], objects, idToIndex, thisId, level, entity);
         }
+        print("");
     }
 }
 
@@ -245,6 +245,13 @@ std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene) {
     }
     // TODO get startPos
     return std::nullopt;
+}
+
+Transform getTransformFromMapPosition(Vector2i positionTexels, Vector2i dimensionsTexels, ActiveLevel& level) {
+    Transform trans = Transform::texels(positionTexels.x() + dimensionsTexels.x() * 0.5 - static_cast<s32>(TEXELS_PER_TILE) / 2,
+                                        level.sizeTexels.y() - (positionTexels.y() - dimensionsTexels.y() * 0.5));
+    trans.position += level.worldOffsetPixels;
+    return trans;
 }
 
 }  // namespace whal

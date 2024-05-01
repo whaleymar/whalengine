@@ -42,6 +42,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - Light 
 - Trigger
 - collision callback (move object, kill player, play animation, etc.)
+- name
 
 ## Entity Prefabs
 - particle

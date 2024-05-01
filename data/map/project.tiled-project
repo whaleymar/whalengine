@@ -40,6 +40,31 @@
         {
             "color": "#ffa0a0a4",
             "drawFill": true,
+            "id": 10,
+            "members": [
+                {
+                    "name": "halflenTexelsX",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "halflenTexelsY",
+                    "type": "float",
+                    "value": 0
+                }
+            ],
+            "name": "Component_ActorCollider",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "tile",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
             "id": 6,
             "members": [
                 {
@@ -95,6 +120,36 @@
         {
             "color": "#ffa0a0a4",
             "drawFill": true,
+            "id": 12,
+            "members": [
+                {
+                    "name": "coyoteTimeSecondsMax",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "jumpInitialVelocity",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "jumpSecondsMax",
+                    "type": "float",
+                    "value": 0
+                }
+            ],
+            "name": "Component_RigidBody",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "tile",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
             "id": 7,
             "members": [
                 {
@@ -109,6 +164,56 @@
                 }
             ],
             "name": "Component_SolidCollider",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "tile",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 9,
+            "members": [
+                {
+                    "name": "Color",
+                    "type": "color",
+                    "value": ""
+                },
+                {
+                    "name": "Sprite",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "Component_Sprite_NoAnim",
+            "type": "class",
+            "useAs": [
+                "property",
+                "object",
+                "tile",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 11,
+            "members": [
+                {
+                    "name": "velX",
+                    "type": "float",
+                    "value": 0
+                },
+                {
+                    "name": "velY",
+                    "type": "float",
+                    "value": 0
+                }
+            ],
+            "name": "Component_Velocity",
             "type": "class",
             "useAs": [
                 "property",

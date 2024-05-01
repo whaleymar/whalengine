@@ -8,6 +8,8 @@ struct RGB {
     f32 r = 1.0;
     f32 g = 1.0;
     f32 b = 1.0;
+
+    static RGB fromInts(s32 r, s32 g, s32 b);
 };
 
 namespace Color {
