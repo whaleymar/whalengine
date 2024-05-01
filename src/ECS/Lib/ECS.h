@@ -293,6 +293,7 @@ public:
     virtual void onRemove(const Entity){};
 
     std::unordered_map<EntityID, Entity> getEntities() const { return mEntities; }
+    Entity first() const { return mEntities.begin()->second; }
 
 private:
     // TODO storing id:entity pairs is just duplicating data. I should make this an unordered_set of Entities?

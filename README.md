@@ -78,7 +78,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - a lot of physics stuff (like velocity) is stored as floats even though it could be fixed precision (like nearest tenth of a texel) --> I should use ints for this?
 
 ## Bugs
-- when player dies, camera dies, which causes a crash
 - isNearZero not working
 - cppcheck issues
 - depth test broken for Draw components (low priority)

@@ -24,6 +24,13 @@ Expected<ecs::Entity> createCamera(ecs::Entity target) {
     camera.add<Velocity>();
     camera.add<Camera>();
 
+    // if (camera.has<Camera>()) {
+    //     print("has camera");
+    // }
+    // if (camera.has<Transform>()) {
+    //     print("has trasnform");
+    // }
+
     return camera;
 }
 

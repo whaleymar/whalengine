@@ -9,16 +9,24 @@ struct Follow;
 struct Velocity;
 struct Transform;
 
-// TODO needs onEntityDeath listener to remove child from Children.entities
-// if it dies
 class EntityChildSystem : public ecs::ISystem<Children> {
 public:
+    EntityChildSystem();
+    static std::shared_ptr<EntityChildSystem> instance() {
+        static std::shared_ptr<EntityChildSystem> instance_ = ecs::ECS::getInstance().registerSystem<EntityChildSystem>();
+        return instance_;
+    }
     void onRemove(ecs::Entity entity) override;
+
+private:
+    EventListener<ecs::Entity> mEntityDeathListener;
 };
 
 class FollowSystem : public ecs::ISystem<Follow, Velocity, Transform> {
 public:
     void update() override;
 };
+
+void removeEntityFromChildList(ecs::Entity entity);
 
 }  // namespace whal

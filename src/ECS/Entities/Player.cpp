@@ -142,6 +142,7 @@ Expected<ecs::Entity> createPlayer() {
 
 // use sprite with pre-constructed vao/vbo created on main thread
 void createPlayerAsynch(Sprite sprite) {
+    print("called createPlayerAsynch");
     Expected<ecs::Entity> player = createPlayerWithSprite(sprite);
     if (!player.isExpected()) {
         print(player.error());

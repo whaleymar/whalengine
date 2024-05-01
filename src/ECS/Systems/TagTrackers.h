@@ -1,10 +1,12 @@
 #pragma once
 
-#include "ECS/Components/Tags.h"
 #include "ECS/Lib/ECS.h"
 #include "Util/Vector.h"
 
 namespace whal {
+
+struct Player;
+struct Camera;
 
 class PlayerSystem : public ecs::ISystem<Player> {
 public:

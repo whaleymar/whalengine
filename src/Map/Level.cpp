@@ -119,7 +119,8 @@ void unloadAndRemoveLevel(ActiveLevel& level) {
 }
 
 void unloadLevel(ActiveLevel& level) {
-    for (auto entity : level.childEntities) {
+    std::set<ecs::Entity> toKill = std::move(level.childEntities);
+    for (auto entity : toKill) {
         entity.kill();
     }
     print("unloaded level:", level.name);
