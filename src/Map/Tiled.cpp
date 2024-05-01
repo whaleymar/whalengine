@@ -147,11 +147,9 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
             if (creatorFunc == nullptr) {
                 continue;
             }
-            print("Creating Component:", componentName);
 
             creatorFunc(property["value"], objects, idToIndex, thisId, level, entity);
         }
-        print("");
     }
 }
 
@@ -216,6 +214,21 @@ Expected<Frame> getTileFrame(const TileMap& map, s32 blockId) {
         {fullFrame.atlasPositionTexels.x() + colIx * tset.tileWidthTexels, fullFrame.atlasPositionTexels.y() + rowIx * tset.tileHeightTexels},
         {tset.tileWidthTexels, tset.tileHeightTexels}};
     return newFrame;
+}
+
+std::optional<Error> parseMapProject(const char* mapfile) {
+    using json = nlohmann::json;
+
+    Expected<std::string> jString = readFile(std::format("{}/{}", MAP_DIR, mapfile).c_str());
+    if (!jString.isExpected()) {
+        return jString.error();
+    }
+
+    json data = json::parse(jString.value());
+    for (auto& propType : data["propertyTypes"]) {
+        TileMap::componentFactory.makeDefaultComponent(propType);
+    }
+    return std::nullopt;
 }
 
 std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene) {

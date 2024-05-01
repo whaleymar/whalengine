@@ -21,6 +21,16 @@ void Sprite::setFrameSize(s32 frameSizeX, s32 frameSizeY) {
     isVertsUpdateNeeded = true;
 }
 
+void Sprite::setFrameSize(Vector2i frameSize) {
+    mFrameSizeTexels = frameSize;
+    isVertsUpdateNeeded = true;
+}
+
+void Sprite::setFrame(Frame frame) {
+    setFrameSize(frame.dimensionsTexels);
+    atlasPositionTexels = frame.atlasPositionTexels;
+}
+
 void Sprite::setColor(RGB rgb) {
     color = rgb;
     isVertsUpdateNeeded = true;
@@ -57,6 +67,11 @@ void Draw::setFrameSize(s32 frameSizeX, s32 frameSizeY) {
     updateVertices();
 }
 
+void Draw::setFrameSize(Vector2i frameSize) {
+    mFrameSizeTexels = frameSize;
+    updateVertices();
+}
+
 void Draw::updateVertices() {
     const f32 width = getPixelSize(mFrameSizeTexels.x(), 1.0);
     const f32 height = getPixelSize(mFrameSizeTexels.y(), 1.0);
@@ -66,6 +81,7 @@ void Draw::updateVertices() {
 
 void Draw::setColor(RGB rgb) {
     color = rgb;
+    updateVertices();
 }
 
 }  // namespace whal

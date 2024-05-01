@@ -18,7 +18,10 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
         - parsing (DONE)
         - component factory (DONE)
         - component factory functions
-        - Tiled class default arguments
+        - Tiled class default arguments (DONE)
+        - special metadata
+            - spawn points
+            - camera strat
         - Templates
     - parallax
     - move tiled map(s) and tilesets into data/ directory (DONE)

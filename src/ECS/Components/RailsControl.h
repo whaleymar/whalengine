@@ -36,6 +36,7 @@ public:
     bool isVelocityUpdateNeeded = false;
     u64 curTarget = 0;
 
+    void setCheckpoints(std::vector<CheckPoint>& checkpoints);
     CheckPoint getTarget() const;
     void startManually();
     void step();

@@ -17,6 +17,7 @@ struct TileMap;
 struct Scene;
 
 Expected<Frame> getTileFrame(const TileMap& map, s32 blockIx);
+std::optional<Error> parseMapProject(const char* projectfile);
 std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene);
 Transform getTransformFromMapPosition(Vector2i mapCenterPositionTexels, Vector2i dimensionsTexels, ActiveLevel& level);
 

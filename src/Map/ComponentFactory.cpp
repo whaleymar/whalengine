@@ -41,19 +41,122 @@ ComponentFactory::ComponentFactory() : Factory<ComponentAdder>("ComponentFactory
     initFactory(S_COMPONENT_ENTRIES);
 }
 
+void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
+    // who cares
+
+    std::string componentName = property["name"];
+    ComponentAdder creatorFunc = nullptr;
+    if (getEntryIndex(componentName.c_str(), &creatorFunc) == -1) {
+        return;
+    }
+
+    if (componentName == "Component_RailsControl") {
+        for (auto& member : property["members"]) {
+            std::string memberName = member["name"];
+            if (memberName == "isCycle") {
+                DefaultRailsControl.isCycle = member["value"];
+            } else if (memberName == "speed") {
+                DefaultRailsControl.speed = member["value"];
+            } else if (memberName == "waitTime") {
+                DefaultRailsControl.waitTime = member["value"];
+            } else {
+                print("Skipping member ", memberName, "for", componentName);
+            }
+        }
+
+    } else if (componentName == "Component_ActorCollider") {
+        Vector2i half;
+        for (auto& member : property["member"]) {
+            std::string memberName = member["name"];
+            if (memberName == "halflenTexelsX") {
+                half.e[0] = member["value"];
+            } else if (memberName == "halflenTexelsY") {
+                half.e[1] = member["value"];
+            } else {
+                print("Skipping member ", memberName, "for", componentName);
+            }
+        }
+        half = Transform::texels(half.x(), half.y()).position;
+        DefaultActorCollider.getCollider().setHalflen(half);
+
+    } else if (componentName == "Component_SolidCollider") {
+        Vector2i half;
+        for (auto& member : property["member"]) {
+            std::string memberName = member["name"];
+            if (memberName == "halflenTexelsX") {
+                half.e[0] = member["value"];
+            } else if (memberName == "halflenTexelsY") {
+                half.e[1] = member["value"];
+            } else {
+                print("Skipping member ", memberName, "for", componentName);
+            }
+        }
+        half = Transform::texels(half.x(), half.y()).position;
+        DefaultSolidCollider.getCollider().setHalflen(half);
+
+    } else if (componentName == "Component_Draw") {
+        for (auto& member : property["member"]) {
+            std::string memberName = member["name"];
+            if (memberName == "Color") {
+                std::string hexString = member["value"];
+                DefaultDraw.setColor(RGB::fromHexStringARGB(hexString));
+            } else {
+                print("Skipping member ", memberName, "for", componentName);
+            }
+        }
+    } else if (componentName == "Component_Sprite_NoAnim") {
+        for (auto& member : property["member"]) {
+            std::string memberName = member["name"];
+            if (memberName == "Color") {
+                std::string hexString = member["value"];
+                DefaultSprite.setColor(RGB::fromHexStringARGB(hexString));
+            } else if (memberName == "Sprite") {
+                // do nothing
+            } else {
+                print("Skipping member ", memberName, "for", componentName);
+            }
+        }
+    } else if (componentName == "Component_RigidBody") {
+        for (auto& member : property["member"]) {
+            std::string memberName = member["name"];
+            if (memberName == "coyoteTimeSecondsMax") {
+                DefaultRigidBody.coyoteTimeSecondsMax = member["value"];
+            } else if (memberName == "jumpInitialVelocity") {
+                DefaultRigidBody.jumpInitialVelocity = member["value"];
+            } else if (memberName == "jumpSecondsMax") {
+                DefaultRigidBody.jumpSecondsMax = member["value"];
+            } else {
+                print("Skipping member ", memberName, "for", componentName);
+            }
+        }
+    } else if (componentName == "Component_Velocity") {
+        for (auto& member : property["member"]) {
+            std::string memberName = member["name"];
+            if (memberName == "velX") {
+                DefaultVelocity.stable.e[0] = member["value"];
+            } else if (memberName == "velY") {
+                DefaultVelocity.stable.e[1] = member["value"];
+            } else {
+                print("Skipping member ", memberName, "for", componentName);
+            }
+        }
+    } else {
+        print("unhandled default component type: ", componentName);
+    }
+}
+
 void addComponentVelocity(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
                           ecs::Entity entity) {
-    f32 velx = 0;
-    f32 vely = 0;
+    Velocity velocity = ComponentFactory::DefaultVelocity;
 
     if (values.contains("velX")) {
-        velx = values["velX"];
+        velocity.stable.e[0] = values["velX"];
     }
     if (values.contains("velY")) {
-        vely = values["velY"];
+        velocity.stable.e[1] = values["velY"];
     }
 
-    entity.add(Velocity({velx, vely}));
+    entity.add(velocity);
 }
 
 void addComponentRailsControl(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
@@ -65,24 +168,20 @@ void addComponentRailsControl(nlohmann::json& values, nlohmann::json& allObjects
         loadCheckpoints(checkPointObj, checkpoints, level);
     }
 
-    // TODO get default values from project file
-    bool isCycle = true;
-    f32 speed = 5;
-    f32 waitTime = 0;
+    RailsControl rails = ComponentFactory::DefaultRailsControl;
+    rails.setCheckpoints(checkpoints);
 
     if (values.contains("isCycle")) {
-        isCycle = values["isCycle"];
+        rails.isCycle = values["isCycle"];
     }
-
     if (values.contains("speed")) {
-        speed = values["speed"];
+        rails.speed = values["speed"];
     }
-
     if (values.contains("waitTime")) {
-        waitTime = values["waitTime"];
+        rails.waitTime = values["waitTime"];
     }
 
-    entity.add(RailsControl(speed, checkpoints, waitTime, isCycle));
+    entity.add(rails);
 }
 
 void addComponentDraw(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
@@ -90,107 +189,103 @@ void addComponentDraw(nlohmann::json& values, nlohmann::json& allObjects, std::u
     s32 ix = idToIndex[thisId];
     Vector2i frameSizeTexels = {allObjects[ix]["width"], allObjects[ix]["height"]};
 
-    // ARGB TODO default values
-    std::string hexcode = "#ffffffff";
-    if (values.contains("Color")) {
-        hexcode = values["Color"];
-    }
-    s32 r, g, b;
-    hexcode = hexcode.erase(0, 3);  // remove "#" and alpha
-    std::istringstream(hexcode.substr(0, 2)) >> std::hex >> r;
-    std::istringstream(hexcode.substr(2, 2)) >> std::hex >> g;
-    std::istringstream(hexcode.substr(4, 2)) >> std::hex >> b;
-
     // TODO parse depth
-    entity.add(Draw(RGB::fromInts(r, g, b), frameSizeTexels, Depth::Player));
+    Draw draw = ComponentFactory::DefaultDraw;
+    draw.setFrameSize(frameSizeTexels);
+
+    // ARGB
+    if (values.contains("Color")) {
+        std::string hexcode = "#ffffffff";
+        hexcode = values["Color"];
+        RGB color = RGB::fromHexStringARGB(hexcode);
+        draw.setColor(color);
+    }
+
+    entity.add(draw);
 }
 
 void addComponentSprite(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
                         ecs::Entity entity) {
-    // ARGB TODO default values
-    std::string hexcode = "#ffffffff";
-    if (values.contains("Color")) {
-        hexcode = values["Color"];
-    }
-    s32 r, g, b;
-    hexcode = hexcode.erase(0, 3);  // remove "#" and alpha
-    std::istringstream(hexcode.substr(0, 2)) >> std::hex >> r;
-    std::istringstream(hexcode.substr(2, 2)) >> std::hex >> g;
-    std::istringstream(hexcode.substr(4, 2)) >> std::hex >> b;
+    Sprite sprite = ComponentFactory::DefaultSprite;
 
-    // TODO parse depth
+    // ARGB
+    if (values.contains("Color")) {
+        std::string hexcode = "#ffffffff";
+        hexcode = values["Color"];
+        RGB color = RGB::fromHexStringARGB(hexcode);
+        sprite.setColor(color);
+    }
+
     std::string spritePath = "";
     if (values.contains("Sprite")) {
         spritePath = values["Sprite"];
-        print(spritePath);
         std::replace(spritePath.begin(), spritePath.end(), '\\', '/');
     }
     auto frameOpt = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame(spritePath.c_str());
     if (frameOpt) {
-        Sprite sprite = Sprite(Depth::Player, frameOpt.value(), RGB::fromInts(r, g, b));
+        // TODO parse depth
+        sprite.setFrame(frameOpt.value());
         entity.add(sprite);
     } else {
         print("Coudn't find frame for sprite:", spritePath);
         // add draw instead
         s32 ix = idToIndex[thisId];
         Vector2i frameSizeTexels = {allObjects[ix]["width"], allObjects[ix]["height"]};
-        entity.add(Draw(RGB::fromInts(r, g, b), frameSizeTexels, Depth::Player));
+        Draw draw = ComponentFactory::DefaultDraw;
+        draw.setFrameSize(frameSizeTexels);
+        entity.add(draw);
     }
 }
 
 void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                                ActiveLevel& level, ecs::Entity entity) {
-    // TODO default values
-    s32 halflenTexelsX = 0;
-    s32 halflenTexelsY = 0;
+    SolidCollider solid = ComponentFactory::DefaultSolidCollider;
+    Vector2i halflenTexels = solid.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
 
     if (values.contains("halflenTexelsX")) {
-        halflenTexelsX = values["halflenTexelsX"];
+        halflenTexels.e[0] = values["halflenTexelsX"];
     }
     if (values.contains("halflenTexelsY")) {
-        halflenTexelsY = values["halflenTexelsY"];
+        halflenTexels.e[1] = values["halflenTexelsY"];
     }
 
-    Vector2i half = Transform::texels(halflenTexelsX, halflenTexelsY).position;
+    Vector2i half = Transform::texels(halflenTexels.x(), halflenTexels.y()).position;
     Vector2i center = entity.get<Transform>().position + Vector2i(0, half.y());
     entity.add(SolidCollider(toFloatVec(center), half));
 }
 
 void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                                ActiveLevel& level, ecs::Entity entity) {
-    // TODO default values
-    s32 halflenTexelsX = 0;
-    s32 halflenTexelsY = 0;
+    ActorCollider actor = ComponentFactory::DefaultActorCollider;
+    Vector2i halflenTexels = actor.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
 
     if (values.contains("halflenTexelsX")) {
-        halflenTexelsX = values["halflenTexelsX"];
+        halflenTexels.e[0] = values["halflenTexelsX"];
     }
     if (values.contains("halflenTexelsY")) {
-        halflenTexelsY = values["halflenTexelsY"];
+        halflenTexels.e[1] = values["halflenTexelsY"];
     }
 
-    Vector2i half = Transform::texels(halflenTexelsX, halflenTexelsY).position;
+    Vector2i half = Transform::texels(halflenTexels.x(), halflenTexels.y()).position;
     Vector2i center = entity.get<Transform>().position + Vector2i(0, half.y());
     entity.add(ActorCollider(toFloatVec(center), half));
 }
 
 void addComponentRigidBody(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                            ActiveLevel& level, ecs::Entity entity) {
-    f32 jumpInitialVelocity = 15.5;
-    f32 jumpSecondsMax = 1.25;
-    f32 coyoteTimeSecondsMax = 0.1;
+    RigidBody rb = ComponentFactory::DefaultRigidBody;
 
     if (values.contains("jumpInitialVelocity")) {
-        jumpInitialVelocity = values["jumpInitialVelocity"];
+        rb.jumpInitialVelocity = values["jumpInitialVelocity"];
     }
     if (values.contains("jumpSecondsMax")) {
-        jumpSecondsMax = values["jumpSecondsMax"];
+        rb.jumpSecondsMax = values["jumpSecondsMax"];
     }
     if (values.contains("coyoteTimeSecondsMax")) {
-        coyoteTimeSecondsMax = values["coyoteTimeSecondsMax"];
+        rb.coyoteTimeSecondsMax = values["coyoteTimeSecondsMax"];
     }
 
-    entity.add(RigidBody(jumpInitialVelocity, jumpSecondsMax, coyoteTimeSecondsMax));
+    entity.add(rb);
 }
 
 // Tiled doesn't support array properties so I have to do some BS

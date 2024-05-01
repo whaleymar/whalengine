@@ -32,7 +32,9 @@ struct Sprite : public IDraw {
 
     VertArrayRectRGBUV getVertices() const { return mVertices; }
     void updateVertices(bool flipX = false);
+    void setFrame(Frame frame);
     void setFrameSize(s32 x, s32 y);
+    void setFrameSize(Vector2i frameSize);
     void setColor(RGB rgb);
 
 private:
@@ -45,6 +47,7 @@ struct Draw : public IDraw {
     VertArrayRectRGB getVertices() const { return mVertices; }
     void updateVertices();
     void setFrameSize(s32 x, s32 y);
+    void setFrameSize(Vector2i frameSize);
     void setColor(RGB rgb);
 
 private:

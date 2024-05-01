@@ -24,6 +24,10 @@ void AABB::setPositionFromBottom(Vector2i bottom) {
     center = {bottom.x(), bottom.y() + half.y()};
 }
 
+void AABB::setHalflen(Vector2i half_) {
+    half = half_;
+}
+
 const std::optional<HitInfo> AABB::collide(AABB other) const {
     const auto delta = other.center - center;
     const auto overlap = half + other.half;

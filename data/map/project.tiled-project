@@ -44,12 +44,12 @@
             "members": [
                 {
                     "name": "halflenTexelsX",
-                    "type": "float",
+                    "type": "int",
                     "value": 0
                 },
                 {
                     "name": "halflenTexelsY",
-                    "type": "float",
+                    "type": "int",
                     "value": 0
                 }
             ],
@@ -70,7 +70,7 @@
                 {
                     "name": "Color",
                     "type": "color",
-                    "value": ""
+                    "value": "#ffffffff"
                 }
             ],
             "name": "Component_Draw",
@@ -154,12 +154,12 @@
             "members": [
                 {
                     "name": "halflenTexelsX",
-                    "type": "float",
+                    "type": "int",
                     "value": 0
                 },
                 {
                     "name": "halflenTexelsY",
-                    "type": "float",
+                    "type": "int",
                     "value": 0
                 }
             ],
@@ -180,7 +180,7 @@
                 {
                     "name": "Color",
                     "type": "color",
-                    "value": ""
+                    "value": "#ffffffff"
                 },
                 {
                     "name": "Sprite",

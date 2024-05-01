@@ -35,6 +35,7 @@
 #include "Systems/System.h"
 
 constexpr f32 MAX_LOAD_DISTANCE_TEXELS = WINDOW_WIDTH_TEXELS * 3;
+static const char* TILED_PROJECT_FILE = "project.tiled-project";
 
 Game::Game() : mEntityDeathListener(EventListener<ecs::Entity>(&removeEntityFromLevel)) {
     System::eventMgr.registerListener(Event::DEATH_EVENT, mEntityDeathListener);
@@ -74,6 +75,12 @@ bool Game::startup() {
     err = createAndRegisterTexture(SPRITE_TEXTURE_PATH, TEXNAME_SPRITE);
     if (err) {
         print("Failed to register", TEXNAME_SPRITE, "texture. Got error:\n", *err);
+        return true;
+    }
+
+    err = parseMapProject(TILED_PROJECT_FILE);
+    if (err) {
+        print("Failed to parse map project file. Got error:\n", *err);
         return true;
     }
 

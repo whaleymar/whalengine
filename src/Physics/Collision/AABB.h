@@ -27,6 +27,7 @@ struct AABB {
     void setPosition(Vector2i position);
     void setPosition(Vector2f position);
     void setPositionFromBottom(Vector2i position);
+    void setHalflen(Vector2i half);
     const std::optional<HitInfo> collide(AABB other) const;
     const std::optional<HitInfo> collide(Segment segment) const;
     bool isOverlapping(AABB other) const;

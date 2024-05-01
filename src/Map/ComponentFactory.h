@@ -2,6 +2,10 @@
 
 #include <unordered_map>
 
+#include "ECS/Components/Collision.h"
+#include "ECS/Components/Draw.h"
+#include "ECS/Components/RigidBody.h"
+#include "ECS/Components/Velocity.h"
 #include "json_fwd.hpp"
 
 #include "Map/Level.h"
@@ -20,6 +24,16 @@ using ComponentAdder = void (*)(nlohmann::json&, nlohmann::json&, std::unordered
 class ComponentFactory : public Factory<ComponentAdder> {
 public:
     ComponentFactory();
+
+    void makeDefaultComponent(nlohmann::json property);
+
+    inline static Velocity DefaultVelocity;
+    inline static RailsControl DefaultRailsControl;
+    inline static ActorCollider DefaultActorCollider;
+    inline static SolidCollider DefaultSolidCollider;
+    inline static RigidBody DefaultRigidBody;
+    inline static Draw DefaultDraw;
+    inline static Sprite DefaultSprite;
 };
 
 void addComponentVelocity(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
