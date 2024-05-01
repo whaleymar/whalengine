@@ -41,7 +41,7 @@ f32 RailsControl::getSpeed(Vector2i currentPosition, f32 inv_dt) {
     const Vector2f targetPosf = toFloatVec(getTarget().position);
 
     const f32 segmentDistance = (targetPosf - startPosition).len();
-    const f32 expectedSegmentTime = segmentDistance / (speed * static_cast<f32>(TILE_LEN_PIXELS));  // speed is in tiles/sec, but pos is in pixels
+    const f32 expectedSegmentTime = segmentDistance / (speed * static_cast<f32>(PIXELS_PER_TILE));  // speed is in tiles/sec, but pos is in pixels
 
     f32 progress;
     switch (getTarget().movement) {

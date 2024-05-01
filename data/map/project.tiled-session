@@ -1,17 +1,28 @@
 {
     "activeFile": "testmap.tmj",
     "expandedProjectPaths": [
-        "templates",
-        "."
+        ".",
+        "templates"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "testmap.tmj": {
+            "expandedObjectLayers": [
+                6
+            ],
+            "scale": 3.1023437499999997,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 321.69226894988674,
+                "y": 96.86225132208514
+            }
+        },
+        "testmap2.tmj": {
             "scale": 3.1023437499999997,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 142.31176026189877,
-                "y": 107.82170737849407
+                "x": 162.94132460337448,
+                "y": 110.078065978343
             }
         },
         "tile-collision.tsj": {
@@ -22,12 +33,18 @@
         }
     },
     "last.objectTemplatePath": "/home/whaley/code/unnamed-engine/data/map",
+    "last.worldFilePath": "/home/whaley/code/unnamed-engine/data/map",
+    "loadedWorlds": [
+        "/home/whaley/code/unnamed-engine/data/map/testworld.world"
+    ],
     "openFiles": [
-        "testmap.tmj"
+        "testmap.tmj",
+        "testmap2.tmj"
     ],
     "project": "project.tiled-project",
-    "property.type": "int",
+    "property.type": "Component_Follow",
     "recentFiles": [
+        "testmap2.tmj",
         "testmap.tmj"
     ]
 }

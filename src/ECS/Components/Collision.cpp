@@ -14,7 +14,6 @@
 namespace whal {
 
 constexpr s32 MOMENTUM_LIFETIME_FRAMES = 10;
-constexpr s32 SPIXELS_PER_TEXEL = static_cast<s32>(PIXELS_PER_TEXEL);
 constexpr s32 CORNERCORRECTIONWIGGLE = 4 * SPIXELS_PER_TEXEL;
 
 ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(AABB(half)) {

@@ -32,16 +32,19 @@ inline constexpr u32 PIXELS_PER_TEXEL = 2;
 // constexpr u32 PIXELS_PER_TEXEL = 6;
 
 // for convenience:
+inline constexpr s32 SWINDOW_WIDTH_PIXELS = static_cast<s32>(WINDOW_WIDTH_PIXELS);
+inline constexpr s32 SPIXELS_PER_TEXEL = static_cast<s32>(PIXELS_PER_TEXEL);
 inline constexpr f32 FPIXELS_PER_TEXEL = static_cast<f32>(PIXELS_PER_TEXEL);
 inline constexpr f32 TEXELS_PER_TILE = 8;
 inline constexpr f32 TEXELS_PER_PIXEL = 1 / FPIXELS_PER_TEXEL;
+inline constexpr s32 PIXELS_PER_TILE = PIXELS_PER_TEXEL * TEXELS_PER_TILE;
+inline constexpr f32 FPIXELS_PER_TILE = static_cast<f32>(PIXELS_PER_TILE);
+inline constexpr f32 TILES_PER_PIXEL = 1 / FPIXELS_PER_TILE;
 
 // these convert world coordinates to screen coordinates, corrected for aspect ratio
 inline constexpr f32 WORLD_SCALE_RATIO = TEXELS_PER_TILE / 10.0;  // don't change this. no i don't know how i calculated it
 inline constexpr f32 TEXEL_SCALE_X = 1.0 / (16.0 / WORLD_SCALE_RATIO);
 inline constexpr f32 TEXEL_SCALE_Y = 1.0 / (9.0 / WORLD_SCALE_RATIO);
-
-inline constexpr s32 TILE_LEN_PIXELS = PIXELS_PER_TEXEL * TEXELS_PER_TILE;
 
 inline constexpr f32 WINDOW_WIDTH_TEXELS = WINDOW_WIDTH_PIXELS / PIXELS_PER_TEXEL;
 inline constexpr f32 WINDOW_HEIGHT_TEXELS = WINDOW_HEIGHT_PIXELS / PIXELS_PER_TEXEL;

@@ -108,7 +108,7 @@ void parseTileLayer(nlohmann::json layer, TileMap& map) {
 }
 
 void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
-    // this will create entities immediately and add them to the level
+    // this will create entities and immediately add them to the level
     auto& ecs = ecs::ECS::getInstance();
 
     using json = nlohmann::json;

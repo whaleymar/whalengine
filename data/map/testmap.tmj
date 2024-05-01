@@ -1,4 +1,5 @@
-{ "compressionlevel":-1,
+{ "class":"Meta_CameraParams",
+ "compressionlevel":-1,
  "height":24,
  "infinite":false,
  "layers":[
@@ -260,7 +261,7 @@
                  "type":"Entity",
                  "visible":true,
                  "width":8,
-                 "x":136,
+                 "x":168,
                  "y":104
                 }, 
                 {

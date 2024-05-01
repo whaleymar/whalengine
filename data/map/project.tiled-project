@@ -85,6 +85,51 @@
         {
             "color": "#ffa0a0a4",
             "drawFill": true,
+            "id": 16,
+            "members": [
+                {
+                    "name": "dampingX",
+                    "type": "float",
+                    "value": 1
+                },
+                {
+                    "name": "dampingY",
+                    "type": "float",
+                    "value": 1
+                },
+                {
+                    "name": "deadZoneX",
+                    "type": "int",
+                    "value": 96
+                },
+                {
+                    "name": "deadZoneY",
+                    "type": "int",
+                    "value": 96
+                },
+                {
+                    "name": "lookAheadX",
+                    "type": "int",
+                    "value": 48
+                },
+                {
+                    "name": "lookAheadY",
+                    "type": "int",
+                    "value": 16
+                }
+            ],
+            "name": "Component_Follow",
+            "type": "class",
+            "useAs": [
+                "property",
+                "map",
+                "object",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
             "id": 1,
             "members": [
                 {
@@ -233,6 +278,70 @@
             "useAs": [
                 "object",
                 "tile",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 15,
+            "members": [
+                {
+                    "name": "CameraFollowParams",
+                    "propertyType": "Component_Follow",
+                    "type": "class",
+                    "value": {
+                    }
+                }
+            ],
+            "name": "Meta_CameraParams",
+            "type": "class",
+            "useAs": [
+                "property",
+                "map",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 14,
+            "members": [
+                {
+                    "name": "CameraFocusPoint",
+                    "type": "object",
+                    "value": 0
+                }
+            ],
+            "name": "Meta_FixedCamera",
+            "type": "class",
+            "useAs": [
+                "property",
+                "map",
+                "project"
+            ]
+        },
+        {
+            "color": "#ffa0a0a4",
+            "drawFill": true,
+            "id": 13,
+            "members": [
+                {
+                    "name": "x",
+                    "type": "int",
+                    "value": 0
+                },
+                {
+                    "name": "y",
+                    "type": "int",
+                    "value": 0
+                }
+            ],
+            "name": "Meta_SpawnPoint",
+            "type": "class",
+            "useAs": [
+                "property",
+                "map",
                 "project"
             ]
         },

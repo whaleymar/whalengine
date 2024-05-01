@@ -73,6 +73,8 @@ struct Vector2 {
         T divisor = 1 / len();
         return Vector2<T>(e[0] * divisor, e[1] * divisor);
     }
+
+    inline Vector2<T> absolute() const { return Vector2<T>(abs(e[0]), abs(e[1])); }
 };
 
 template <typename T>
