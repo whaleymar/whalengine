@@ -122,6 +122,50 @@
                  "y":112
                 }, 
                 {
+                 "gid":4,
+                 "height":8,
+                 "id":19,
+                 "name":"TestPlatform",
+                 "properties":[
+                        {
+                         "name":"Collider",
+                         "propertytype":"Component_SolidCollider",
+                         "type":"class",
+                         "value":
+                            {
+                             "halflenTexelsX":12,
+                             "halflenTexelsY":4
+                            }
+                        }, 
+                        {
+                         "name":"Draw",
+                         "propertytype":"Component_Draw",
+                         "type":"class",
+                         "value":
+                            {
+                             "Color":"#ffff3264"
+                            }
+                        }, 
+                        {
+                         "name":"RailsControl",
+                         "propertytype":"Component_RailsControl",
+                         "type":"class",
+                         "value":
+                            {
+                             "Checkpoints":18,
+                             "isCycle":true,
+                             "speed":5,
+                             "waitTime":1
+                            }
+                        }],
+                 "rotation":0,
+                 "type":"Entity",
+                 "visible":true,
+                 "width":24,
+                 "x":96,
+                 "y":48
+                }, 
+                {
                  "height":0,
                  "id":9,
                  "name":"TestCheckpoints",
@@ -152,6 +196,39 @@
                  "visible":true,
                  "width":0,
                  "x":156,
+                 "y":108
+                }, 
+                {
+                 "height":0,
+                 "id":18,
+                 "name":"TestCheckpoints2",
+                 "polyline":[
+                        {
+                         "x":-88,
+                         "y":-64
+                        }, 
+                        {
+                         "x":0,
+                         "y":-64
+                        }],
+                 "properties":[
+                        {
+                         "name":"move1",
+                         "propertytype":"RailsMovement",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"move2",
+                         "propertytype":"RailsMovement",
+                         "type":"int",
+                         "value":0
+                        }],
+                 "rotation":0,
+                 "type":"CheckpointsN2",
+                 "visible":true,
+                 "width":0,
+                 "x":108,
                  "y":108
                 }, 
                 {
@@ -278,7 +355,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":18,
+ "nextobjectid":20,
  "orientation":"orthogonal",
  "properties":[
         {

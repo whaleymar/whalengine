@@ -260,7 +260,10 @@ std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene) {
     return std::nullopt;
 }
 
+// convert top-left coordinate to bottom-middle
 Transform getTransformFromMapPosition(Vector2i positionTexels, Vector2i dimensionsTexels, ActiveLevel& level) {
+    // add half a tile of height to each point, since they describe the center of an object, but Transform describes the bottom
+    positionTexels.e[1] -= static_cast<s32>(TEXELS_PER_TILE) / 2;
     Transform trans = Transform::texels(positionTexels.x() + dimensionsTexels.x() * 0.5 - static_cast<s32>(TEXELS_PER_TILE) / 2,
                                         level.sizeTexels.y() - (positionTexels.y() - dimensionsTexels.y() * 0.5));
     trans.position += level.worldOffsetPixels;

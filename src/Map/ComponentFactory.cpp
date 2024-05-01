@@ -307,12 +307,10 @@ void loadCheckpointN2(nlohmann::json& checkpointData, std::vector<RailsControl::
     s32 parentY = checkpointData["y"];
 
     s32 i = 0;
-    // add half a tile of height to each point, since they describe the center of a tile, and RailsControl expects transform coordinates (at bottom of
-    // tile)
     for (auto& point : checkpointData["polyline"]) {
         s32 x = point["x"];
         s32 y = point["y"];
-        Vector2i mapPos = {x + parentX, parentY + y - static_cast<s32>(TEXELS_PER_TILE) / 2};
+        Vector2i mapPos = {x + parentX, parentY + y};
         if (i == 0) {
             point1.position = getTransformFromMapPosition(mapPos, {0, 0}, level).position;
         } else {
