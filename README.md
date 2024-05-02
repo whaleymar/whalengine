@@ -32,8 +32,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 
 ## Camera / Follow
 - different movement types (easein/out stuff)
-- min distance before moving (per axis)
-- bake camera strategy into level
+- be affected by momentum
 
 ## Systems
 - lighting\*
@@ -42,17 +41,17 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     2. makes music quieter
     3. pauses all sfx (minus one channel used in pause menu)
     4. creates simple text gui : {Resume, Restart, Quit} -- each of these send their own events
+    - maybe just do bitmap font with instanced letters?
 
 ## Components
 - Light 
 - Trigger
 - collision callback (move object, kill player, play animation, etc.)
-- name
 
 ## Entity Prefabs
 - particle
     - draw(?), position, velocity, lifetime
-    - instead of draw, could do custom component & instance it
+    - instead of draw, could do custom component & *instance* it
 - death plane
 
 ## Physics

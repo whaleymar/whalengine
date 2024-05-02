@@ -74,7 +74,7 @@ TileMap TileMap::parse(const char* path, ActiveLevel& level) {
             map.name = mapName.c_str();
             isNameFound = true;
         } else if (propName == "CameraFollowParams") {
-            level.cameraFollow = loadFollowComponent(property["value"]);
+            level.cameraFollow = loadFollowComponent(property["value"], level);
         }
     }
     if (!isNameFound) {
@@ -131,7 +131,7 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
                 cameraPoint.e[0] = object["x"];
                 cameraPoint.e[1] = object["y"];
                 level.cameraFocalPoint = getTransformFromMapPosition(cameraPoint, {0, 0}, level).position;
-                print("loaded camerapoint with pos", cameraPoint, "-->", level.cameraFocalPoint);
+                // print("loaded camerapoint with pos", cameraPoint, "-->", level.cameraFocalPoint);
             }
             continue;
         }

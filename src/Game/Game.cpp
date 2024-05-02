@@ -233,7 +233,11 @@ void Game::unloadScene() {
 }
 
 std::optional<Error> Game::reloadScene() {
-    return loadScene(mActiveScene.name.c_str());
+    auto errOpt = loadScene(mActiveScene.name.c_str());
+    if (!errOpt) {
+        updateLevelCamera(true);
+    }
+    return errOpt;
 }
 
 Scene& Game::getScene() {
@@ -260,7 +264,7 @@ void Game::updateLoadedLevels(Vector2f cameraWorldPosPixels) {
     }
 }
 
-void Game::updateLevelCamera() {
+void Game::updateLevelCamera(bool overrideCache) {
     if (PlayerSystem::instance()->getEntities().empty() || !mIsSceneLoaded || CameraSystem::instance()->getEntities().empty()) {
         return;
     }
@@ -277,7 +281,7 @@ void Game::updateLevelCamera() {
         doDefaultCamera = true;
     } else {
         curLevel = levelOpt.value().filepath;
-        if (curLevel == lastLevel) {
+        if (!overrideCache && curLevel == lastLevel) {
             return;
         }
         print("not skipping");
@@ -299,7 +303,7 @@ void Game::updateLevelCamera() {
             } else {
                 Vector2i focalPoint = activeOpt.value()->cameraFocalPoint;
                 if (camera.has<Follow>()) {
-                    camera.remove<Follow>();  // TODO double check that this removes camera from child list OR make sure dupes are ok
+                    camera.remove<Follow>();
                 }
                 camera.set(Transform(focalPoint));  // TODO rails control
                 return;
@@ -308,7 +312,7 @@ void Game::updateLevelCamera() {
     }
     if (doDefaultCamera) {
         curLevel = "default";
-        if (curLevel == lastLevel) {
+        if (!overrideCache && curLevel == lastLevel) {
             return;
         }
         lastLevel = curLevel;

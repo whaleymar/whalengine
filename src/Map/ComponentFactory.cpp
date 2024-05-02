@@ -20,6 +20,10 @@
 
 namespace whal {
 
+static const char* KEY_MEMBERS = "members";
+static const char* KEY_NAME = "name";
+static const char* KEY_VALUE = "value";
+
 static NameToCreator<ComponentAdder> S_COMPONENT_ENTRIES[] = {
     {"Component_RailsControl", addComponentRailsControl},
     // {"Animator", addComponentAnimator},
@@ -44,21 +48,21 @@ ComponentFactory::ComponentFactory() : Factory<ComponentAdder>("ComponentFactory
 void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
     // who cares
 
-    std::string componentName = property["name"];
+    std::string componentName = property[KEY_NAME];
     ComponentAdder creatorFunc = nullptr;
     if (getEntryIndex(componentName.c_str(), &creatorFunc) == -1) {
         return;
     }
 
     if (componentName == "Component_RailsControl") {
-        for (auto& member : property["members"]) {
-            std::string memberName = member["name"];
+        for (auto& member : property[KEY_MEMBERS]) {
+            std::string memberName = member[KEY_NAME];
             if (memberName == "isCycle") {
-                DefaultRailsControl.isCycle = member["value"];
+                DefaultRailsControl.isCycle = member[KEY_VALUE];
             } else if (memberName == "speed") {
-                DefaultRailsControl.speed = member["value"];
+                DefaultRailsControl.speed = member[KEY_VALUE];
             } else if (memberName == "waitTime") {
-                DefaultRailsControl.waitTime = member["value"];
+                DefaultRailsControl.waitTime = member[KEY_VALUE];
             } else {
                 print("Skipping member ", memberName, "for", componentName);
             }
@@ -66,12 +70,12 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
 
     } else if (componentName == "Component_ActorCollider") {
         Vector2i half;
-        for (auto& member : property["member"]) {
-            std::string memberName = member["name"];
+        for (auto& member : property[KEY_MEMBERS]) {
+            std::string memberName = member[KEY_NAME];
             if (memberName == "halflenTexelsX") {
-                half.e[0] = member["value"];
+                half.e[0] = member[KEY_VALUE];
             } else if (memberName == "halflenTexelsY") {
-                half.e[1] = member["value"];
+                half.e[1] = member[KEY_VALUE];
             } else {
                 print("Skipping member ", memberName, "for", componentName);
             }
@@ -81,12 +85,12 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
 
     } else if (componentName == "Component_SolidCollider") {
         Vector2i half;
-        for (auto& member : property["member"]) {
-            std::string memberName = member["name"];
+        for (auto& member : property[KEY_MEMBERS]) {
+            std::string memberName = member[KEY_NAME];
             if (memberName == "halflenTexelsX") {
-                half.e[0] = member["value"];
+                half.e[0] = member[KEY_VALUE];
             } else if (memberName == "halflenTexelsY") {
-                half.e[1] = member["value"];
+                half.e[1] = member[KEY_VALUE];
             } else {
                 print("Skipping member ", memberName, "for", componentName);
             }
@@ -95,20 +99,20 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
         DefaultSolidCollider.getCollider().setHalflen(half);
 
     } else if (componentName == "Component_Draw") {
-        for (auto& member : property["member"]) {
-            std::string memberName = member["name"];
+        for (auto& member : property[KEY_MEMBERS]) {
+            std::string memberName = member[KEY_NAME];
             if (memberName == "Color") {
-                std::string hexString = member["value"];
+                std::string hexString = member[KEY_VALUE];
                 DefaultDraw.setColor(RGB::fromHexStringARGB(hexString));
             } else {
                 print("Skipping member ", memberName, "for", componentName);
             }
         }
     } else if (componentName == "Component_Sprite_NoAnim") {
-        for (auto& member : property["member"]) {
-            std::string memberName = member["name"];
+        for (auto& member : property[KEY_MEMBERS]) {
+            std::string memberName = member[KEY_NAME];
             if (memberName == "Color") {
-                std::string hexString = member["value"];
+                std::string hexString = member[KEY_VALUE];
                 DefaultSprite.setColor(RGB::fromHexStringARGB(hexString));
             } else if (memberName == "Sprite") {
                 // do nothing
@@ -117,47 +121,50 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
             }
         }
     } else if (componentName == "Component_RigidBody") {
-        for (auto& member : property["member"]) {
-            std::string memberName = member["name"];
+        for (auto& member : property[KEY_MEMBERS]) {
+            std::string memberName = member[KEY_NAME];
             if (memberName == "coyoteTimeSecondsMax") {
-                DefaultRigidBody.coyoteTimeSecondsMax = member["value"];
+                DefaultRigidBody.coyoteTimeSecondsMax = member[KEY_VALUE];
             } else if (memberName == "jumpInitialVelocity") {
-                DefaultRigidBody.jumpInitialVelocity = member["value"];
+                DefaultRigidBody.jumpInitialVelocity = member[KEY_VALUE];
             } else if (memberName == "jumpSecondsMax") {
-                DefaultRigidBody.jumpSecondsMax = member["value"];
+                DefaultRigidBody.jumpSecondsMax = member[KEY_VALUE];
             } else {
                 print("Skipping member ", memberName, "for", componentName);
             }
         }
     } else if (componentName == "Component_Velocity") {
-        for (auto& member : property["member"]) {
-            std::string memberName = member["name"];
+        for (auto& member : property[KEY_MEMBERS]) {
+            std::string memberName = member[KEY_NAME];
             if (memberName == "velX") {
-                DefaultVelocity.stable.e[0] = member["value"];
+                DefaultVelocity.stable.e[0] = member[KEY_VALUE];
             } else if (memberName == "velY") {
-                DefaultVelocity.stable.e[1] = member["value"];
+                DefaultVelocity.stable.e[1] = member[KEY_VALUE];
             } else {
                 print("Skipping member ", memberName, "for", componentName);
             }
         }
     } else if (componentName == "Component_Follow") {
-        // TODO not handling boundaries
-        for (auto& member : property["member"]) {
-            std::string memberName = member["name"];
+        for (auto& member : property[KEY_MEMBERS]) {
+            std::string memberName = member[KEY_NAME];
             if (memberName == "lookAheadX") {
-                DefaultFollow.lookAheadTexels.e[0] = member["value"];
+                DefaultFollow.lookAheadTexels.e[0] = member[KEY_VALUE];
             } else if (memberName == "lookAheadY") {
-                DefaultFollow.lookAheadTexels.e[1] = member["value"];
+                DefaultFollow.lookAheadTexels.e[1] = member[KEY_VALUE];
             } else if (memberName == "deadZoneX") {
-                DefaultFollow.deadZoneTexels.e[0] = member["value"];
+                DefaultFollow.deadZoneTexels.e[0] = member[KEY_VALUE];
             } else if (memberName == "deadZoneY") {
-                DefaultFollow.deadZoneTexels.e[1] = member["value"];
+                DefaultFollow.deadZoneTexels.e[1] = member[KEY_VALUE];
             } else if (memberName == "dampingX") {
-                DefaultFollow.damping.e[0] = member["value"];
+                DefaultFollow.damping.e[0] = member[KEY_VALUE];
             } else if (memberName == "dampingY") {
-                DefaultFollow.damping.e[1] = member["value"];
+                DefaultFollow.damping.e[1] = member[KEY_VALUE];
             } else if (memberName == "FollowTarget") {
                 // do nothing
+            } else if (memberName == "boundsHalflenX") {
+                DefaultFollow.boundsXTexels = Vector2i(member[KEY_VALUE], member[KEY_VALUE]);
+            } else if (memberName == "boundsHalflenY") {
+                DefaultFollow.boundsYTexels = Vector2i(member[KEY_VALUE], member[KEY_VALUE]);
             } else {
                 print("Skipping member ", memberName, "for", componentName);
             }
@@ -295,7 +302,7 @@ void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObject
 
 void addComponentFollow(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
                         ecs::Entity entity) {
-    entity.add(loadFollowComponent(values));
+    entity.add(loadFollowComponent(values, level));
 }
 
 void addComponentRigidBody(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
@@ -315,7 +322,7 @@ void addComponentRigidBody(nlohmann::json& values, nlohmann::json& allObjects, s
     entity.add(rb);
 }
 
-Follow loadFollowComponent(nlohmann::json& values) {
+Follow loadFollowComponent(nlohmann::json& values, ActiveLevel& level) {
     Follow follow = ComponentFactory::DefaultFollow;
     if (values.contains("FollowTarget")) {
         // TODO compare to entities with Name component and follow first one which matches
@@ -340,6 +347,18 @@ Follow loadFollowComponent(nlohmann::json& values) {
     if (values.contains("lookAheadY")) {
         follow.lookAheadTexels.e[1] = values["lookAheadY"];
     }
+    if (values.contains("boundsHalflenX")) {
+        follow.boundsXTexels = Vector2i(values["boundsHalflenX"], values["boundsHalflenX"]);
+    }
+    if (values.contains("boundsHalflenY")) {
+        follow.boundsYTexels = Vector2i(values["boundsHalflenY"], values["boundsHalflenY"]);
+    }
+
+    // convert bounds from local half length to world coords
+    Vector2i levelPosTexels = Vector2i(level.worldOffsetPixels.x() / SPIXELS_PER_TEXEL, level.worldOffsetPixels.y() / SPIXELS_PER_TEXEL) +
+                              Vector2i(level.sizeTexels.x() / 2, level.sizeTexels.y() / 2);
+    follow.boundsXTexels = {levelPosTexels.x() - follow.boundsXTexels.x(), levelPosTexels.x() + follow.boundsXTexels.x()};
+    follow.boundsYTexels = {levelPosTexels.y() - follow.boundsYTexels.y(), levelPosTexels.y() + follow.boundsYTexels.y()};
     return follow;
 }
 
@@ -375,12 +394,12 @@ void loadCheckpointN2(nlohmann::json& checkpointData, std::vector<RailsControl::
     }
 
     for (auto& moveProperty : checkpointData["properties"]) {
-        std::string name = moveProperty["name"];
+        std::string name = moveProperty[KEY_NAME];
         if (name == "move1") {
-            s32 moveIx = moveProperty["value"];
+            s32 moveIx = moveProperty[KEY_VALUE];
             point1.movement = static_cast<RailsControl::Movement>(moveIx);
         } else if (name == "move2") {
-            s32 moveIx = moveProperty["value"];
+            s32 moveIx = moveProperty[KEY_VALUE];
             point2.movement = static_cast<RailsControl::Movement>(moveIx);
         }
     }

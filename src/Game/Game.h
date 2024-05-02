@@ -25,7 +25,7 @@ public:
     std::optional<Error> reloadScene();
     Scene& getScene();
     void updateLoadedLevels(Vector2f cameraWorldPosPixels);
-    void updateLevelCamera();
+    void updateLevelCamera(bool overrideCache = false);
 
 private:
     Game();

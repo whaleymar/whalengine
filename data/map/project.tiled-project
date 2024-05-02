@@ -107,6 +107,16 @@
                     "value": ""
                 },
                 {
+                    "name": "boundsHalflenX",
+                    "type": "int",
+                    "value": 10
+                },
+                {
+                    "name": "boundsHalflenY",
+                    "type": "int",
+                    "value": 1
+                },
+                {
                     "name": "dampingX",
                     "type": "float",
                     "value": 1

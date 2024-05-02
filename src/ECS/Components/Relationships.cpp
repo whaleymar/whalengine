@@ -4,7 +4,6 @@
 #include "ECS/Components/Name.h"
 #include "ECS/Components/Transform.h"
 #include "Gfx/Color.h"
-#include "Util/Print.h"
 
 namespace whal {
 
@@ -12,11 +11,6 @@ Follow::Follow(ecs::Entity target_) : targetEntity(target_) {}
 
 void Follow::initTarget(ecs::Entity self) {
     isTargetInitialized = true;
-    if (!targetEntity.has<Children>()) {
-        targetEntity.add<Children>();
-    }
-    targetEntity.get<Children>().add(self);
-
     currentTarget = targetEntity.get<Transform>().position;
 
     // this is kind of hacky. Definitely shouldn't be adding children dynamically like this for game logic
@@ -47,17 +41,17 @@ void Follow::initTarget(ecs::Entity self) {
 
 void Children::add(ecs::Entity entity) {
     if (std::find(entities.begin(), entities.end(), entity) != entities.end()) {
-        print("skipping duplicate add");
-        if (entity.has<Name>()) {
-            print("\tduplicate was", entity.get<Name>());
-        }
+        // print("skipping duplicate add");
+        // if (entity.has<Name>()) {
+        //     print("\tduplicate was", entity.get<Name>());
+        // }
         return;
     }
-    if (entity.has<Name>()) {
-        print("adding", entity.get<Name>(), "to child list");
-    }
+    // if (entity.has<Name>()) {
+    //     print("adding", entity.get<Name>(), "to child list");
+    // }
     entities.push_back(entity);
-    print("num children: ", entities.size());
+    // print("num children: ", entities.size());
 }
 
 }  // namespace whal

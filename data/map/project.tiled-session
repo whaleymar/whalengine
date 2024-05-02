@@ -11,10 +11,10 @@
                 6
             ],
             "scale": 3.1023437499999997,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 159.87912364643668,
-                "y": 95.89524049357844
+                "x": 165.52002014605893,
+                "y": 92.34953412238733
             }
         },
         "testmap2.tmj": {
@@ -22,10 +22,10 @@
                 4
             ],
             "scale": 3.1023437499999997,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 159.87912364643665,
-                "y": 95.89524049357844
+                "x": -154.2382271468144,
+                "y": 92.67187106522289
             }
         },
         "tile-collision.tsj": {
@@ -45,7 +45,7 @@
         "testmap2.tmj"
     ],
     "project": "project.tiled-project",
-    "property.type": "object",
+    "property.type": "int",
     "recentFiles": [
         "testmap2.tmj",
         "testmap.tmj"
