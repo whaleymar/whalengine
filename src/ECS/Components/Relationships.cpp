@@ -6,12 +6,17 @@
 
 namespace whal {
 
-Follow::Follow(ecs::Entity target_, ecs::Entity self) : targetEntity(target_), currentTarget(target_.get<Transform>().position) {
+Follow::Follow(ecs::Entity target_) : targetEntity(target_), currentTarget(target_.get<Transform>().position) {}
+
+void Follow::initTarget(ecs::Entity self) {
+    isTargetInitialized = true;
     if (targetEntity.has<Children>()) {
         targetEntity.get<Children>().entities.push_back(self);
     } else {
         targetEntity.add(Children({self}));
     }
+
+#ifndef NDEBUG
     auto eOpt = ecs::ECS::getInstance().entity();
     if (eOpt.isExpected()) {
         debugTargetTracker = eOpt.value();
@@ -27,6 +32,7 @@ Follow::Follow(ecs::Entity target_, ecs::Entity self) : targetEntity(target_), c
         debugPositionTracker.add(Draw(Color::MAGENTA));
         targetEntity.get<Children>().entities.push_back(debugPositionTracker);
     }
+#endif
 }
 
 }  // namespace whal

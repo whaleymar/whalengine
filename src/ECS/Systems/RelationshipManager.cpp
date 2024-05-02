@@ -26,6 +26,9 @@ void FollowSystem::update() {
     for (auto [entityid, entity] : getEntities()) {
         Transform trans = entity.get<Transform>();
         auto& follow = entity.get<Follow>();
+        if (!follow.isTargetInitialized) {
+            follow.initTarget(entity);
+        }
         Transform targetTrans = follow.targetEntity.get<Transform>();
 
         // consider target speed if it has the component and adjust lookahead to be smaller for low speeds
@@ -95,7 +98,7 @@ void FollowSystem::update() {
         vel.stable *= {2, 2};
 
         // don't go too slow
-        f32 minspeed = 1.91;
+        f32 minspeed = 1.91;  // min speed for rounding to not zero at 60fps
         if (vel.stable.x() > 0 && vel.stable.x() < minspeed) {
             vel.stable.e[0] = minspeed;
         } else if (vel.stable.x() < 0 && vel.stable.x() > -minspeed) {

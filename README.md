@@ -28,6 +28,8 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - game class (DONE)
 - moving camera (DONE)
 
+- #cleanup stuff
+
 ## Camera / Follow
 - different movement types (easein/out stuff)
 - min distance before moving (per axis)
@@ -56,11 +58,13 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 ## Physics
 - Trigger colliders
 - one way collision (should be easy, just check that move axis and sign match the member var)
+- moving platforms are jittery
 - X axis momentum is weird
     - jumping off platform gives very little x momentum 
     - moving in same direction as momentum gives too much speed AND is inconsistent -> use 2 players overlapped and i get completely different speeds
     - moving in opposite direction as momentum completely negates it 
     - trying to walk off platform in same direction it's moving is buggy
+- fixed updates at 60fps so rounding doesn't fuck me
 
 ## Non-ECS Systems
 - chunk loading/unloading (quad tree?)
@@ -78,9 +82,11 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - rework controller system to be manually called by Event
 - hot-reloading code (youtube video is bookmarked)
 - convenience methods to get bottom position of a collider component && get center from transform + yhalf
-- a lot of physics stuff (like velocity) is stored as floats even though it could be fixed precision (like nearest tenth of a texel) --> I should use ints for this?
+- a lot of physics stuff (like velocity) is stored as floats even though it could be fixed precision (like nearest tenth of a texel) --> I should use ints for this? #CLEANUP
+- velocity is in TILES per second which is a huge footgun #CLEANUP
 
 ## Bugs
+- something wrong with red moving platform in test level 1
 - isNearZero not working
 - cppcheck issues
 - depth test broken for Draw components (low priority)

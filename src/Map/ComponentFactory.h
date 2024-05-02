@@ -4,6 +4,7 @@
 
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
+#include "ECS/Components/Relationships.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Velocity.h"
 #include "json_fwd.hpp"
@@ -34,6 +35,7 @@ public:
     inline static RigidBody DefaultRigidBody;
     inline static Draw DefaultDraw;
     inline static Sprite DefaultSprite;
+    inline static Follow DefaultFollow;
 };
 
 void addComponentVelocity(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
@@ -55,9 +57,11 @@ void addComponentSprite(nlohmann::json& values, nlohmann::json& allObjects, std:
 // void addComponentPlayerControlRB(nlohmann::json& data, ecs::Entity entity);
 // void addComponentPlayerControlFree(nlohmann::json& data, ecs::Entity entity);
 // void addComponentChildren(nlohmann::json& data, ecs::Entity entity);
-// void addComponentFollow(nlohmann::json& data, ecs::Entity entity);
+void addComponentFollow(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
+                        ecs::Entity entity);
 // void addComponentTags(nlohmann::json& data, ecs::Entity entity);
 
+Follow loadFollowComponent(nlohmann::json& values);
 void loadCheckpoints(nlohmann::json& checkpointData, std::vector<RailsControl::CheckPoint>& dstCheckpoints, ActiveLevel& level);
 void loadCheckpointN2(nlohmann::json& data, std::vector<RailsControl::CheckPoint>& dstCheckpoints, ActiveLevel& level);
 
