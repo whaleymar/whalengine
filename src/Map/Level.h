@@ -35,6 +35,7 @@ struct Scene {
     Vector2f startPos;
 
     std::optional<Level> getLevelAt(Vector2f worldPosTexels);
+    Expected<ActiveLevel*> getLoadedLevel(Level level);
 };
 
 std::optional<Error> loadLevel(const Level level);

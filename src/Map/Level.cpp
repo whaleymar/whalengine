@@ -24,6 +24,23 @@ std::optional<Level> Scene::getLevelAt(Vector2f worldPosTexels) {
     return std::nullopt;
 }
 
+Expected<ActiveLevel*> Scene::getLoadedLevel(Level level) {
+    for (auto& active : loadedLevels) {
+        if (active == level) {
+            return &active;
+        }
+    }
+
+    // load it
+    auto errOpt = loadLevel(level);
+    if (errOpt) {
+        return errOpt.value();
+    }
+    ActiveLevel* result = &loadedLevels[-1];
+    assert(result->filepath == level.filepath && "Last active level doesn't match passed arg");
+    return result;
+}
+
 std::optional<Error> loadLevel(const Level level) {
     Vector2i worldOffsetPixels = Transform::texels(level.worldPosOriginTexels.x(), level.worldPosOriginTexels.y() - level.sizeTexels.y()).position;
     ActiveLevel lvl = {level, "", {}, worldOffsetPixels, std::nullopt, {}};

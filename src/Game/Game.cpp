@@ -33,6 +33,7 @@
 
 #include "Systems/Audio.h"
 #include "Systems/System.h"
+#include "Util/Vector.h"
 
 constexpr f32 MAX_LOAD_DISTANCE_TEXELS = WINDOW_WIDTH_TEXELS * 3;
 static const char* TILED_PROJECT_FILE = "project.tiled-project";
@@ -146,6 +147,7 @@ void Game::mainloop() {
         if (System::frame.getFrame() == 0) {
             Vector2f cameraPos = toFloatVec(getCameraPosition());
             updateLoadedLevels(cameraPos);
+            // print(cameraPos);
         }
 
         // randomFallingTile(1);
@@ -165,6 +167,9 @@ void Game::mainloop() {
             actorsMgr->update();
             solidsMgr->update();
         }
+
+        // Update Scene
+        updateLevelCamera();
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -251,6 +256,68 @@ void Game::updateLoadedLevels(Vector2f cameraWorldPosPixels) {
             }
         } else if (!shouldLoad && isLevelLoaded) {
             unloadAndRemoveLevel(*it);
+        }
+    }
+}
+
+void Game::updateLevelCamera() {
+    if (PlayerSystem::instance()->getEntities().empty() || !mIsSceneLoaded || CameraSystem::instance()->getEntities().empty()) {
+        return;
+    }
+    static std::string lastLevel = "default";
+    std::string curLevel;
+    ecs::Entity player = PlayerSystem::instance()->first();
+    ecs::Entity camera = CameraSystem::instance()->first();
+    Vector2f playerPosTexels = toFloatVec(player.get<Transform>().position) * TEXELS_PER_PIXEL;
+    auto levelOpt = mActiveScene.getLevelAt(playerPosTexels);
+
+    bool doDefaultCamera = false;
+    if (!levelOpt) {
+        // print("Not within any level boundaries");
+        doDefaultCamera = true;
+    } else {
+        curLevel = levelOpt.value().filepath;
+        if (curLevel == lastLevel) {
+            return;
+        }
+        print("not skipping");
+        lastLevel = curLevel;
+        Expected<ActiveLevel*> activeOpt = mActiveScene.getLoadedLevel(levelOpt.value());
+        if (!activeOpt.isExpected()) {
+            print("Couldn't load level. Got error:", activeOpt.error());
+            doDefaultCamera = true;
+        } else {
+            if (activeOpt.value()->cameraFollow) {
+                Follow follow = activeOpt.value()->cameraFollow.value();
+                follow.targetEntity = player;
+                follow.isTargetInitialized = false;
+                if (camera.has<Follow>()) {
+                    camera.set(follow);
+                } else {
+                    camera.add(follow);
+                }
+                return;
+            } else {
+                Vector2i focalPoint = activeOpt.value()->cameraFocalPoint;
+                if (camera.has<Follow>()) {
+                    camera.remove<Follow>();  // TODO double check that this removes camera from child list OR make sure dupes are ok
+                }
+                camera.set(Transform(focalPoint));  // TODO rails control
+                return;
+            }
+        }
+    }
+    if (doDefaultCamera) {
+        curLevel = "default";
+        if (curLevel == lastLevel) {
+            return;
+        }
+        lastLevel = curLevel;
+        Follow follow = Follow(player);
+        if (camera.has<Follow>()) {
+            camera.set(follow);
+        } else {
+            camera.add(follow);
         }
     }
 }
