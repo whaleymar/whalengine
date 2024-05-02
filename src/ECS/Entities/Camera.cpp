@@ -1,5 +1,6 @@
 #include "Camera.h"
 
+#include "ECS/Components/Name.h"
 #include "ECS/Components/Relationships.h"
 #include "ECS/Components/Tags.h"
 #include "ECS/Components/Transform.h"
@@ -20,6 +21,7 @@ Expected<ecs::Entity> createCamera(ecs::Entity target) {
     camera.add(target.get<Transform>());
     camera.add(Follow(target));
     camera.add<Velocity>();
+    camera.add(Name("Camera"));
     camera.add<Camera>();
 
     return camera;

@@ -2,6 +2,7 @@
 
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
+#include "ECS/Components/Name.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Entities/Block.h"
 #include "Game/Game.h"
@@ -144,6 +145,9 @@ void unloadLevel(ActiveLevel& level) {
 }
 
 void removeEntityFromLevel(ecs::Entity entity) {
+    if (entity.has<Name>()) {
+        print("killing entity", entity.get<Name>());
+    }
     Scene& scene = Game::instance().getScene();
     for (auto& lvl : scene.loadedLevels) {
         if (lvl.childEntities.erase(entity)) {

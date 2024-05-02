@@ -4,6 +4,7 @@
 #include "ECS/Components/Animator.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
+#include "ECS/Components/Name.h"
 #include "ECS/Components/PlayerControl.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Tags.h"
@@ -103,6 +104,7 @@ Expected<ecs::Entity> createPlayerWithSprite(Sprite sprite) {
     auto player = expected.value();
     Transform transform = Transform::tiles(15, 10);
     player.add(transform);
+    player.add(Name("Player"));
     player.add<Player>();
     player.add<Velocity>();
     player.add<PlayerControlRB>();

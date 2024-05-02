@@ -25,6 +25,7 @@ private:
 class FollowSystem : public ecs::ISystem<Follow, Velocity, Transform> {
 public:
     void update() override;
+    void onRemove(ecs::Entity entity) override;
 };
 
 void removeEntityFromChildList(ecs::Entity entity);
