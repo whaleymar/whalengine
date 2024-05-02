@@ -2,6 +2,7 @@
 
 #include <format>
 #include <memory>
+#include "ECS/Components/Name.h"
 #include "ECS/Components/Transform.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
@@ -141,6 +142,11 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
             continue;
         }
         ecs::Entity entity = eEntity.value();
+        std::string name = object["name"];
+        if (name.size()) {
+            entity.add(Name(name.c_str()));
+            print("Created Entity: ", name);
+        }
         level.childEntities.insert(entity);
 
         // top left
