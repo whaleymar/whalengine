@@ -1,5 +1,5 @@
 {
-    "activeFile": "testmap.tmj",
+    "activeFile": "testmap2.tmj",
     "expandedProjectPaths": [
         ".",
         "templates"
@@ -11,18 +11,21 @@
                 6
             ],
             "scale": 3.1023437499999997,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 321.69226894988674,
-                "y": 96.86225132208514
+                "x": 457.5572903550743,
+                "y": 94.28355577940067
             }
         },
         "testmap2.tmj": {
+            "expandedObjectLayers": [
+                4
+            ],
             "scale": 3.1023437499999997,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 162.94132460337448,
-                "y": 110.078065978343
+                "x": 137.47670611936542,
+                "y": 93.96121883656508
             }
         },
         "tile-collision.tsj": {
@@ -42,9 +45,9 @@
         "testmap2.tmj"
     ],
     "project": "project.tiled-project",
-    "property.type": "Component_Follow",
+    "property.type": "object",
     "recentFiles": [
-        "testmap2.tmj",
-        "testmap.tmj"
+        "testmap.tmj",
+        "testmap2.tmj"
     ]
 }

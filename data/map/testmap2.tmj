@@ -84,7 +84,7 @@
                  "name":"CameraFocus",
                  "point":true,
                  "rotation":0,
-                 "type":"",
+                 "type":"CameraPoint",
                  "visible":true,
                  "width":0,
                  "x":160,
@@ -135,11 +135,6 @@
  "nextobjectid":2,
  "orientation":"orthogonal",
  "properties":[
-        {
-         "name":"CameraFocusPoint",
-         "type":"object",
-         "value":1
-        }, 
         {
          "name":"Name",
          "type":"string",

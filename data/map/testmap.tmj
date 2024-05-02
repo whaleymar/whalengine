@@ -360,6 +360,16 @@
  "orientation":"orthogonal",
  "properties":[
         {
+         "name":"CameraFollowParams",
+         "propertytype":"Component_Follow",
+         "type":"class",
+         "value":
+            {
+             "FollowTarget":"Player",
+             "deadZoneX":100
+            }
+        }, 
+        {
          "name":"Name",
          "type":"string",
          "value":"DebugLevel"
