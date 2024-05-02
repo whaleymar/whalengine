@@ -2,6 +2,7 @@
 
 #include <set>
 
+#include "ECS/Components/Relationships.h"
 #include "ECS/Lib/ECS.h"
 #include "Util/Vector.h"
 
@@ -22,6 +23,9 @@ struct ActiveLevel : public Level {
     std::string name;
     std::set<ecs::Entity> childEntities;
     Vector2i worldOffsetPixels;
+
+    std::optional<Follow> cameraFollow;
+    Vector2i cameraFocalPoint;
 };
 
 struct Scene {

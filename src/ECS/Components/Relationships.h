@@ -9,7 +9,9 @@ namespace whal {
 // in general, dead zone should be bigger than lookahead
 struct Follow {
     Follow() = default;
-    Follow(ecs::Entity target, ecs::Entity self);
+    Follow(ecs::Entity target);
+
+    void initTarget(ecs::Entity self);
 
     ecs::Entity targetEntity;
 
@@ -21,6 +23,7 @@ struct Follow {
     Vector2f damping = {1.0, 1.0};            // damping factor
     bool isMovingX = false;
     bool isMovingY = false;
+    bool isTargetInitialized = false;
 
     ecs::Entity debugTargetTracker;
     ecs::Entity debugPositionTracker;

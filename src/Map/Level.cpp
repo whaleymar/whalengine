@@ -26,7 +26,7 @@ std::optional<Level> Scene::getLevelAt(Vector2f worldPosTexels) {
 
 std::optional<Error> loadLevel(const Level level) {
     Vector2i worldOffsetPixels = Transform::texels(level.worldPosOriginTexels.x(), level.worldPosOriginTexels.y() - level.sizeTexels.y()).position;
-    ActiveLevel lvl = {level, "", {}, worldOffsetPixels};
+    ActiveLevel lvl = {level, "", {}, worldOffsetPixels, std::nullopt, {}};
     TileMap map = TileMap::parse(level.filepath.c_str(), lvl);
     print("loaded", map.name);
 

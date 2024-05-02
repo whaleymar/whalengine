@@ -1,7 +1,7 @@
 #include "ComponentFactory.h"
 
-#include <sstream>
 #include "ECS/Components/RigidBody.h"
+#include "ECS/Systems/TagTrackers.h"
 #include "json.hpp"
 
 #include "Gfx/GLResourceManager.h"
@@ -31,7 +31,7 @@ static NameToCreator<ComponentAdder> S_COMPONENT_ENTRIES[] = {
     // {"PlayerControlRB", addComponentPlayerControlRB},
     // {"PlayerControlFree", addComponentPlayerControlFree},
     // {"Children", addComponentChildren},
-    // {"Follow", addComponentFollow},
+    {"Component_Follow", addComponentFollow},
     {"Component_RigidBody", addComponentRigidBody},
     // {"Tags", addComponentTags},
     {"Component_Velocity", addComponentVelocity},
@@ -136,6 +136,28 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
                 DefaultVelocity.stable.e[0] = member["value"];
             } else if (memberName == "velY") {
                 DefaultVelocity.stable.e[1] = member["value"];
+            } else {
+                print("Skipping member ", memberName, "for", componentName);
+            }
+        }
+    } else if (componentName == "Component_Follow") {
+        // TODO not handling boundaries
+        for (auto& member : property["member"]) {
+            std::string memberName = member["name"];
+            if (memberName == "lookAheadX") {
+                DefaultFollow.lookAheadTexels.e[0] = member["value"];
+            } else if (memberName == "lookAheadY") {
+                DefaultFollow.lookAheadTexels.e[1] = member["value"];
+            } else if (memberName == "deadZoneX") {
+                DefaultFollow.deadZoneTexels.e[0] = member["value"];
+            } else if (memberName == "deadZoneY") {
+                DefaultFollow.deadZoneTexels.e[1] = member["value"];
+            } else if (memberName == "dampingX") {
+                DefaultFollow.damping.e[0] = member["value"];
+            } else if (memberName == "dampingY") {
+                DefaultFollow.damping.e[1] = member["value"];
+            } else if (memberName == "FollowTarget") {
+                // do nothing
             } else {
                 print("Skipping member ", memberName, "for", componentName);
             }
@@ -271,6 +293,11 @@ void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObject
     entity.add(ActorCollider(toFloatVec(center), half));
 }
 
+void addComponentFollow(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
+                        ecs::Entity entity) {
+    entity.add(loadFollowComponent(values));
+}
+
 void addComponentRigidBody(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                            ActiveLevel& level, ecs::Entity entity) {
     RigidBody rb = ComponentFactory::DefaultRigidBody;
@@ -286,6 +313,34 @@ void addComponentRigidBody(nlohmann::json& values, nlohmann::json& allObjects, s
     }
 
     entity.add(rb);
+}
+
+Follow loadFollowComponent(nlohmann::json& values) {
+    Follow follow = ComponentFactory::DefaultFollow;
+    if (values.contains("FollowTarget")) {
+        // TODO compare to entities with Name component and follow first one which matches
+        // std::string followTargetName = values["FollowTarget"];
+        follow.targetEntity = PlayerSystem::instance()->first();
+    }
+    if (values.contains("dampingX")) {
+        follow.damping.e[0] = values["dampingX"];
+    }
+    if (values.contains("dampingY")) {
+        follow.damping.e[1] = values["dampingY"];
+    }
+    if (values.contains("deadZoneX")) {
+        follow.deadZoneTexels.e[0] = values["deadZoneX"];
+    }
+    if (values.contains("deadZoneY")) {
+        follow.deadZoneTexels.e[1] = values["deadZoneY"];
+    }
+    if (values.contains("lookAheadX")) {
+        follow.lookAheadTexels.e[0] = values["lookAheadX"];
+    }
+    if (values.contains("lookAheadY")) {
+        follow.lookAheadTexels.e[1] = values["lookAheadY"];
+    }
+    return follow;
 }
 
 // Tiled doesn't support array properties so I have to do some BS
