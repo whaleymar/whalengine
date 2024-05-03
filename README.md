@@ -85,7 +85,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - velocity is in TILES per second which is a huge footgun #CLEANUP
 
 ## Bugs
-- something wrong with red moving platform in test level 1
 - isNearZero not working
 - cppcheck issues
 - depth test broken for Draw components (low priority)

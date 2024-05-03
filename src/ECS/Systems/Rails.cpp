@@ -1,7 +1,6 @@
 #include "Rails.h"
 
 #include "ECS/Components/Collision.h"
-#include "ECS/Components/Name.h"
 #include "ECS/Components/RailsControl.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
@@ -24,13 +23,6 @@ void RailsSystem::update() {
             continue;
         }
         auto& transform = entity.get<Transform>();
-        print("RAILS DATA");
-        if (entity.has<Name>()) {
-            print("name:", entity.get<Name>());
-        }
-        print("position", transform.position);
-        print("target", rails.getTarget().position);
-        print("-----------------------------------------------");
 
         const Vector2f delta = toFloatVec(rails.getTarget().position - transform.position);
         f32 distance = delta.len();
@@ -55,8 +47,16 @@ void RailsSystem::update() {
 
                     rails.isVelocityUpdateNeeded = true;
                     rails.curActionTime = 0;
-                    entity.add<Velocity>(
-                        Velocity(toFloatVec(rails.getTarget().position - transform.position).norm() * rails.getSpeed(transform.position, inv_dt)));
+
+                    Vector2i newDelta = rails.getTarget().position - transform.position;
+                    // prevent divide by zero
+                    if (newDelta.x() == 0 && newDelta.y() == 0) {
+                        entity.add<Velocity>();
+                    } else {
+                        Velocity velToAdd = Velocity(toFloatVec(newDelta).norm() * rails.getSpeed(transform.position, inv_dt));
+                        entity.add<Velocity>(velToAdd);
+                    }
+
                 } else {
                     rails.curActionTime += dt;
                 }
