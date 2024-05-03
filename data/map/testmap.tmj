@@ -120,13 +120,13 @@
                  "visible":true,
                  "width":24,
                  "x":144,
-                 "y":112
+                 "y":104
                 }, 
                 {
                  "gid":4,
                  "height":8,
                  "id":19,
-                 "name":"TestPlatform",
+                 "name":"TestPlatformRED",
                  "properties":[
                         {
                          "name":"Collider",
@@ -164,7 +164,7 @@
                  "visible":true,
                  "width":24,
                  "x":96,
-                 "y":48
+                 "y":40
                 }, 
                 {
                  "height":0,
@@ -235,7 +235,7 @@
                 {
                  "height":8,
                  "id":16,
-                 "name":"SpriteSolidTest",
+                 "name":"Obj1",
                  "properties":[
                         {
                          "name":"Collider",
@@ -261,8 +261,8 @@
                  "type":"Entity",
                  "visible":true,
                  "width":8,
-                 "x":40,
-                 "y":112
+                 "x":136,
+                 "y":104
                 }, 
                 {
                  "height":8,
@@ -313,6 +313,38 @@
                  "width":8,
                  "x":160,
                  "y":82
+                }, 
+                {
+                 "gid":2,
+                 "height":8,
+                 "id":25,
+                 "name":"Obj2",
+                 "properties":[
+                        {
+                         "name":"Collider",
+                         "propertytype":"Component_SolidCollider",
+                         "type":"class",
+                         "value":
+                            {
+                             "halflenTexelsX":4,
+                             "halflenTexelsY":4
+                            }
+                        }, 
+                        {
+                         "name":"Sprite",
+                         "propertytype":"Component_Sprite_NoAnim",
+                         "type":"class",
+                         "value":
+                            {
+                             "Sprite":"tile\/purpledirt"
+                            }
+                        }],
+                 "rotation":0,
+                 "type":"Entity",
+                 "visible":true,
+                 "width":8,
+                 "x":128,
+                 "y":104
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -356,7 +388,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":20,
+ "nextobjectid":26,
  "orientation":"orthogonal",
  "properties":[
         {

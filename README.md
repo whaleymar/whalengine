@@ -21,7 +21,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
         - Tiled class default arguments (DONE)
         - special metadata
             - spawn points
-            - camera strat
+            - camera strat (DONE)
         - Templates
     - parallax
     - move tiled map(s) and tilesets into data/ directory (DONE)

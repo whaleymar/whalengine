@@ -4,6 +4,7 @@
  "imagewidth":40,
  "margin":0,
  "name":"tileset-small",
+ "objectalignment":"topleft",
  "spacing":0,
  "tilecount":25,
  "tiledversion":"1.10.2",

@@ -199,6 +199,7 @@ void addComponentRailsControl(nlohmann::json& values, nlohmann::json& allObjects
 
     RailsControl rails = ComponentFactory::DefaultRailsControl;
     rails.setCheckpoints(checkpoints);
+    print("new railscontrol's checkpoints are at ", &rails.mCheckpoints);
 
     if (values.contains("isCycle")) {
         rails.isCycle = values["isCycle"];
@@ -386,9 +387,9 @@ void loadCheckpointN2(nlohmann::json& checkpointData, std::vector<RailsControl::
         s32 y = point["y"];
         Vector2i mapPos = {x + parentX, parentY + y};
         if (i == 0) {
-            point1.position = getTransformFromMapPosition(mapPos, {0, 0}, level).position;
+            point1.position = getTransformFromMapPosition(mapPos, {0, 0}, level, true).position;
         } else {
-            point2.position = getTransformFromMapPosition(mapPos, {0, 0}, level).position;
+            point2.position = getTransformFromMapPosition(mapPos, {0, 0}, level, true).position;
         }
         i++;
     }

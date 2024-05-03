@@ -13,8 +13,8 @@
             "scale": 3.1023437499999997,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 165.52002014605893,
-                "y": 92.34953412238733
+                "x": 142.79526567615213,
+                "y": 91.70486023671617
             }
         },
         "testmap2.tmj": {
@@ -24,8 +24,8 @@
             "scale": 3.1023437499999997,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": -154.2382271468144,
-                "y": 92.67187106522289
+                "x": -166.00352556031226,
+                "y": 92.02719717955173
             }
         },
         "tile-collision.tsj": {
@@ -40,12 +40,13 @@
     "loadedWorlds": [
         "/home/whaley/code/unnamed-engine/data/map/testworld.world"
     ],
+    "mapScene.enableWorlds": true,
     "openFiles": [
         "testmap.tmj",
         "testmap2.tmj"
     ],
     "project": "project.tiled-project",
-    "property.type": "int",
+    "property.type": "Component_Sprite_NoAnim",
     "recentFiles": [
         "testmap2.tmj",
         "testmap.tmj"

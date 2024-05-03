@@ -131,7 +131,7 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
                 Vector2i cameraPoint;
                 cameraPoint.e[0] = object["x"];
                 cameraPoint.e[1] = object["y"];
-                level.cameraFocalPoint = getTransformFromMapPosition(cameraPoint, {0, 0}, level).position;
+                level.cameraFocalPoint = getTransformFromMapPosition(cameraPoint, {0, 0}, level, true).position;
                 // print("loaded camerapoint with pos", cameraPoint, "-->", level.cameraFocalPoint);
             }
             continue;
@@ -151,10 +151,13 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
 
         // top left
         auto positionTexels = Vector2i(object["x"], object["y"]);
+        if (name.size()) {
+            print("with pos", positionTexels);
+        }
         auto dimensionsTexels = Vector2i(object["width"], object["height"]);
         s32 thisId = object["id"];
 
-        Transform trans = getTransformFromMapPosition(positionTexels, dimensionsTexels, level);
+        Transform trans = getTransformFromMapPosition(positionTexels, dimensionsTexels, level, false);
         entity.add(trans);
 
         for (auto& property : object["properties"]) {
@@ -278,9 +281,14 @@ std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene) {
 }
 
 // convert top-left coordinate to bottom-middle
-Transform getTransformFromMapPosition(Vector2i positionTexels, Vector2i dimensionsTexels, ActiveLevel& level) {
-    // add half a tile of height to each point, since they describe the center of an object, but Transform describes the bottom
-    positionTexels.e[1] -= static_cast<s32>(TEXELS_PER_TILE) / 2;
+Transform getTransformFromMapPosition(Vector2i positionTexels, Vector2i dimensionsTexels, ActiveLevel& level, bool isPoint) {
+    // subtract (remember y=0 is top of map, so using +) half a tile of height to each point, since they describe the center of an object, but
+    // Transform describes the bottom also Tiled is STUPID and uses different coordinate systems for tiles -- I turned on the setting for object
+    // heights to match tiles, but points need manual adjustment (+1 tile up)
+    positionTexels.e[1] += static_cast<s32>(TEXELS_PER_TILE) / 2;
+    if (isPoint) {
+        positionTexels.e[1] -= TEXELS_PER_TILE;
+    }
     Transform trans = Transform::texels(positionTexels.x() + dimensionsTexels.x() * 0.5 - static_cast<s32>(TEXELS_PER_TILE) / 2,
                                         level.sizeTexels.y() - (positionTexels.y() - dimensionsTexels.y() * 0.5));
     trans.position += level.worldOffsetPixels;
