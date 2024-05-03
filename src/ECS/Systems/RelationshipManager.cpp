@@ -28,7 +28,14 @@ void FollowSystem::update() {
         if (!follow.isTargetInitialized) {
             follow.initTarget(entity);
         }
-        Transform targetTrans = follow.targetEntity.get<Transform>();
+        auto targetTransOpt = follow.targetEntity.tryGet<Transform>();
+        if (!targetTransOpt) {
+            // TODO ideally this should be an event which listens for entity deaths, but hooking up class methods as callbacks doesn't work
+            entity.remove<Follow>();
+            continue;
+        }
+
+        Transform targetTrans = *targetTransOpt.value();
 
         // consider target speed if it has the component and adjust lookahead to be smaller for low speeds
         f32 lookAheadX = follow.lookAheadTexels.x();

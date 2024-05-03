@@ -197,8 +197,10 @@ void addComponentRailsControl(nlohmann::json& values, nlohmann::json& allObjects
         loadCheckpoints(checkPointObj, checkpoints, level);
     }
 
-    RailsControl rails = ComponentFactory::DefaultRailsControl;
-    rails.setCheckpoints(checkpoints);
+    // RailsControl rails = ComponentFactory::DefaultRailsControl;
+    RailsControl rails(ComponentFactory::DefaultRailsControl.speed, checkpoints, ComponentFactory::DefaultRailsControl.waitTime,
+                       ComponentFactory::DefaultRailsControl.isCycle);
+    // rails.setCheckpoints(checkpoints);
     print("new railscontrol's checkpoints are at ", &rails.mCheckpoints);
 
     if (values.contains("isCycle")) {

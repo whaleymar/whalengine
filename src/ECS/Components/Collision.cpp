@@ -41,6 +41,11 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
  *   => if                    == false run callback on each actor we hit but don't push/move
  */
 
+// UPDATED THOUGHTS
+// an entity will never have multiple colliders, multiple triggers, or, a collider + trigger
+// so it would make sense to have a single Collider component which is a container for all these things
+// and it holds an enum or something saying its type
+
 bool ActorCollider::moveX(const Vector2f amount, const CollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
     s32 toMove = std::round(amount.x());

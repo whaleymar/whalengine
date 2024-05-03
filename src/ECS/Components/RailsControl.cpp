@@ -38,6 +38,8 @@ f32 RailsControl::getSpeed(Vector2i currentPosition, f32 inv_dt) {
     // I feel like I should be using deltatime but it breaks things
     // but idk it Just Works
 
+    // TODO use derivates of easein/out functions
+
     const Vector2f targetPosf = toFloatVec(getTarget().position);
 
     const f32 segmentDistance = (targetPosf - startPosition).len();

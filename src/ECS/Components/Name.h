@@ -7,7 +7,7 @@
 namespace whal {
 
 struct Name {
-    const char* name;
+    std::string name;
 
     bool operator==(Name& other) const { return isEqualString(name, other.name); }
 };
