@@ -31,6 +31,7 @@ void FollowSystem::update() {
         auto targetTransOpt = follow.targetEntity.tryGet<Transform>();
         if (!targetTransOpt) {
             // TODO ideally this should be an event which listens for entity deaths, but hooking up class methods as callbacks doesn't work
+            // MAYBE a system's entity set should be static, so I can use static methods for callbacks instead?
             entity.remove<Follow>();
             continue;
         }

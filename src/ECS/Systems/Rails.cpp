@@ -1,6 +1,7 @@
 #include "Rails.h"
 
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/Name.h"
 #include "ECS/Components/RailsControl.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
@@ -49,9 +50,12 @@ void RailsSystem::update() {
                     rails.curActionTime = 0;
 
                     Vector2i newDelta = rails.getTarget().position - transform.position;
+
                     // prevent divide by zero
                     if (newDelta.x() == 0 && newDelta.y() == 0) {
+                        // we're already at target for some reason, so no need to wait again
                         entity.add<Velocity>();
+                        rails.curActionTime = rails.waitTime;
                     } else {
                         Velocity velToAdd = Velocity(toFloatVec(newDelta).norm() * rails.getSpeed(transform.position, inv_dt));
                         entity.add<Velocity>(velToAdd);
@@ -75,6 +79,10 @@ void RailsSystem::update() {
                 entity.set(Transform(rails.getTarget().position));
             }
 
+            // if (entity.has<Name>()) {
+            //     print("name:", entity.get<Name>());
+            // }
+            // print("got to destination in ", rails.curActionTime, "seconds");
             entity.remove<Velocity>();
             rails.isWaiting = true;
             rails.curActionTime = 0;
@@ -84,6 +92,8 @@ void RailsSystem::update() {
             // moving to next checkpoint
             if (rails.isVelocityUpdateNeeded) {
                 f32 speed = rails.getSpeed(transform.position, inv_dt);
+                // f32 speed = rails.getSpeedNew();
+                // print("Speed", speed);
                 entity.set(Velocity(delta.norm() * speed));
             }
             rails.curActionTime += dt;

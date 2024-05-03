@@ -292,7 +292,7 @@ public:
     virtual void onAdd(const Entity){};
     virtual void onRemove(const Entity){};
 
-    std::unordered_map<EntityID, Entity> getEntities() const { return mEntities; }
+    std::unordered_map<EntityID, Entity> getEntities() const { return mEntities; }  // TODO should return a reference?
     Entity first() const { return mEntities.begin()->second; }
 
 private:

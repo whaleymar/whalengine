@@ -190,7 +190,7 @@
                          "name":"move2",
                          "propertytype":"RailsMovement",
                          "type":"int",
-                         "value":4
+                         "value":1
                         }],
                  "rotation":0,
                  "type":"CheckpointsN2",

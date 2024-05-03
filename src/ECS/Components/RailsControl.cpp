@@ -45,26 +45,27 @@ f32 RailsControl::getSpeed(Vector2i currentPosition, f32 inv_dt) {
     const f32 segmentDistance = (targetPosf - startPosition).len();
     const f32 expectedSegmentTime = segmentDistance / (speed * static_cast<f32>(PIXELS_PER_TILE));  // speed is in tiles/sec, but pos is in pixels
 
+    f32 t = curActionTime / expectedSegmentTime;
     f32 progress;
     switch (getTarget().movement) {
     case Movement::LINEAR:
-        progress = curActionTime / expectedSegmentTime;
+        progress = t;
         break;
 
     case Movement::EASEIO_SINE:
-        progress = easeInOutSine(0, 1, curActionTime / expectedSegmentTime);
+        progress = easeInOutSine(0, 1, t);
         break;
 
     case Movement::EASEIO_BEZIER:
-        progress = easeInOutBezier(0, 1, curActionTime / expectedSegmentTime);
+        progress = easeInOutBezier(0, 1, t);
         break;
 
     case Movement::EASEI_QUAD:
-        progress = easeInQuad(0, 1, curActionTime / expectedSegmentTime);
+        progress = easeInQuad(0, 1, t);
         break;
 
     case Movement::EASEI_CUBE:
-        progress = easeInCubic(0, 1, curActionTime / expectedSegmentTime);
+        progress = easeInCubic(0, 1, t);
         break;
     }
 
@@ -73,6 +74,40 @@ f32 RailsControl::getSpeed(Vector2i currentPosition, f32 inv_dt) {
     }
     const Vector2f newPos = lerp(startPosition, targetPosf, progress);
     return (newPos - toFloatVec(currentPosition)).len();
+}
+
+f32 RailsControl::getSpeedNew() {
+    // this isn't working for some reason
+    // these can be calced once per segment
+    const Vector2f targetPosf = toFloatVec(getTarget().position);
+    const f32 segmentDistance = (targetPosf - startPosition).len();
+    const f32 expectedSegmentTime = segmentDistance / (speed * static_cast<f32>(PIXELS_PER_TILE));  // speed is in tiles/sec, but pos is in pixels
+
+    f32 t = curActionTime / expectedSegmentTime;
+    f32 newSpeed;
+    switch (getTarget().movement) {
+    case Movement::LINEAR:
+        newSpeed = speed;
+        break;
+
+    case Movement::EASEIO_SINE:
+        newSpeed = easeInOutSineDt(0, speed, t);
+        break;
+
+    case Movement::EASEIO_BEZIER:
+        newSpeed = easeInOutBezierDt(0, speed, t);
+        break;
+
+    case Movement::EASEI_QUAD:
+        newSpeed = easeInQuadDt(0, speed, t);
+        break;
+
+    case Movement::EASEI_CUBE:
+        newSpeed = easeInCubicDt(0, speed, t);
+        break;
+    }
+
+    return newSpeed;
 }
 
 bool RailsControl::isValid() const {
