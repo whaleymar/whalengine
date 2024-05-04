@@ -380,7 +380,9 @@
                 "EASEIO_BEZIER",
                 "EASEIO_SINE",
                 "EASEI_QUAD",
-                "EASEI_CUBE"
+                "EASEI_CUBE",
+                "EASEO_QUAD",
+                "EASEO_CUBE"
             ],
             "valuesAsFlags": false
         }

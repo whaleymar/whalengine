@@ -1,8 +1,8 @@
 {
     "activeFile": "testmap.tmj",
     "expandedProjectPaths": [
-        "templates",
-        "."
+        ".",
+        "templates"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -13,8 +13,8 @@
             "scale": 3.1023437499999997,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 142.79526567615213,
-                "y": 91.70486023671617
+                "x": 159.87912364643668,
+                "y": 95.89524049357844
             }
         },
         "testmap2.tmj": {
@@ -24,15 +24,16 @@
             "scale": 3.1023437499999997,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": -166.00352556031226,
-                "y": 92.02719717955173
+                "x": 159.87912364643665,
+                "y": 95.89524049357844
             }
         },
         "tile-collision.tsj": {
             "scaleInDock": 1
         },
         "tileset-small.tsj": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         }
     },
     "last.objectTemplatePath": "/home/whaley/code/unnamed-engine/data/map",
@@ -43,11 +44,13 @@
     "mapScene.enableWorlds": true,
     "openFiles": [
         "testmap.tmj",
-        "testmap2.tmj"
+        "testmap2.tmj",
+        "tileset-small.tsj"
     ],
     "project": "project.tiled-project",
     "property.type": "Component_Sprite_NoAnim",
     "recentFiles": [
+        "tileset-small.tsj",
         "testmap2.tmj",
         "testmap.tmj"
     ]
