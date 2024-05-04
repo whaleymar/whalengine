@@ -1,7 +1,6 @@
 #include "Rails.h"
 
 #include "ECS/Components/Collision.h"
-#include "ECS/Components/Name.h"
 #include "ECS/Components/RailsControl.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"

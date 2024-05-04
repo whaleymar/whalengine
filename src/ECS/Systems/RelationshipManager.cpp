@@ -21,6 +21,10 @@ void EntityChildSystem::onRemove(ecs::Entity entity) {
     }
 }
 
+FollowSystem::FollowSystem() : mEntityDeathListener(&unfollowEntity) {
+    System::eventMgr.registerListener(Event::DEATH_EVENT, mEntityDeathListener);
+}
+
 void FollowSystem::update() {
     for (auto [entityid, entity] : getEntities()) {
         Transform trans = entity.get<Transform>();
@@ -28,16 +32,7 @@ void FollowSystem::update() {
         if (!follow.isTargetInitialized) {
             follow.initTarget(entity);
         }
-        auto targetTransOpt = follow.targetEntity.tryGet<Transform>();
-        if (!targetTransOpt) {
-            // TODO ideally this should be an event which listens for entity deaths, but hooking up class methods as callbacks doesn't work
-            // MAYBE a system's entity set should be static, so I can use static methods for callbacks instead?
-            entity.remove<Follow>();
-            continue;
-        }
-
-        Transform targetTrans = *targetTransOpt.value();
-
+        Transform targetTrans = follow.targetEntity.get<Transform>();
         // consider target speed if it has the component and adjust lookahead to be smaller for low speeds
         f32 lookAheadX = follow.lookAheadTexels.x();
         f32 lookAheadY = follow.lookAheadTexels.y();
@@ -143,6 +138,19 @@ void FollowSystem::onRemove(ecs::Entity entity) {
     // reset any lingering effects on velocity
     if (entity.has<Velocity>()) {
         entity.set(Velocity());
+    }
+}
+
+void unfollowEntity(ecs::Entity killedEntity) {
+    std::vector<ecs::Entity> toRemove;
+    for (auto& [entityid, entity] : FollowSystem::getEntities()) {
+        if (entity.get<Follow>().targetEntity == killedEntity) {
+            toRemove.push_back(entity);
+        }
+    }
+
+    for (auto entity : toRemove) {
+        entity.remove<Follow>();
     }
 }
 

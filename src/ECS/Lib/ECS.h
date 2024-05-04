@@ -292,12 +292,7 @@ public:
     virtual void onAdd(const Entity){};
     virtual void onRemove(const Entity){};
 
-    std::unordered_map<EntityID, Entity> getEntities() const { return mEntities; }  // TODO should return a reference?
-    Entity first() const { return mEntities.begin()->second; }
-
-private:
-    // TODO storing id:entity pairs is just duplicating data. I should make this an unordered_set of Entities?
-    std::unordered_map<EntityID, Entity> mEntities;
+    virtual std::unordered_map<EntityID, Entity>& getEntitiesVirtual() = 0;  // only used by SystemManager
 };
 
 // each system has a set of entities it operates on
@@ -313,6 +308,9 @@ public:
         }
     }
 
+    std::unordered_map<EntityID, Entity>& getEntitiesVirtual() override { return mEntities; }
+    static std::unordered_map<EntityID, Entity>& getEntities() { return mEntities; }
+    static Entity first() { return mEntities.begin()->second; }
     Pattern getPattern() { return mPattern; }
 
 private:
@@ -328,6 +326,7 @@ private:
         componentTypes.push_back(ComponentManager::getComponentID<Last>());
     }
 
+    inline static std::unordered_map<EntityID, Entity> mEntities = {};
     Pattern mPattern;
 };
 
@@ -355,9 +354,9 @@ public:
         // TODO make thread safe
         // TODO it should run at the end of a frame/gametick; o.w. systems that kill entities fuck themselves
         for (const auto& system : mSystems) {
-            auto const ix = system->mEntities.find(entity.id());
-            if (ix != system->mEntities.end()) {
-                system->mEntities.erase(entity.id());
+            auto const ix = system->getEntitiesVirtual().find(entity.id());
+            if (ix != system->getEntitiesVirtual().end()) {
+                system->getEntitiesVirtual().erase(entity.id());
                 system->onRemove(entity);
             }
         }
@@ -367,17 +366,17 @@ public:
         // TODO make thread safe
         for (size_t i = 0; i < mSystemIDs.size(); i++) {
             auto const& systemPattern = mPatterns[i];
-            auto const ix = mSystems[i]->mEntities.find(entity.id());
+            auto const ix = mSystems[i]->getEntitiesVirtual().find(entity.id());
             if ((newEntityPattern & systemPattern) == systemPattern) {
-                if (ix != mSystems[i]->mEntities.end()) {
+                if (ix != mSystems[i]->getEntitiesVirtual().end()) {
                     // already in system
                     continue;
                 }
-                mSystems[i]->mEntities.insert({entity.id(), entity});
+                mSystems[i]->getEntitiesVirtual().insert({entity.id(), entity});
                 mSystems[i]->onAdd(entity);
-            } else if (ix != mSystems[i]->mEntities.end()) {
+            } else if (ix != mSystems[i]->getEntitiesVirtual().end()) {
                 mSystems[i]->onRemove(entity);
-                mSystems[i]->mEntities.erase(entity.id());
+                mSystems[i]->getEntitiesVirtual().erase(entity.id());
             }
         }
     }

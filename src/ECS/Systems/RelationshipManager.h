@@ -24,10 +24,15 @@ private:
 
 class FollowSystem : public ecs::ISystem<Follow, Velocity, Transform> {
 public:
+    FollowSystem();
     void update() override;
     void onRemove(ecs::Entity entity) override;
+
+private:
+    EventListener<ecs::Entity> mEntityDeathListener;
 };
 
+void unfollowEntity(ecs::Entity killedEntity);
 void removeEntityFromChildList(ecs::Entity entity);
 
 }  // namespace whal
