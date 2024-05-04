@@ -250,18 +250,20 @@ void addComponentSprite(nlohmann::json& values, nlohmann::json& allObjects, std:
         spritePath = values["Sprite"];
         std::replace(spritePath.begin(), spritePath.end(), '\\', '/');
     }
+
+    s32 ix = idToIndex[thisId];
+    Vector2i entitySizeTexels = {allObjects[ix]["width"], allObjects[ix]["height"]};
     auto frameOpt = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame(spritePath.c_str());
     if (frameOpt) {
         // TODO parse depth
-        sprite.setFrame(frameOpt.value());
+        sprite.setSpriteFrame(frameOpt.value(), false);
+        sprite.setFrameSize(entitySizeTexels);
         entity.add(sprite);
     } else {
         print("Coudn't find frame for sprite:", spritePath);
         // add draw instead
-        s32 ix = idToIndex[thisId];
-        Vector2i frameSizeTexels = {allObjects[ix]["width"], allObjects[ix]["height"]};
         Draw draw = ComponentFactory::DefaultDraw;
-        draw.setFrameSize(frameSizeTexels);
+        draw.setFrameSize(entitySizeTexels);
         entity.add(draw);
     }
 }

@@ -4,6 +4,7 @@
 #include <memory>
 #include "ECS/Components/Name.h"
 #include "ECS/Components/Transform.h"
+#include "Game/Game.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Map/ComponentFactory.h"
@@ -184,7 +185,6 @@ void parseImageLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
         return;
     }
     ecs::Entity entity = eEntity.value();
-    level.childEntities.insert(entity);
 
     Vector2i position(layer["x"], layer["y"]);
 
@@ -219,6 +219,18 @@ void parseImageLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
 
     // TODO use parallax for depth?
     entity.add(Sprite(Depth::BackgroundNoParallax, frame.value()));
+
+    // not doing anything with these cause opengl doesn't have a simple way to repeat subtextures
+    // bool isRepeatX = false;
+    // bool isRepeatY = false;
+    // if (layer.contains("repeatx")) {
+    //     isRepeatX = layer["repeatx"];
+    // }
+    // if (layer.contains("repeaty")) {
+    //     isRepeatY = layer["repeaty"];
+    // }
+
+    level.childEntities.insert(entity);
 }
 
 Expected<TileSet> parseTileset(std::string basename, s32 firstgid) {
@@ -321,7 +333,7 @@ std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene) {
         s32 y = map["y"];
         s32 width = map["width"];
         s32 height = map["height"];
-        Level lvl = {filename, Vector2f(x, y), Vector2f(width, height)};
+        Level lvl = {filename, Vector2f(x, -y), Vector2f(width, height)};
         dstScene.allLevels.push_back(lvl);
     }
     // TODO get startPos

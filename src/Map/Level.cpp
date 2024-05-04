@@ -78,30 +78,34 @@ std::optional<Error> loadLevel(const Level level) {
                 collisionColumn.push_back(0);
             }
 
-            blockID = map.backgroundLayer.data.get()[ix];
-            if (blockID != 0) {
-                Expected<Frame> frame = getTileFrame(map, blockID);
-                if (!frame.isExpected()) {
-                    print(frame.error());
-                } else {
-                    Sprite sprite = Sprite(Depth::BackgroundNoParallax, frame.value());
-                    auto eEntity = createDecal(trans, sprite);
-                    if (eEntity.isExpected()) {
-                        lvl.childEntities.insert(eEntity.value());
+            if (map.backgroundLayer.data != nullptr) {
+                blockID = map.backgroundLayer.data.get()[ix];
+                if (blockID != 0) {
+                    Expected<Frame> frame = getTileFrame(map, blockID);
+                    if (!frame.isExpected()) {
+                        print(frame.error());
+                    } else {
+                        Sprite sprite = Sprite(Depth::BackgroundNoParallax, frame.value());
+                        auto eEntity = createDecal(trans, sprite);
+                        if (eEntity.isExpected()) {
+                            lvl.childEntities.insert(eEntity.value());
+                        }
                     }
                 }
             }
 
-            blockID = map.foregroundLayer.data.get()[ix];
-            if (blockID != 0) {
-                Expected<Frame> frame = getTileFrame(map, blockID);
-                if (!frame.isExpected()) {
-                    print(frame.error());
-                } else {
-                    Sprite sprite = Sprite(Depth::Foreground, frame.value());
-                    auto eEntity = createDecal(trans, sprite);
-                    if (eEntity.isExpected()) {
-                        lvl.childEntities.insert(eEntity.value());
+            if (map.foregroundLayer.data != nullptr) {
+                blockID = map.foregroundLayer.data.get()[ix];
+                if (blockID != 0) {
+                    Expected<Frame> frame = getTileFrame(map, blockID);
+                    if (!frame.isExpected()) {
+                        print(frame.error());
+                    } else {
+                        Sprite sprite = Sprite(Depth::Foreground, frame.value());
+                        auto eEntity = createDecal(trans, sprite);
+                        if (eEntity.isExpected()) {
+                            lvl.childEntities.insert(eEntity.value());
+                        }
                     }
                 }
             }
@@ -146,9 +150,12 @@ void unloadLevel(ActiveLevel& level) {
 
 void removeEntityFromLevel(ecs::Entity entity) {
     if (entity.has<Name>()) {
-        print("killing entity", entity.get<Name>());
+        print("erasing", entity.get<Name>(), "from child lists");
     }
     Scene& scene = Game::instance().getScene();
+    if (scene.childEntities.erase(entity)) {
+        return;
+    }
     for (auto& lvl : scene.loadedLevels) {
         if (lvl.childEntities.erase(entity)) {
             break;

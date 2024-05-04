@@ -122,7 +122,7 @@ Expected<ecs::Entity> createPlayerWithSprite(Sprite sprite) {
 
     Frame frame = animator.getFrame();
     sprite.depth = Depth::Player;
-    sprite.setFrameSize(frame.dimensionsTexels.x(), frame.dimensionsTexels.y());
+    sprite.setSpriteFrame(frame, true);
     sprite.atlasPositionTexels = frame.atlasPositionTexels;
     player.add(sprite);
 
