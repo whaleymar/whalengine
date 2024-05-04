@@ -177,9 +177,8 @@ void Game::mainloop() {
 
         animationSystem->update();
 
-        // draw opaque objects, then objects with transparency (sprites) in order from farthest to closest
-        drawSystem->drawEntities();
         spriteSystem->drawEntities();
+        drawSystem->drawEntities();
 #ifndef NDEBUG
         if (System::input.isMusicDebug()) {
             System::input.reset(InputType::MUSICTEST);

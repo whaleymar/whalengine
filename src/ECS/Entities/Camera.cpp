@@ -21,6 +21,7 @@ Expected<ecs::Entity> createCamera(ecs::Entity target) {
     auto camera = expected.value();
     camera.add(target.get<Transform>());
     camera.add(Follow(target));
+    // camera.add<PlayerControlFree>();
     camera.add<Velocity>();
     camera.add(Name("Camera"));
     camera.add<Camera>();

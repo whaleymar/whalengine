@@ -36,6 +36,7 @@ inline constexpr s32 SWINDOW_WIDTH_PIXELS = static_cast<s32>(WINDOW_WIDTH_PIXELS
 inline constexpr s32 SPIXELS_PER_TEXEL = static_cast<s32>(PIXELS_PER_TEXEL);
 inline constexpr f32 FPIXELS_PER_TEXEL = static_cast<f32>(PIXELS_PER_TEXEL);
 inline constexpr f32 TEXELS_PER_TILE = 8;
+inline constexpr s32 STEXELS_PER_TILE = static_cast<s32>(TEXELS_PER_TILE);
 inline constexpr f32 TEXELS_PER_PIXEL = 1 / FPIXELS_PER_TEXEL;
 inline constexpr s32 PIXELS_PER_TILE = PIXELS_PER_TEXEL * TEXELS_PER_TILE;
 inline constexpr f32 FPIXELS_PER_TILE = static_cast<f32>(PIXELS_PER_TILE);

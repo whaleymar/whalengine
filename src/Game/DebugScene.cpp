@@ -26,6 +26,10 @@ std::optional<Error> loadTestMap() {
     if (!player.isExpected()) {
         return player.error();
     }
+    // auto testBlock =
+    //     createBlock(Transform::tiles(0, 0),
+    //                 Sprite(Depth::Player, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/translucent").value()));
+    // createBlock(Transform::tiles(0, -1), Draw(Color::MAGENTA));
     return loadMap();
 }
 

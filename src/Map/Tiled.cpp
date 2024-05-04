@@ -22,6 +22,8 @@ inline const char* TSET_SPRITE_DIR = "data/sprite/map";
 Expected<TileSet> parseTileset(std::string basename, s32 firstgid);
 void parseTileLayer(nlohmann::json layer, TileMap& map);
 void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level);
+void parseImageLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level);
+std::string getSpriteKeyFromPath(std::string& spritePath);
 
 TileMap TileMap::parse(const char* path, ActiveLevel& level) {
     // TODO
@@ -49,6 +51,8 @@ TileMap TileMap::parse(const char* path, ActiveLevel& level) {
             parseTileLayer(layer, map);
         } else if (type == "objectgroup") {
             parseObjectLayer(layer, map, level);
+        } else if (type == "imagelayer") {
+            parseImageLayer(layer, map, level);
         } else {
             print("unrecognized layer: ", type, "\nSkipping for now");
         }
@@ -151,13 +155,14 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
 
         // top left
         auto positionTexels = Vector2i(object["x"], object["y"]);
-        if (name.size()) {
-            print("with pos", positionTexels);
-        }
         auto dimensionsTexels = Vector2i(object["width"], object["height"]);
         s32 thisId = object["id"];
 
         Transform trans = getTransformFromMapPosition(positionTexels, dimensionsTexels, level, false);
+        if (name.size()) {
+            print("\twith pos", positionTexels);
+            print("\tand trans pos", trans.position);
+        }
         entity.add(trans);
 
         for (auto& property : object["properties"]) {
@@ -171,6 +176,49 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
             creatorFunc(property["value"], objects, idToIndex, thisId, level, entity);
         }
     }
+}
+
+void parseImageLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
+    auto eEntity = ecs::ECS::getInstance().entity();
+    if (!eEntity.isExpected()) {
+        return;
+    }
+    ecs::Entity entity = eEntity.value();
+    level.childEntities.insert(entity);
+
+    Vector2i position(layer["x"], layer["y"]);
+
+    Vector2i offset;
+    if (layer.contains("offsetx")) {
+        offset.e[0] = layer["offsetx"];
+    }
+    if (layer.contains("offsety")) {
+        offset.e[1] = layer["offsety"];
+    }
+
+    Vector2f parallax = {1.0, 1.0};
+    if (layer.contains("parallaxx")) {
+        parallax.e[0] = layer["parallaxx"];
+    }
+    if (layer.contains("parallaxy")) {
+        parallax.e[1] = layer["parallaxy"];
+    }
+    std::string name = layer["name"];
+    std::string imgPath = layer["image"];
+    std::string spriteKey = getSpriteKeyFromPath(imgPath);
+
+    std::optional<Frame> frame = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame(spriteKey.c_str());
+    if (!frame) {
+        entity.kill();
+        return;
+    }
+
+    Transform trans = getTransformFromMapPosition(position + offset, frame.value().dimensionsTexels, level, false);
+
+    entity.add(trans);
+
+    // TODO use parallax for depth?
+    entity.add(Sprite(Depth::BackgroundNoParallax, frame.value()));
 }
 
 Expected<TileSet> parseTileset(std::string basename, s32 firstgid) {
@@ -282,17 +330,30 @@ std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene) {
 
 // convert top-left coordinate to bottom-middle
 Transform getTransformFromMapPosition(Vector2i positionTexels, Vector2i dimensionsTexels, ActiveLevel& level, bool isPoint) {
-    // subtract (remember y=0 is top of map, so using +) half a tile of height to each point, since they describe the center of an object, but
-    // Transform describes the bottom also Tiled is STUPID and uses different coordinate systems for tiles -- I turned on the setting for object
-    // heights to match tiles, but points need manual adjustment (+1 tile up)
-    positionTexels.e[1] += static_cast<s32>(TEXELS_PER_TILE) / 2;
+    // subtract (remember y=0 is top of map, so using +) half a tile of height to each point, since they describe the top of an object, but
+    // Transform describes the bottom. Also Tiled is STUPID and uses different coordinate systems for tiles -- I turned on the setting for object
+    // heights to match tiles, but points need manual adjustment
+
     if (isPoint) {
-        positionTexels.e[1] -= TEXELS_PER_TILE;
+        positionTexels.e[1] += STEXELS_PER_TILE / 2;
     }
-    Transform trans = Transform::texels(positionTexels.x() + dimensionsTexels.x() * 0.5 - static_cast<s32>(TEXELS_PER_TILE) / 2,
-                                        level.sizeTexels.y() - (positionTexels.y() - dimensionsTexels.y() * 0.5));
+    Transform trans = Transform::texels(positionTexels.x() + dimensionsTexels.x() * 0.5 - STEXELS_PER_TILE / 2,
+                                        level.sizeTexels.y() - positionTexels.y() - dimensionsTexels.y() + STEXELS_PER_TILE);
     trans.position += level.worldOffsetPixels;
     return trans;
+}
+
+// converts a relative sprite path to a valid GLResourceManager key
+// example: "../sprite/actor/player-run1.png" -> "actor/player-run1"
+std::string getSpriteKeyFromPath(std::string& spritePath) {
+    const char* spriteDir = "sprite/";
+    constexpr s32 substrLen = 7;
+    auto ix = spritePath.find(spriteDir);
+    if (ix == std::string::npos) {
+        return "";
+    }
+    auto extensionIx = spritePath.find(".", ix + substrLen);
+    return spritePath.substr(ix + substrLen, extensionIx - ix - substrLen);
 }
 
 }  // namespace whal

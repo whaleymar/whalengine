@@ -14,6 +14,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     - enable hot-reloading (DONE)
     - support rotations / flips?
     - store tile material data 
+    - image layers (DONE)
     - object layers
         - parsing (DONE)
         - component factory (DONE)
@@ -32,7 +33,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 
 ## Camera / Follow
 - different movement types (easein/out stuff)
-- be affected by momentum
+- be affected by momentum (maybe momentum should be added to velocity.total?)
 
 ## Systems
 - lighting\*
