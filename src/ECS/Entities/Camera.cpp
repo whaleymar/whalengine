@@ -37,7 +37,7 @@ RailsControl createCameraMoveController(Vector2i currentPosition, Vector2i nextP
     return RailsControl(45,
                         {
                             {currentPosition, RailsControl::Movement::LINEAR},
-                            {nextPosition, RailsControl::Movement::LINEAR},
+                            {nextPosition, RailsControl::Movement::EASEO_CUBE},
                         },
                         0, true, &onCameraAtDestination);
 }

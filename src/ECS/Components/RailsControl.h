@@ -11,13 +11,7 @@ class Entity;
 }
 
 struct RailsControl {
-    enum class Movement {
-        LINEAR,
-        EASEIO_BEZIER,
-        EASEIO_SINE,
-        EASEI_QUAD,
-        EASEI_CUBE,
-    };
+    enum class Movement { LINEAR, EASEIO_BEZIER, EASEIO_SINE, EASEI_QUAD, EASEI_CUBE, EASEO_QUAD, EASEO_CUBE };
 
     struct CheckPoint {
         Vector2i position;

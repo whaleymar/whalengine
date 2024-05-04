@@ -67,6 +67,14 @@ f32 RailsControl::getSpeed(Vector2i currentPosition, f32 inv_dt) {
     case Movement::EASEI_CUBE:
         progress = easeInCubic(0, 1, t);
         break;
+
+    case Movement::EASEO_QUAD:
+        progress = easeOutQuad(0, 1, t);
+        break;
+
+    case Movement::EASEO_CUBE:
+        progress = easeOutCubic(0, 1, t);
+        break;
     }
 
     if ((1 - progress) < SPEED_CURVE_EPSILON) {
@@ -104,6 +112,14 @@ f32 RailsControl::getSpeedNew() {
 
     case Movement::EASEI_CUBE:
         newSpeed = easeInCubicDt(0, speed, t);
+        break;
+
+    case Movement::EASEO_QUAD:
+        newSpeed = easeOutQuad(0, 1, t);
+        break;
+
+    case Movement::EASEO_CUBE:
+        newSpeed = easeOutCubic(0, 1, t);
         break;
     }
 
