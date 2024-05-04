@@ -42,7 +42,7 @@ void PhysicsSystem::update() {
 
     // sync collider in case position changed in another system
     // is a little inefficient to do it this way (vs separating the systems)
-    for (auto& [entityid, entity] : getEntities()) {
+    for (auto& [entityid, entity] : getEntitiesRef()) {
         Transform& trans = entity.get<Transform>();
         if (!trans.isManuallyMoved) {
             continue;
@@ -56,7 +56,7 @@ void PhysicsSystem::update() {
         }
     }
 
-    for (auto& [entityid, entity] : getEntities()) {
+    for (auto& [entityid, entity] : getEntitiesRef()) {
         Transform& trans = entity.get<Transform>();
         Velocity& vel = entity.get<Velocity>();
 

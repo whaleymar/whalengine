@@ -26,7 +26,7 @@ FollowSystem::FollowSystem() : mEntityDeathListener(&unfollowEntity) {
 }
 
 void FollowSystem::update() {
-    for (auto [entityid, entity] : getEntities()) {
+    for (auto [entityid, entity] : getEntitiesRef()) {
         Transform trans = entity.get<Transform>();
         auto& follow = entity.get<Follow>();
         if (!follow.isTargetInitialized) {
@@ -143,7 +143,7 @@ void FollowSystem::onRemove(ecs::Entity entity) {
 
 void unfollowEntity(ecs::Entity killedEntity) {
     std::vector<ecs::Entity> toRemove;
-    for (auto& [entityid, entity] : FollowSystem::getEntities()) {
+    for (auto& [entityid, entity] : FollowSystem::getEntitiesRef()) {
         if (entity.get<Follow>().targetEntity == killedEntity) {
             toRemove.push_back(entity);
         }
@@ -155,7 +155,7 @@ void unfollowEntity(ecs::Entity killedEntity) {
 }
 
 void removeEntityFromChildList(ecs::Entity entity) {
-    for (auto [entityid, parent] : EntityChildSystem::instance()->getEntities()) {
+    for (auto [entityid, parent] : EntityChildSystem::instance()->getEntitiesRef()) {
         auto& children = parent.get<Children>();
         auto it = std::find(children.entities.begin(), children.entities.end(), entity);
         if (it != children.entities.end()) {

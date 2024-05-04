@@ -1,6 +1,7 @@
 #include "Camera.h"
 
 #include "ECS/Components/Name.h"
+#include "ECS/Components/RailsControl.h"
 #include "ECS/Components/Relationships.h"
 #include "ECS/Components/Tags.h"
 #include "ECS/Components/Transform.h"
@@ -25,6 +26,20 @@ Expected<ecs::Entity> createCamera(ecs::Entity target) {
     camera.add<Camera>();
 
     return camera;
+}
+
+void onCameraAtDestination(ecs::Entity cameraEntity, RailsControl& rails) {
+    cameraEntity.remove<RailsControl>();
+    cameraEntity.add<Velocity>();  // railscontrol removed it
+}
+
+RailsControl createCameraMoveController(Vector2i currentPosition, Vector2i nextPosition) {
+    return RailsControl(45,
+                        {
+                            {currentPosition, RailsControl::Movement::LINEAR},
+                            {nextPosition, RailsControl::Movement::LINEAR},
+                        },
+                        0, true, &onCameraAtDestination);
 }
 
 }  // namespace whal

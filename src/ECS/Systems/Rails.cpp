@@ -16,7 +16,7 @@ constexpr f32 CHECKPOINT_DISTANCE_THRESHOLD = 4;  // in pixels
 void RailsSystem::update() {
     f32 dt = System::dt();
     f32 inv_dt = 1 / dt;
-    for (auto& [entityid, entity] : getEntities()) {
+    for (auto& [entityid, entity] : getEntitiesCopy()) {
         auto& rails = entity.get<RailsControl>();
         if (!rails.isValid()) {
             print("skipping invalid RailsControl component for entity", entityid);
@@ -86,6 +86,9 @@ void RailsSystem::update() {
             rails.isWaiting = true;
             rails.curActionTime = 0;
             rails.isVelocityUpdateNeeded = false;
+            if (rails.arrivalCallback != nullptr) {
+                rails.arrivalCallback(entity, rails);
+            }
 
         } else {
             // moving to next checkpoint

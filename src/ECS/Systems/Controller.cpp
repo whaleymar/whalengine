@@ -21,7 +21,7 @@ void ControllerSystemRB::update() {
     bool isJumpAvailable = input.isJumpAvailable();
     input.useJump();
 
-    for (auto& [entityid, entity] : getEntities()) {
+    for (auto& [entityid, entity] : getEntitiesRef()) {
         Velocity& vel = entity.get<Velocity>();
         PlayerControlRB& control = entity.get<PlayerControlRB>();
 
@@ -125,7 +125,7 @@ void ControllerSystemRB::update() {
 
 void ControllerSystemFree::update() {
     auto& input = System::input;
-    for (auto& [entityid, entity] : getEntities()) {
+    for (auto& [entityid, entity] : getEntitiesRef()) {
         Vector2f delta;
         if (input.isLeft()) {
             delta += Vector2f::unitLeft;

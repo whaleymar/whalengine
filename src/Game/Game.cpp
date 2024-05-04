@@ -4,6 +4,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "ECS/Entities/Camera.h"
 #include "ECS/Systems/RelationshipManager.h"
 #include "ECS/Systems/TagTrackers.h"
 #include "Game/Events.h"
@@ -265,7 +266,7 @@ void Game::updateLoadedLevels(Vector2f cameraWorldPosPixels) {
 }
 
 void Game::updateLevelCamera(bool overrideCache) {
-    if (PlayerSystem::instance()->getEntities().empty() || !mIsSceneLoaded || CameraSystem::instance()->getEntities().empty()) {
+    if (PlayerSystem::instance()->getEntitiesRef().empty() || !mIsSceneLoaded || CameraSystem::instance()->getEntitiesRef().empty()) {
         return;
     }
     static std::string lastLevel = "default";
@@ -305,7 +306,8 @@ void Game::updateLevelCamera(bool overrideCache) {
                 if (camera.has<Follow>()) {
                     camera.remove<Follow>();
                 }
-                camera.set(Transform(focalPoint));  // TODO rails control
+                // TODO lock player controls && freeze everything except camera?
+                camera.add(createCameraMoveController(camera.get<Transform>().position, focalPoint));
                 return;
             }
         }

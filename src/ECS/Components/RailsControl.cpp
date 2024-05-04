@@ -5,8 +5,8 @@ namespace whal {
 
 constexpr f32 SPEED_CURVE_EPSILON = 0.01;
 
-RailsControl::RailsControl(f32 moveSpeed_, std::vector<CheckPoint> checkPoints_, f32 waitTime_, bool isCycle_)
-    : mCheckpoints(checkPoints_), speed(moveSpeed_), waitTime(waitTime_), curActionTime(waitTime_), isCycle(isCycle_) {}
+RailsControl::RailsControl(f32 moveSpeed_, std::vector<CheckPoint> checkPoints_, f32 waitTime_, bool isCycle_, ArrivalCallback callback)
+    : mCheckpoints(checkPoints_), speed(moveSpeed_), waitTime(waitTime_), arrivalCallback(callback), curActionTime(waitTime_), isCycle(isCycle_) {}
 
 void RailsControl::setCheckpoints(std::vector<CheckPoint>& checkpoints) {
     mCheckpoints = std::move(checkpoints);

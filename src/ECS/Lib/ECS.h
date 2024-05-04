@@ -100,7 +100,10 @@ public:
         mComponentTable[ix] = component;
     }
 
-    void setData(const Entity entity, T component) { mComponentTable[mEntityToIndex[entity.id()]] = component; }
+    void setData(const Entity entity, T component) {
+        assert(mEntityToIndex.find(entity.id()) != mEntityToIndex.end() && "cannot set component value without adding it to the entity first");
+        mComponentTable[mEntityToIndex[entity.id()]] = component;
+    }
 
     void removeData(const Entity entity) {
         if (mEntityToIndex.find(entity.id()) == mEntityToIndex.end()) {
@@ -309,7 +312,8 @@ public:
     }
 
     std::unordered_map<EntityID, Entity>& getEntitiesVirtual() override { return mEntities; }
-    static std::unordered_map<EntityID, Entity>& getEntities() { return mEntities; }
+    static std::unordered_map<EntityID, Entity>& getEntitiesRef() { return mEntities; }
+    static std::unordered_map<EntityID, Entity> getEntitiesCopy() { return mEntities; }
     static Entity first() { return mEntities.begin()->second; }
     Pattern getPattern() { return mPattern; }
 
@@ -352,7 +356,8 @@ public:
     void entityDestroyed(const Entity entity) const {
         System::eventMgr.triggerEvent(Event::DEATH_EVENT, entity);
         // TODO make thread safe
-        // TODO it should run at the end of a frame/gametick; o.w. systems that kill entities fuck themselves
+        // TODO it should run at the end of a frame/gametick; o.w. systems that kill their entities fuck themselves (ALSO do the same for component
+        // removal?)
         for (const auto& system : mSystems) {
             auto const ix = system->getEntitiesVirtual().find(entity.id());
             if (ix != system->getEntitiesVirtual().end()) {

@@ -6,7 +6,7 @@
 namespace whal {
 
 std::optional<ecs::Entity> getCamera() {
-    if (CameraSystem::instance()->getEntities().empty()) {
+    if (CameraSystem::instance()->getEntitiesRef().empty()) {
         return std::nullopt;
     }
     return CameraSystem::instance()->first();

@@ -17,7 +17,7 @@ void ActorsManager::update() {
     }
     std::vector<std::tuple<ecs::Entity, ActorCollider*>> newActorList;
 
-    for (auto& [entityid, entity] : getEntities()) {
+    for (auto& [entityid, entity] : getEntitiesRef()) {
         auto pCollider = &entity.get<ActorCollider>();
         newActorList.push_back({entity, pCollider});
     }
@@ -47,7 +47,7 @@ void SolidsManager::update() {
         return;
     }
     std::vector<std::tuple<ecs::Entity, SolidCollider*>> newSolidList;
-    for (auto& [entityid, entity] : getEntities()) {
+    for (auto& [entityid, entity] : getEntitiesRef()) {
         auto pCollider = &entity.get<SolidCollider>();
         newSolidList.push_back({entity, pCollider});
     }

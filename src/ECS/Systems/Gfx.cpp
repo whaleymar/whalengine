@@ -72,7 +72,7 @@ void DrawSystem::drawEntities() {
     glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
 
     // sorting not required since Draw components don't have transparency
-    for (auto const& [entityid, entity] : getEntities()) {
+    for (auto const& [entityid, entity] : getEntitiesRef()) {
         Transform& trans = entity.get<Transform>();
         Draw& draw = entity.get<Draw>();
         drawEntity(program, trans, draw, draw.getVertices().data(), draw.getVertices().size());
