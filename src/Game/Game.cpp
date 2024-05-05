@@ -229,6 +229,10 @@ void Game::unloadScene() {
         unloadLevel(lvl);
         mActiveScene.loadedLevels.pop_back();
     }
+    std::set<ecs::Entity> toKill = std::move(mActiveScene.childEntities);
+    for (auto entity : toKill) {
+        entity.kill();
+    }
     mIsSceneLoaded = false;
 }
 

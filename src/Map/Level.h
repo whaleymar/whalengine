@@ -33,6 +33,7 @@ struct Scene {
     std::vector<Level> allLevels;
     std::vector<ActiveLevel> loadedLevels;
     Vector2f startPos;
+    std::set<ecs::Entity> childEntities;
 
     std::optional<Level> getLevelAt(Vector2f worldPosTexels);
     Expected<ActiveLevel*> getLoadedLevel(Level level);

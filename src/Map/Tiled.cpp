@@ -321,7 +321,7 @@ std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene) {
         s32 y = map["y"];
         s32 width = map["width"];
         s32 height = map["height"];
-        Level lvl = {filename, Vector2f(x, y), Vector2f(width, height)};
+        Level lvl = {filename, Vector2f(x, -y), Vector2f(width, height)};
         dstScene.allLevels.push_back(lvl);
     }
     // TODO get startPos
