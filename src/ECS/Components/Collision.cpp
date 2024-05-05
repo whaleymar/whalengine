@@ -121,30 +121,53 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
 void ActorCollider::setMomentum(const f32 momentum, const bool isXDirection) {
     if (isXDirection) {
         mStoredMomentum.e[0] = momentum;
+        mMomentumFramesLeft.e[0] = MOMENTUM_LIFETIME_FRAMES;
     } else {
         mStoredMomentum.e[1] = momentum;
+        mMomentumFramesLeft.e[1] = MOMENTUM_LIFETIME_FRAMES;
     }
-    mMomentumFramesLeft = MOMENTUM_LIFETIME_FRAMES;
 }
 
 void ActorCollider::addMomentum(const f32 momentum, const bool isXDirection) {
     if (isXDirection) {
         mStoredMomentum.e[0] += momentum;
+        mMomentumFramesLeft.e[0] = MOMENTUM_LIFETIME_FRAMES;
     } else {
         mStoredMomentum.e[1] += momentum;
+        mMomentumFramesLeft.e[1] = MOMENTUM_LIFETIME_FRAMES;
     }
-    mMomentumFramesLeft = MOMENTUM_LIFETIME_FRAMES;
+}
+
+void ActorCollider::maintainMomentum(const bool isXDirection) {
+    if (isXDirection) {
+        mMomentumFramesLeft.e[0] = MOMENTUM_LIFETIME_FRAMES;
+    } else {
+        mMomentumFramesLeft.e[1] = MOMENTUM_LIFETIME_FRAMES;
+    }
+}
+
+void ActorCollider::resetMomentumX() {
+    mStoredMomentum.e[0] = 0;
+    mMomentumFramesLeft.e[0] = 0;
+}
+
+void ActorCollider::resetMomentumY() {
+    mStoredMomentum.e[1] = 0;
+    mMomentumFramesLeft.e[1] = 0;
 }
 
 void ActorCollider::resetMomentum() {
     mStoredMomentum = {0, 0};
-    mMomentumFramesLeft = 0;
+    mMomentumFramesLeft = {0, 0};
 }
 
 void ActorCollider::momentumNotUsed() {
-    mMomentumFramesLeft--;
-    if (!mMomentumFramesLeft) {
-        resetMomentum();
+    mMomentumFramesLeft -= {1, 1};
+    if (!mMomentumFramesLeft.x()) {
+        resetMomentumX();
+    }
+    if (!mMomentumFramesLeft.y()) {
+        resetMomentumY();
     }
 }
 
@@ -235,53 +258,54 @@ void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
     mIsCollidable = false;
     if (toMoveX > 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(toMoveX, 0));
-        moveDirection(toMoveX, true, mCollider.right(), &AABB::left, riding, isManualMove);
+        moveDirection(toMoveX, x, true, mCollider.right(), &AABB::left, riding, isManualMove);
     } else if (toMoveX < 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(toMoveX, 0));
-        moveDirection(toMoveX, true, mCollider.left(), &AABB::right, riding, isManualMove);
+        moveDirection(toMoveX, x, true, mCollider.left(), &AABB::right, riding, isManualMove);
     }
 
     if (toMoveY > 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(0, toMoveY));
-        moveDirection(toMoveY, false, mCollider.top(), &AABB::bottom, riding, isManualMove);
+        moveDirection(toMoveY, y, false, mCollider.top(), &AABB::bottom, riding, isManualMove);
     } else if (toMoveY < 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(0, toMoveY));
-        moveDirection(toMoveY, false, mCollider.bottom(), &AABB::top, riding, isManualMove);
+        moveDirection(toMoveY, y, false, mCollider.bottom(), &AABB::top, riding, isManualMove);
     }
 
     mIsCollidable = wasCollidable;
 }
 
-void SolidCollider::moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding,
-                                  bool isManualMove) {
+void SolidCollider::moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
+                                  std::vector<ActorCollider*>& riding, bool isManualMove) {
     f32 dt = System::dt();
     for (auto& [entity, actor] : ActorsManager::getInstance()->getAllActors()) {
         // push takes priority over carry
         if (mCollider.isOverlapping(actor->getCollider())) {
             f32 actorEdge = (actor->getCollider().*edgeFunc)();
-            toMove = solidEdge - actorEdge;
+            toMoveRounded = solidEdge - actorEdge;
             if (isXDirection) {
-                actor->moveX(Vector2f(toMove, 0), &ActorCollider::squish);
+                actor->moveX(Vector2f(toMoveRounded, 0), &ActorCollider::squish);
             } else {
-                actor->moveY(Vector2f(0, toMove), &ActorCollider::squish);
+                actor->moveY(Vector2f(0, toMoveRounded), &ActorCollider::squish);
             }
-            f32 momentum = toMove / dt;
             if (isManualMove) {
-                actor->addMomentum(momentum, isXDirection);
+                actor->maintainMomentum(isXDirection);
             } else {
+                // don't worry about rounding, we're just moving the overlap distance
+                f32 momentum = toMoveRounded / dt;
                 actor->setMomentum(momentum, isXDirection);
             }
         } else if (std::find(riding.begin(), riding.end(), actor) != riding.end()) {
             // I might change this for solids moving down faster than gravity RESEARCH
             if (isXDirection) {
-                actor->moveX(Vector2f(toMove, 0), nullptr);
+                actor->moveX(Vector2f(toMoveRounded, 0), nullptr);
             } else {
-                actor->moveY(Vector2f(0, toMove), nullptr);
+                actor->moveY(Vector2f(0, toMoveRounded), nullptr);
             }
-            f32 momentum = toMove / dt;
             if (isManualMove) {
-                actor->addMomentum(momentum, isXDirection);
+                actor->maintainMomentum(isXDirection);
             } else {
+                f32 momentum = toMoveUnrounded / dt;
                 actor->setMomentum(momentum, isXDirection);
             }
         }

@@ -8,10 +8,10 @@
 
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
+#include "Util/Print.h"
 
 namespace whal {
 
-// constexpr f32 APPROACH_SPEED_X = 10.0;  // 5 frames to max speed
 constexpr f32 APPROACH_SPEED_X = 7.5;  // 5 frames to max speed
 
 void ControllerSystemRB::update() {
@@ -58,22 +58,28 @@ void ControllerSystemRB::update() {
         if (input.isRight()) {
             impulseX += 1;
         }
+
+        // controls can only speed us up, not slow us down (assuming trying to move the same direction as current velocity)
         impulseX *= control.moveSpeed;
         const f32 approachSpeed = APPROACH_SPEED_X * dt * control.moveSpeed;
         if (impulseX != 0) {
             f32 approachFrom;
-            if (sign(impulseX) == sign(vel.total.x())) {
-                approachFrom = vel.total.x();
+            // f32 approachTarget = impulseX;
+            approachFrom = vel.stable.x();
+            if (sign(impulseX) == sign(vel.stable.x())) {
+                if (abs(approachFrom) < control.moveSpeed) {
+                    // approach max move speed
+                    impulseX = approach(approachFrom, impulseX, approachSpeed);
+                    vel.stable.e[0] = impulseX;
+                }
             } else {
                 approachFrom = 0;
+                impulseX = approach(approachFrom, impulseX, approachSpeed);
+                vel.stable.e[0] += impulseX;
             }
-            impulseX = approach(approachFrom, impulseX, approachSpeed);
+            // print("impulseX:", impulseX, "velocityX:", vel.stable.x(), "\tapproachFrom:", approachFrom, ", target:", approachTarget, ",
+            // approachspeed:", approachSpeed);
         }
-        // if (abs(impulseX) == control.moveSpeed) {
-        //     print("hit max speed");
-        // } else if (impulseX) {
-        //     print("frame");
-        // }
 
         f32 impulseY = 0;
         if (isJumpAvailable) {
@@ -110,7 +116,8 @@ void ControllerSystemRB::update() {
             rb.isJumping = false;
         }
 
-        vel.impulse += Vector2f(impulseX, impulseY);
+        vel.impulse += Vector2f(0.0, impulseY);
+        // vel.impulse += Vector2f(impulseX, impulseY);
 
         auto& trans = entity.get<Transform>();
         if (impulseX > 0 && trans.facing != Facing::Right) {

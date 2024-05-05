@@ -24,6 +24,7 @@ struct RigidBody {
 
     f32 jumpSecondsRemaining = 0;
     f32 coyoteSecondsRemaining = 0;
+    s32 momentumCooldownFrames = 0;
     Material groundMaterial = Material::None;
     bool isJumping = false;
     bool isLanding = false;

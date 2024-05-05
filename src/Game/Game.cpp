@@ -203,6 +203,12 @@ void Game::mainloop() {
                 isTimeNormal = true;
             }
         }
+        if (System::input.isKillPlayer()) {
+            System::input.reset(InputType::KILLPLAYER);
+            for (auto [entityid, entity] : PlayerSystem::instance()->getEntitiesCopy()) {
+                entity.kill();
+            }
+        }
 #endif
 
         lifetimeSystem->update();
@@ -320,7 +326,6 @@ void Game::updateLevelCamera(bool overrideCache) {
                 if (camera.has<Follow>()) {
                     camera.remove<Follow>();
                 }
-                // TODO lock player controls && freeze everything except camera?
                 camera.add(createCameraMoveController(camera.get<Transform>().position, focalPoint));
                 System::dt.setMultiplier(0.0);
                 return;

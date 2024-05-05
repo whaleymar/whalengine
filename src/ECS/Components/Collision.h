@@ -26,7 +26,8 @@ public:
     std::vector<ActorCollider*> getRidingActors() const;
 
 private:
-    void moveDirection(f32 toMove, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc, std::vector<ActorCollider*>& riding, bool isManualMove);
+    void moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
+                       std::vector<ActorCollider*>& riding, bool isManualMove);
 };
 
 class ActorCollider : public IUseCollision {
@@ -39,9 +40,13 @@ public:
     bool isAlive() const { return mIsAlive; }
     void setMomentum(const f32 momentum, const bool isXDirection);
     void addMomentum(const f32 momentum, const bool isXDirection);
+    void maintainMomentum(const bool isXDirection);
+    void resetMomentumX();
+    void resetMomentumY();
     void resetMomentum();
     Vector2f getMomentum() const { return mStoredMomentum; }
-    bool isMomentumStored() const { return mMomentumFramesLeft > 0; }
+    bool isMomentumStoredX() const { return mMomentumFramesLeft.x() > 0; }
+    bool isMomentumStoredY() const { return mMomentumFramesLeft.y() > 0; }
     void momentumNotUsed();
     bool checkIsGrounded(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids, SolidCollider** groundSolid);
 
@@ -57,7 +62,7 @@ private:
     bool tryCornerCorrection(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPos, s32 moveSign);
 
     Vector2f mStoredMomentum;
-    s32 mMomentumFramesLeft = 0;
+    Vector2i mMomentumFramesLeft = {0, 0};
     // f32 mMass = 1; // could give solids a mass and use mass ratio to calculate force
     bool mIsAlive = true;
 };

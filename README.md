@@ -4,18 +4,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 # To Do 
 
 ## Current Goal: 
-- text system (on hold)
-- tiled parser
-    - support rotations / flips?
-    - object layers
-        - component factory functions (mostly done)
-        - special metadata
-            - spawn points
-            - camera strat (might want to rework)
-        - Templates
-    - parallax
-
-- #cleanup stuff
+- physics rework
 
 ## Camera / Follow
 - different movement types (easein/out stuff)
@@ -51,6 +40,17 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     - moving in opposite direction as momentum completely negates it 
     - trying to walk off platform in same direction it's moving is buggy
 - fixed updates at 60fps so rounding doesn't fuck me
+
+## Map 
+- support rotations / flips? (leaning towards no)
+- object layers
+    - component factory functions (mostly done)
+    - special metadata
+        - spawn points
+        - camera strat (might want to rework)
+    - Templates
+- parallax
+
 
 ## Non-ECS Systems
 - chunk loading/unloading (quad tree?)

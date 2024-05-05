@@ -11,6 +11,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
+#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
@@ -19,10 +20,13 @@ constexpr f32 GRAVITY = 35;
 
 constexpr f32 FRICTION_GROUND = 30.0;
 constexpr f32 FRICTION_AIR = 25.0;
+// constexpr f32 FRICTION_AIR = 10.0;
 constexpr f32 MOVE_EPSILON = 0.1;
 
 constexpr f32 JUMP_PEAK_GRAVITY_MULT = 0.5;
 constexpr f32 JUMP_PEAK_SPEED_MAX = -3.5;  // once Y velocity is below this, no longer considered "jumping"
+
+constexpr s32 MOMENTUM_COOLDOWN_FRAMES = 10;
 
 void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
     bool isInJumpPeak = isJumping && isBetween(velocity.total.y(), JUMP_PEAK_SPEED_MAX, 0.0f);
@@ -105,7 +109,7 @@ void PhysicsSystem::update() {
             allActors.push_back(entity);
 
             // RIGIDBODY FLAGS, MOMENTUM, AND COYOTE TIME
-            bool isMomentumStored = actor.value()->isMomentumStored();
+            bool isMomentumStored = actor.value()->isMomentumStoredX() || actor.value()->isMomentumStoredY();
             if (rb.value()->isGrounded) {
                 rb.value()->isLanding = !wasGrounded;
 
@@ -120,9 +124,14 @@ void PhysicsSystem::update() {
                     rb.value()->coyoteSecondsRemaining -= dt;
                 }
 
-                if (isMomentumStored) {
-                    vel.stable += actor.value()->getMomentum() * dt;  // TODO scaling by dt feels wrong -- is possibly just bad naming?
+                // prevent repeated push forces from accumulating huge speed
+                if (isMomentumStored && rb.value()->momentumCooldownFrames <= 0) {
+                    // velocity in tiles per second, momentum in pixels
+                    vel.stable += actor.value()->getMomentum() * TILES_PER_PIXEL;
                     actor.value()->resetMomentum();
+                    rb.value()->momentumCooldownFrames = MOMENTUM_COOLDOWN_FRAMES;
+                } else if (rb.value()->momentumCooldownFrames > 0) {
+                    rb.value()->momentumCooldownFrames--;
                 }
             }
 

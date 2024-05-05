@@ -5,7 +5,6 @@
 
 namespace whal {
 
-// TODO some of these should be set by map
 // in general, dead zone should be bigger than lookahead
 struct Follow {
     Follow() = default;

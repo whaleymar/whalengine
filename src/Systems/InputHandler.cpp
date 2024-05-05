@@ -73,6 +73,9 @@ void InputHandler::set(InputType input) {
     case InputType::TIMETEST:
         mIsTimeTest = true;
         break;
+    case InputType::KILLPLAYER:
+        mIsKillPlayer = true;
+        break;
 #endif
     }
 }
@@ -128,6 +131,9 @@ void InputHandler::reset(InputType input) {
     case InputType::TIMETEST:
         mIsTimeTest = false;
         break;
+    case InputType::KILLPLAYER:
+        mIsKillPlayer = false;
+        break;
 #endif
 
     default:
@@ -151,6 +157,7 @@ void InputHandler::loadMappings() const {
     KeyMap.insert({SDLK_m, InputType::MUSICTEST});
     KeyMap.insert({SDLK_r, InputType::RELOADSCENE});
     KeyMap.insert({SDLK_t, InputType::TIMETEST});
+    KeyMap.insert({SDLK_k, InputType::KILLPLAYER});
 //     KeyMap.insert({GLFW_KEY_LEFT, InputType::SHRINKX});
 //     KeyMap.insert({GLFW_KEY_RIGHT, InputType::GROWX});
 //     KeyMap.insert({GLFW_KEY_DOWN, InputType::SHRINKY});
