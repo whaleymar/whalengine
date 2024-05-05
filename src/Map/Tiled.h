@@ -7,6 +7,7 @@
 #include "ECS/Components/Transform.h"
 #include "Map/ComponentFactory.h"
 #include "Map/Level.h"
+#include "Physics/Material.h"
 #include "Util/Expected.h"
 #include "Util/Types.h"
 
@@ -14,12 +15,14 @@ namespace whal {
 
 struct Frame;
 struct TileMap;
+struct TileSet;
 struct Scene;
 
 Expected<Frame> getTileFrame(const TileMap& map, s32 blockIx);
 std::optional<Error> parseMapProject(const char* projectfile);
 std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene);
 Transform getTransformFromMapPosition(Vector2i mapCenterPositionTexels, Vector2i dimensionsTexels, ActiveLevel& level, bool isPoint);
+const TileSet* getTileSet(const TileMap& map, s32 blockId);
 
 struct TileLayer {
     std::string name;
@@ -39,6 +42,7 @@ struct TileSet {
     s32 spacing;
     std::string fileName;
     std::string spriteFileName;
+    std::vector<Material> materials;
 };
 
 struct TileMap {

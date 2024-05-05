@@ -8,6 +8,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Map/ComponentFactory.h"
 #include "Map/Level.h"
+#include "Physics/Material.h"
 #include "json.hpp"
 
 #include "Gfx/Texture.h"
@@ -245,25 +246,44 @@ Expected<TileSet> parseTileset(std::string basename, s32 firstgid) {
 
     s32 widthTiles = widthTexels / tileWidth;
     s32 heightTiles = heightTexels / tileHeight;
+    s32 tilecount = data["tilecount"];
 
-    return TileSet(firstgid, data["tilecount"], tileWidth, tileHeight, widthTiles, heightTiles, data["margin"], data["spacing"], basename,
-                   sourceFileBasenameNoExt);
-}
+    std::vector<Material> materials;
+    for (s32 i = 0; i < tilecount; i++) {
+        materials.push_back(Material::None);
+    }
 
-TileSet getTileSet(const TileMap& map, s32 blockIx) {
-    for (size_t i = 0; i < map.tilesets.size(); i++) {
-        s32 firstgid = map.tilesets[i].firstgid;
-        if (firstgid <= blockIx && blockIx < firstgid + map.tilesets[i].tilecount) {
-            return map.tilesets[i];
+    if (data.contains("tiles")) {
+        for (auto& tiledata : data["tiles"]) {
+            s32 id = tiledata["id"];
+            for (auto& property : tiledata["properties"]) {
+                std::string propname = property["propertytype"];
+                if (propname == "Material") {
+                    materials[id] = property["value"];
+                    break;
+                }
+            }
         }
     }
-    print("error getting tileset for blockIx", blockIx, "\nReturning first tileset instead");
-    return map.tilesets[0];
+
+    return TileSet(firstgid, tilecount, tileWidth, tileHeight, widthTiles, heightTiles, data["margin"], data["spacing"], basename,
+                   sourceFileBasenameNoExt, materials);
+}
+
+const TileSet* getTileSet(const TileMap& map, s32 blockId) {
+    for (size_t i = 0; i < map.tilesets.size(); i++) {
+        s32 firstgid = map.tilesets[i].firstgid;
+        if (firstgid <= blockId && blockId < firstgid + map.tilesets[i].tilecount) {
+            return &map.tilesets[i];
+        }
+    }
+    print("error getting tileset for blockIx", blockId, "\nReturning first tileset instead");
+    return &map.tilesets[0];
 }
 
 Expected<Frame> getTileFrame(const TileMap& map, s32 blockId) {
-    TileSet tset = getTileSet(map, blockId);
-    std::string spritePath = std::format("{}/{}", "map", tset.spriteFileName);
+    const TileSet* tset = getTileSet(map, blockId);
+    std::string spritePath = std::format("{}/{}", "map", tset->spriteFileName);
     std::optional<Frame> tsetFrameOpt = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame(spritePath.c_str());
 
     if (!tsetFrameOpt) {
@@ -272,15 +292,15 @@ Expected<Frame> getTileFrame(const TileMap& map, s32 blockId) {
 
     // ASSUMING 0 MARGIN && SPACING
 
-    s32 blockIx = blockId - 1;  // id is 1-indexed
+    s32 blockIx = blockId - tset->firstgid;
 
-    s32 rowIx = blockIx / tset.heightTiles;
-    s32 colIx = blockIx % tset.widthTiles;
+    s32 rowIx = blockIx / tset->heightTiles;
+    s32 colIx = blockIx % tset->widthTiles;
 
     Frame fullFrame = tsetFrameOpt.value();
     Frame newFrame = {
-        {fullFrame.atlasPositionTexels.x() + colIx * tset.tileWidthTexels, fullFrame.atlasPositionTexels.y() + rowIx * tset.tileHeightTexels},
-        {tset.tileWidthTexels, tset.tileHeightTexels}};
+        {fullFrame.atlasPositionTexels.x() + colIx * tset->tileWidthTexels, fullFrame.atlasPositionTexels.y() + rowIx * tset->tileHeightTexels},
+        {tset->tileWidthTexels, tset->tileHeightTexels}};
     return newFrame;
 }
 

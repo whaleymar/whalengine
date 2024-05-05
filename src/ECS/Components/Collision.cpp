@@ -46,13 +46,13 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
 // so it would make sense to have a single Collider component which is a container for all these things
 // and it holds an enum or something saying its type
 
-bool ActorCollider::moveX(const Vector2f amount, const CollisionCallback callback) {
+std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const CollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
     s32 toMove = std::round(amount.x());
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
 
     if (toMove == 0) {
-        return false;
+        return std::nullopt;
     }
 
     const s32 moveSign = sign(toMove);
@@ -67,19 +67,26 @@ bool ActorCollider::moveX(const Vector2f amount, const CollisionCallback callbac
             if (callback != nullptr) {
                 ((*this).*callback)(hitInfo.value());
             }
-            return true;
+            return hitInfo;
         }
     }
-    return false;
+    return std::nullopt;
 }
 
-bool ActorCollider::moveY(const Vector2f amount, const CollisionCallback callback) {
+std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const CollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
     s32 toMove = std::round(amount.y());
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
 
     if (toMove == 0) {
-        return amount.y() <= 0 && checkIsGrounded(solids);
+        SolidCollider* groundCollider = nullptr;
+        if (amount.y() <= 0 && checkIsGrounded(solids, &groundCollider)) {
+            HitInfo hitinfo;
+            hitinfo.otherMaterial = groundCollider->getMaterial();
+            return hitinfo;
+        } else {
+            return std::nullopt;
+        }
     }
 
     const s32 moveSign = sign(toMove);
@@ -97,10 +104,18 @@ bool ActorCollider::moveY(const Vector2f amount, const CollisionCallback callbac
             if (callback != nullptr) {
                 ((*this).*callback)(hitInfo.value());
             }
-            return true;
+            return hitInfo;
         }
     }
-    return amount.y() <= 0 && checkIsGrounded(solids);
+
+    SolidCollider* groundCollider = nullptr;
+    if (amount.y() <= 0 && checkIsGrounded(solids, &groundCollider)) {
+        HitInfo hitinfo;
+        hitinfo.otherMaterial = groundCollider->getMaterial();
+        return hitinfo;
+    } else {
+        return std::nullopt;
+    }
 }
 
 void ActorCollider::setMomentum(const f32 momentum, const bool isXDirection) {
@@ -133,9 +148,10 @@ void ActorCollider::momentumNotUsed() {
     }
 }
 
-bool ActorCollider::checkIsGrounded(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids) {
+bool ActorCollider::checkIsGrounded(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids, SolidCollider** groundCollider) {
     for (auto& [entity, solid] : solids) {
         if (isRiding(solid)) {
+            *groundCollider = solid;
             return true;
         }
     }
@@ -153,6 +169,7 @@ std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::tupl
         }
         std::optional<HitInfo> hitInfo = movedCollider.collide(collider->getCollider());
         if (hitInfo != std::nullopt) {
+            hitInfo->otherMaterial = collider->getMaterial();
             return hitInfo;
         }
     }
@@ -167,7 +184,6 @@ void ActorCollider::squish(const HitInfo hitInfo) {
 bool ActorCollider::isRiding(const SolidCollider* solid) const {
     // check for collision 1 unit down
     auto movedCollider = AABB(mCollider.center + Vector2i::unitDown, mCollider.half);
-    // if (movedCollider.collide(solid->getCollider()) != std::nullopt) {
     if (movedCollider.isOverlapping(solid->getCollider())) {
         return true;
     }
@@ -200,7 +216,7 @@ bool ActorCollider::tryCornerCorrection(const std::vector<std::tuple<ecs::Entity
     return false;
 }
 
-SolidCollider::SolidCollider(Vector2f position, Vector2i half) : IUseCollision(AABB(half)) {
+SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material) : IUseCollision(AABB(half), material) {
     mCollider.setPosition(position);
 }
 

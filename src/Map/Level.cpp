@@ -69,7 +69,10 @@ std::optional<Error> loadLevel(const Level level) {
                     }
                 } else {
                     Sprite sprite = Sprite(Depth::Player, frame.value());
-                    auto eEntity = createDecal(trans, sprite);
+                    // auto eEntity = createDecal(trans, sprite);
+                    const TileSet* tset = getTileSet(map, blockID);
+                    Material material = tset->materials[blockID - tset->firstgid];
+                    auto eEntity = createBlock(trans, sprite, material);
                     if (eEntity.isExpected()) {
                         lvl.childEntities.insert(eEntity.value());
                     }
@@ -113,10 +116,8 @@ std::optional<Error> loadLevel(const Level level) {
         collisionGrid.push_back(collisionColumn);
     }
 
-    std::vector<SolidCollider> mesh;
-    // auto now = std::chrono::steady_clock::now();
-    makeCollisionMesh(collisionGrid, lvl);
-    // print("mesh creation time: ", std::chrono::duration<f32>(std::chrono::steady_clock::now() - now).count());
+    // std::vector<SolidCollider> mesh;
+    // makeCollisionMesh(collisionGrid, lvl);
 
     Game::instance().getScene().loadedLevels.push_back(lvl);
 

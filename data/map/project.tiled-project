@@ -311,6 +311,23 @@
             ]
         },
         {
+            "id": 18,
+            "name": "Material",
+            "storageType": "int",
+            "type": "enum",
+            "values": [
+                "None",
+                "Dirt",
+                "Rock",
+                "Soft",
+                "Wood",
+                "Grass",
+                "Water",
+                "Metal"
+            ],
+            "valuesAsFlags": false
+        },
+        {
             "color": "#ffa0a0a4",
             "drawFill": true,
             "id": 15,

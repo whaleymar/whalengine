@@ -68,6 +68,7 @@ bool brain(Animator& animator, ecs::Entity entity) {
         }
         if (vel.total.x() != 0) {
             if (animator.setAnimation(RUN)) {
+                print("running on material:", toString(rb.groundMaterial));
                 return true;
             }
         } else {

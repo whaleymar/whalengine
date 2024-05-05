@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Physics/Material.h"
 #include "Util/Expected.h"
 
 namespace whal {
@@ -14,7 +15,7 @@ struct Sprite;
 
 Expected<ecs::Entity> createBlock(Transform transform);
 Expected<ecs::Entity> createBlock(Transform transform, Draw draw);
-Expected<ecs::Entity> createBlock(Transform transform, Sprite sprite);
+Expected<ecs::Entity> createBlock(Transform transform, Sprite sprite, Material material = Material::None);
 Expected<ecs::Entity> createDecal(Transform transform, Sprite sprite);
 
 }  // namespace whal

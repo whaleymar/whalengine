@@ -48,7 +48,7 @@ Expected<ecs::Entity> createBlock(Transform transform, Draw draw) {
     return block;
 }
 
-Expected<ecs::Entity> createBlock(Transform transform, Sprite sprite) {
+Expected<ecs::Entity> createBlock(Transform transform, Sprite sprite, Material material) {
     auto& ecs = ecs::ECS::getInstance();
 
     auto expected = ecs.entity();
@@ -62,7 +62,7 @@ Expected<ecs::Entity> createBlock(Transform transform, Sprite sprite) {
 
     const s32 widthTileHL = PIXELS_PER_TEXEL * TEXELS_PER_TILE / 2;
     const s32 heightTileHL = PIXELS_PER_TEXEL * TEXELS_PER_TILE / 2;
-    block.add(SolidCollider(toFloatVec(transform.position) + Vector2f(0, heightTileHL), Vector2i(widthTileHL, heightTileHL)));
+    block.add(SolidCollider(toFloatVec(transform.position) + Vector2f(0, heightTileHL), Vector2i(widthTileHL, heightTileHL), material));
 
     return block;
 }

@@ -90,16 +90,16 @@ void PhysicsSystem::update() {
             //// only actors can be grounded (because they're the only ones that interact with the ground)
             //// no callback needed when actor moves into solid
             const bool wasGrounded = rb.value()->isGrounded;
-            if (actor.value()->moveY(move, nullptr)) {
+            if (auto hitinfo = actor.value()->moveY(move, nullptr); hitinfo) {
                 if (move.y() <= 0) {
-                    rb.value()->isGrounded = true;
+                    rb.value()->setGrounded(hitinfo.value().otherMaterial);
                 } else {
-                    rb.value()->isGrounded = false;
+                    rb.value()->setNotGrounded();
                 }
                 rb.value()->isJumping = false;
                 vel.residualImpulse.e[1] = 0;
             } else {
-                rb.value()->isGrounded = false;
+                rb.value()->setNotGrounded();
             }
             actor.value()->moveX(move, nullptr);
             allActors.push_back(entity);

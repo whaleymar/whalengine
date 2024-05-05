@@ -13,7 +13,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     - stitching levels together (DONE) 
     - enable hot-reloading (DONE)
     - support rotations / flips?
-    - store tile material data 
+    - store tile material data (DONE)
     - image layers (DONE)
     - object layers
         - parsing (DONE)
