@@ -136,6 +136,7 @@ void Game::mainloop() {
     }
     // System::audio.play(music);
 
+    bool isTimeNormal = true;
     mWindow->setFocus();
     while (true) {
         pollEvents();
@@ -191,6 +192,16 @@ void Game::mainloop() {
         }
         if (System::input.isDebug()) {
             drawColliders();
+        }
+        if (System::input.isTimeDebug()) {
+            System::input.reset(InputType::TIMETEST);
+            if (isTimeNormal) {
+                System::dt.setMultiplier(0.0);
+                isTimeNormal = false;
+            } else {
+                System::dt.setMultiplier(1.0);
+                isTimeNormal = true;
+            }
         }
 #endif
 
@@ -311,6 +322,7 @@ void Game::updateLevelCamera(bool overrideCache) {
                 }
                 // TODO lock player controls && freeze everything except camera?
                 camera.add(createCameraMoveController(camera.get<Transform>().position, focalPoint));
+                System::dt.setMultiplier(0.0);
                 return;
             }
         }

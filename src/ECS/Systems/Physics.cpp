@@ -4,6 +4,7 @@
 
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/RigidBody.h"
+#include "ECS/Components/Tags.h"
 #include "ECS/Components/Transform.h"
 
 #include "ECS/Components/Velocity.h"
@@ -34,10 +35,6 @@ void applyFriction(Vector2f& velocity, f32 frictionMultiplier) {
 }
 
 void PhysicsSystem::update() {
-    const f32 dt = System::dt();
-    const f32 frictionStepGround = dt * FRICTION_GROUND;
-    const f32 frictionStepAir = dt * FRICTION_AIR;
-    const f32 gravityStep = dt * GRAVITY * 3;
     std::vector<ecs::Entity> allActors;
 
     // sync collider in case position changed in another system
@@ -57,6 +54,15 @@ void PhysicsSystem::update() {
     }
 
     for (auto& [entityid, entity] : getEntitiesRef()) {
+        f32 dt;
+        if (entity.has<Camera>()) {
+            dt = System::dt.getUnmodified();
+        } else {
+            dt = System::dt();
+        }
+        const f32 frictionStepGround = dt * FRICTION_GROUND;
+        const f32 frictionStepAir = dt * FRICTION_AIR;
+        const f32 gravityStep = dt * GRAVITY * 3;
         Transform& trans = entity.get<Transform>();
         Velocity& vel = entity.get<Velocity>();
 

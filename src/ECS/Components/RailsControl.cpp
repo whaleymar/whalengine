@@ -28,7 +28,7 @@ void RailsControl::step() {
     }
 }
 
-f32 RailsControl::getSpeed(Vector2i currentPosition, f32 inv_dt) {
+f32 RailsControl::getSpeed(Vector2i currentPosition) {
     // this is super hacky
     // because my easeIn/easeOut functions describe 2nd order functions
     // but i need to set a velocity, not position, so the physics system will work

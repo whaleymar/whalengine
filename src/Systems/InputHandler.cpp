@@ -66,8 +66,12 @@ void InputHandler::set(InputType input) {
         mIsMusicTest = true;
         break;
 
-    case whal::InputType::RELOADSCENE:
+    case InputType::RELOADSCENE:
         mIsReloadScene = true;
+        break;
+
+    case InputType::TIMETEST:
+        mIsTimeTest = true;
         break;
 #endif
     }
@@ -120,6 +124,10 @@ void InputHandler::reset(InputType input) {
     case InputType::RELOADSCENE:
         mIsReloadScene = false;
         break;
+
+    case InputType::TIMETEST:
+        mIsTimeTest = false;
+        break;
 #endif
 
     default:
@@ -142,6 +150,7 @@ void InputHandler::loadMappings() const {
     KeyMap.insert({SDLK_0, InputType::DEBUG});
     KeyMap.insert({SDLK_m, InputType::MUSICTEST});
     KeyMap.insert({SDLK_r, InputType::RELOADSCENE});
+    KeyMap.insert({SDLK_t, InputType::TIMETEST});
 //     KeyMap.insert({GLFW_KEY_LEFT, InputType::SHRINKX});
 //     KeyMap.insert({GLFW_KEY_RIGHT, InputType::GROWX});
 //     KeyMap.insert({GLFW_KEY_DOWN, InputType::SHRINKY});

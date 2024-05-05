@@ -2,6 +2,7 @@
 
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/RailsControl.h"
+#include "ECS/Components/Tags.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/Velocity.h"
 
@@ -14,9 +15,13 @@ namespace whal {
 constexpr f32 CHECKPOINT_DISTANCE_THRESHOLD = 4;  // in pixels
 
 void RailsSystem::update() {
-    f32 dt = System::dt();
-    f32 inv_dt = 1 / dt;
     for (auto& [entityid, entity] : getEntitiesCopy()) {
+        f32 dt;
+        if (entity.has<Camera>()) {
+            dt = System::dt.getUnmodified();
+        } else {
+            dt = System::dt();
+        }
         auto& rails = entity.get<RailsControl>();
         if (!rails.isValid()) {
             print("skipping invalid RailsControl component for entity", entityid);
@@ -56,7 +61,7 @@ void RailsSystem::update() {
                         entity.add<Velocity>();
                         rails.curActionTime = rails.waitTime;
                     } else {
-                        Velocity velToAdd = Velocity(toFloatVec(newDelta).norm() * rails.getSpeed(transform.position, inv_dt));
+                        Velocity velToAdd = Velocity(toFloatVec(newDelta).norm() * rails.getSpeed(transform.position));
                         entity.add<Velocity>(velToAdd);
                     }
 
@@ -93,7 +98,7 @@ void RailsSystem::update() {
         } else {
             // moving to next checkpoint
             if (rails.isVelocityUpdateNeeded) {
-                f32 speed = rails.getSpeed(transform.position, inv_dt);
+                f32 speed = rails.getSpeed(transform.position);
                 // f32 speed = rails.getSpeedNew();
                 // print("Speed", speed);
                 entity.set(Velocity(delta.norm() * speed));

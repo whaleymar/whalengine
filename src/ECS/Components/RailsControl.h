@@ -42,7 +42,7 @@ public:
     CheckPoint getTarget() const;
     void startManually();
     void step();
-    f32 getSpeed(Vector2i currentPosition, f32 inv_dt);
+    f32 getSpeed(Vector2i currentPosition);
     f32 getSpeedNew();
     bool isValid() const;
 };

@@ -32,10 +32,11 @@ Expected<ecs::Entity> createCamera(ecs::Entity target) {
 void onCameraAtDestination(ecs::Entity cameraEntity, RailsControl& rails) {
     cameraEntity.remove<RailsControl>();
     cameraEntity.add<Velocity>();  // railscontrol removed it
+    System::dt.setMultiplier(1.0);
 }
 
 RailsControl createCameraMoveController(Vector2i currentPosition, Vector2i nextPosition) {
-    return RailsControl(45,
+    return RailsControl(65,
                         {
                             {currentPosition, RailsControl::Movement::LINEAR},
                             {nextPosition, RailsControl::Movement::EASEO_CUBE},

@@ -12,7 +12,9 @@ public:
     friend System;
 
     f32 operator()() const { return mDeltatime; }
+    f32 getUnmodified() const { return mDeltatimeUnmodified; }
     void update();
+    void setMultiplier(f32);
 
 private:
     Deltatime();
@@ -21,6 +23,8 @@ private:
 
     std::chrono::time_point<std::chrono::steady_clock> mPreviousTime;
     f32 mDeltatime;
+    f32 mDeltatimeUnmodified;
+    f32 mTimeMultiplier = 1.0;
 };
 
 }  // namespace whal

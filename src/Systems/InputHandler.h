@@ -7,7 +7,7 @@ namespace whal {
 
 struct System;
 
-enum class InputType { LEFT, RIGHT, UP, DOWN, JUMP, PAUSE, QUIT, DEBUG, GROWX, GROWY, SHRINKX, SHRINKY, MUSICTEST, RELOADSCENE };
+enum class InputType { LEFT, RIGHT, UP, DOWN, JUMP, PAUSE, QUIT, DEBUG, GROWX, GROWY, SHRINKX, SHRINKY, MUSICTEST, RELOADSCENE, TIMETEST };
 
 void pollEvents();
 void keyCallback(SDL_Event& event);
@@ -39,6 +39,7 @@ public:
     bool isGrowY() const { return mIsGrowY; }
     bool isMusicDebug() const { return mIsMusicTest; }
     bool isReloadScene() const { return mIsReloadScene; }
+    bool isTimeDebug() const { return mIsTimeTest; }
 #endif
 
     inline static std::unordered_map<int, InputType> KeyMap;
@@ -66,6 +67,7 @@ private:
     bool mIsShrinkY = false;
     bool mIsGrowX = false;
     bool mIsGrowY = false;
+    bool mIsTimeTest = false;
 #endif
 };
 
