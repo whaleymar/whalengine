@@ -406,12 +406,13 @@
                             }
                         }, 
                         {
-                         "name":"Draw",
-                         "propertytype":"Component_Draw",
+                         "name":"Sprite",
+                         "propertytype":"Component_Sprite_NoAnim",
                          "type":"class",
                          "value":
                             {
-                             "Color":"#ff00c896"
+                             "Color":"#ffffc864",
+                             "Sprite":"tile\/dirtblock"
                             }
                         }],
                  "rotation":0,
