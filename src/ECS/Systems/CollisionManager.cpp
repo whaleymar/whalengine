@@ -1,7 +1,6 @@
 #include "CollisionManager.h"
 
 #include "ECS/Components/Collision.h"
-#include "ECS/Components/Transform.h"
 #include "ECS/Systems/TagTrackers.h"
 #include "Game/Events.h"
 
@@ -28,6 +27,7 @@ void ActorsManager::update() {
 
 void ActorsManager::onAdd(ecs::Entity entity) {
     mActors.push_back({entity, &entity.get<ActorCollider>()});
+    entity.get<ActorCollider>().setEntity(entity);
 #ifndef NDEBUG
     entity.get<ActorCollider>().getCollider().vao.initArray();
     entity.get<ActorCollider>().getCollider().vbo.initBuffer();
@@ -57,6 +57,7 @@ void SolidsManager::update() {
 
 void SolidsManager::onAdd(ecs::Entity entity) {
     mSolids.push_back({entity, &entity.get<SolidCollider>()});
+    entity.get<SolidCollider>().setEntity(entity);
 #ifndef NDEBUG
     entity.get<SolidCollider>().getCollider().vao.initArray();
     entity.get<SolidCollider>().getCollider().vbo.initBuffer();

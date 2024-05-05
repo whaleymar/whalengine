@@ -48,20 +48,20 @@ const std::optional<HitInfo> AABB::collide(AABB other) const {
         // Vector2i hitPos(center.x() + half.x() * signX, center.y() + half.y() * signY);
         // Vector2i hitDelta(px * signX, py * signY);
         Vector2i hitNormal(signX, signY);
-        return HitInfo(hitNormal, &other);
+        return HitInfo(hitNormal);
     }
     if (px < py) {
         const s32 signX = sign(delta.x());
         // Vector2i hitPos(center.x() + half.x() * signX, other.center.y());
         // Vector2i hitDelta(px * signX, 0);
         Vector2i hitNormal(signX, 0);
-        return HitInfo(hitNormal, &other);
+        return HitInfo(hitNormal);
     } else {
         const s32 signY = sign(delta.y());
         // Vector2i hitPos(other.center.x(), center.y() + half.y() * signY);
         // Vector2i hitDelta(0, py * signY);
         Vector2i hitNormal(0, signY);
-        return HitInfo(hitNormal, &other);
+        return HitInfo(hitNormal);
     }
 }
 
@@ -106,7 +106,7 @@ const std::optional<HitInfo> AABB::collide(Segment segment) const {
     // const s32 uncollidedFraction = clamp(near, 0, 1);
     // Vector2i hitDelta = segment.delta * (-1 * (1 - uncollidedFraction));
     // Vector2i hitPos = segment.delta * uncollidedFraction + segment.origin;
-    return HitInfo(hitNormal, nullptr);
+    return HitInfo(hitNormal);
 }
 
 bool AABB::isOverlapping(AABB other) const {

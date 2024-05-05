@@ -81,7 +81,7 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
     if (toMove == 0) {
         SolidCollider* groundCollider = nullptr;
         if (amount.y() <= 0 && checkIsGrounded(solids, &groundCollider)) {
-            HitInfo hitinfo;
+            HitInfo hitinfo(Vector2i(0, -1));
             hitinfo.otherMaterial = groundCollider->getMaterial();
             return hitinfo;
         } else {
@@ -110,7 +110,7 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
 
     SolidCollider* groundCollider = nullptr;
     if (amount.y() <= 0 && checkIsGrounded(solids, &groundCollider)) {
-        HitInfo hitinfo;
+        HitInfo hitinfo(Vector2i(0, -1));
         hitinfo.otherMaterial = groundCollider->getMaterial();
         return hitinfo;
     } else {
@@ -192,6 +192,7 @@ std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::tupl
         }
         std::optional<HitInfo> hitInfo = movedCollider.collide(collider->getCollider());
         if (hitInfo != std::nullopt) {
+            hitInfo->other = collider->getEntity();
             hitInfo->otherMaterial = collider->getMaterial();
             return hitInfo;
         }

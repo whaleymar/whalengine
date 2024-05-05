@@ -8,7 +8,6 @@
 
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
-#include "Util/Print.h"
 
 namespace whal {
 
@@ -64,7 +63,6 @@ void ControllerSystemRB::update() {
         const f32 approachSpeed = APPROACH_SPEED_X * dt * control.moveSpeed;
         if (impulseX != 0) {
             f32 approachFrom;
-            // f32 approachTarget = impulseX;
             approachFrom = vel.stable.x();
             if (sign(impulseX) == sign(vel.stable.x())) {
                 if (abs(approachFrom) < control.moveSpeed) {
@@ -77,10 +75,9 @@ void ControllerSystemRB::update() {
                 impulseX = approach(approachFrom, impulseX, approachSpeed);
                 vel.stable.e[0] += impulseX;
             }
-            // print("impulseX:", impulseX, "velocityX:", vel.stable.x(), "\tapproachFrom:", approachFrom, ", target:", approachTarget, ",
-            // approachspeed:", approachSpeed);
         }
 
+        // Y axis controls (jumping) works different because this feels better
         f32 impulseY = 0;
         if (isJumpAvailable) {
             control.jumpBuffer.buffer();
@@ -117,7 +114,6 @@ void ControllerSystemRB::update() {
         }
 
         vel.impulse += Vector2f(0.0, impulseY);
-        // vel.impulse += Vector2f(impulseX, impulseY);
 
         auto& trans = entity.get<Transform>();
         if (impulseX > 0 && trans.facing != Facing::Right) {
