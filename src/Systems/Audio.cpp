@@ -86,7 +86,8 @@ void AudioPlayer::play(const Music& music) {
     mCondition.notify_one();
 }
 
-void AudioPlayer::play(const AudioClip& clip) const {
+// plays an audio clip. Can pass in desired volume scale between 0-1. Default 1
+void AudioPlayer::play(const AudioClip& clip, f32 volume) const {
     if (!clip.isValid()) {
         return;
     }
@@ -96,10 +97,15 @@ void AudioPlayer::play(const AudioClip& clip) const {
     // arg 3:
     // 0 == play once and stop
     // -1 == play forever?
+
+    // volume ranges from 0-128
+    s32 sVolume = static_cast<s32>(128.0 * volume);
     auto channel = Mix_PlayChannel(-1, clip.get(), 0);
     if (channel == -1) {
         print("couldn't play audio clip");
+        return;
     }
+    Mix_Volume(channel, sVolume);
 }
 
 void AudioPlayer::stopMusic() {
@@ -148,6 +154,11 @@ std::optional<Error> Sfx::load() {
     errOpt = ENEMY_CRY.load("data/minecwaftZombieBruh.mp3");
     if (errOpt)
         return errOpt;
+
+    errOpt = FOOTSTEPTEST.load("data/test-footstep.mp3");
+    if (errOpt) {
+        return errOpt;
+    }
 
     return std::nullopt;
 }

@@ -8,6 +8,7 @@
 #include <optional>
 
 #include "Util/Expected.h"
+#include "Util/Types.h"
 
 namespace whal {
 
@@ -58,7 +59,7 @@ public:
     void end();
 
     void play(const Music& music);
-    void play(const AudioClip& clip) const;
+    void play(const AudioClip& clip, f32 volume = 1.0) const;
     void stopMusic();
     void stopAll();
     bool isValid() const { return mIsValid; }
@@ -90,6 +91,7 @@ public:
 
     inline static AudioClip GAMEOVER;
     inline static AudioClip ENEMY_CRY;
+    inline static AudioClip FOOTSTEPTEST;
 
     std::optional<Error> load();
 

@@ -68,7 +68,7 @@ bool brain(Animator& animator, ecs::Entity entity) {
         }
         if (vel.total.x() != 0) {
             if (animator.setAnimation(RUN)) {
-                print("running on material:", toString(rb.groundMaterial));
+                System::audio.play(Sfx::FOOTSTEPTEST, 0.3);
                 return true;
             }
         } else {
@@ -90,7 +90,11 @@ bool brain(Animator& animator, ecs::Entity entity) {
     }
 
     // animation did not change
-    return basicAnimation(animator, entity);
+    bool frameChanged = basicAnimation(animator, entity);
+    if (frameChanged && animator.getAnimation().id == RUN && animator.curFrameIx % 2 == 0) {
+        System::audio.play(Sfx::FOOTSTEPTEST, 0.25);
+    }
+    return frameChanged;
 }
 
 }  // namespace PlayerAnim

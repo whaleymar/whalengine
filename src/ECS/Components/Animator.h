@@ -14,6 +14,7 @@ struct Animator;
 struct Animation;
 struct Frame;
 
+// returns True if frame changed
 using AnimBrain = bool (*)(Animator& animator, ecs::Entity entity);
 
 bool basicAnimation(Animator& animator, ecs::Entity entity);
