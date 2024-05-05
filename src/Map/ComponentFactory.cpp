@@ -175,7 +175,7 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
 }
 
 void addComponentVelocity(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
-                          ecs::Entity entity) {
+                          ecs::Entity entity, LayerData layerData) {
     Velocity velocity = ComponentFactory::DefaultVelocity;
 
     if (values.contains("velX")) {
@@ -189,7 +189,7 @@ void addComponentVelocity(nlohmann::json& values, nlohmann::json& allObjects, st
 }
 
 void addComponentRailsControl(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
-                              ActiveLevel& level, ecs::Entity entity) {
+                              ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
     std::vector<RailsControl::CheckPoint> checkpoints;
     if (values.contains("Checkpoints")) {
         s32 id = values["Checkpoints"];
@@ -214,12 +214,12 @@ void addComponentRailsControl(nlohmann::json& values, nlohmann::json& allObjects
 }
 
 void addComponentDraw(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
-                      ecs::Entity entity) {
+                      ecs::Entity entity, LayerData layerData) {
     s32 ix = idToIndex[thisId];
     Vector2i frameSizeTexels = {allObjects[ix]["width"], allObjects[ix]["height"]};
 
-    // TODO parse depth
     Draw draw = ComponentFactory::DefaultDraw;
+    draw.depth = layerData.depth;
     draw.setFrameSize(frameSizeTexels);
 
     // ARGB
@@ -234,7 +234,7 @@ void addComponentDraw(nlohmann::json& values, nlohmann::json& allObjects, std::u
 }
 
 void addComponentSprite(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
-                        ecs::Entity entity) {
+                        ecs::Entity entity, LayerData layerData) {
     Sprite sprite = ComponentFactory::DefaultSprite;
 
     // ARGB
@@ -252,7 +252,7 @@ void addComponentSprite(nlohmann::json& values, nlohmann::json& allObjects, std:
     }
     auto frameOpt = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame(spritePath.c_str());
     if (frameOpt) {
-        // TODO parse depth
+        sprite.depth = layerData.depth;
         sprite.setFrame(frameOpt.value());
         entity.add(sprite);
     } else {
@@ -267,7 +267,7 @@ void addComponentSprite(nlohmann::json& values, nlohmann::json& allObjects, std:
 }
 
 void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
-                               ActiveLevel& level, ecs::Entity entity) {
+                               ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
     SolidCollider solid = ComponentFactory::DefaultSolidCollider;
     Vector2i halflenTexels = solid.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
 
@@ -284,7 +284,7 @@ void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObject
 }
 
 void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
-                               ActiveLevel& level, ecs::Entity entity) {
+                               ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
     ActorCollider actor = ComponentFactory::DefaultActorCollider;
     Vector2i halflenTexels = actor.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
 
@@ -301,12 +301,12 @@ void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObject
 }
 
 void addComponentFollow(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,
-                        ecs::Entity entity) {
+                        ecs::Entity entity, LayerData layerData) {
     entity.add(loadFollowComponent(values, level));
 }
 
 void addComponentRigidBody(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
-                           ActiveLevel& level, ecs::Entity entity) {
+                           ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
     RigidBody rb = ComponentFactory::DefaultRigidBody;
 
     if (values.contains("jumpInitialVelocity")) {

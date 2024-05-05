@@ -15,10 +15,10 @@
                 6
             ],
             "scale": 2.1889583333333333,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 245.77900447320832,
-                "y": 79.71828304939564
+                "x": 386.94203864090605,
+                "y": 151.8987341772152
             }
         },
         "testmap2.tmj": {
@@ -28,8 +28,8 @@
             "scale": 2.1889583333333333,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": -72.63728942609688,
-                "y": 79.26144475111832
+                "x": 445.8741791186828,
+                "y": 151.8987341772152
             }
         },
         "tile-collision.tsj": {
@@ -44,10 +44,10 @@
                 2
             ],
             "scale": 2.1889583333333333,
-            "selectedLayer": 0,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 239.84010659560295,
-                "y": 124.03159798229754
+                "x": 125.63053202626818,
+                "y": 207.6330065670505
             }
         }
     },
@@ -69,7 +69,7 @@
         "widemap.tmj"
     ],
     "project": "project.tiled-project",
-    "property.type": "Material",
+    "property.type": "Depth",
     "recentFiles": [
         "testmap.tmj",
         "widemap.tmj",

@@ -78,7 +78,7 @@ std::optional<Error> loadDebugScene() {
     }
 
     for (s32 i = 10; i < 15; i++) {
-        Depth d = i % 2 == 0 ? Depth::Foreground : Depth::BackgroundNoParallax;
+        Depth d = i % 2 == 0 ? Depth::Foreground1 : Depth::Background1;
         auto invisBlock =
             createBlock(Transform::tiles(i, 2),
                         Sprite(d, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/dirtblock").value(), Color::EMERALD))

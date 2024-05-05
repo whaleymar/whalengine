@@ -24,10 +24,16 @@ std::optional<Error> parseWorld(const char* mapfile, Scene& dstScene);
 Transform getTransformFromMapPosition(Vector2i mapCenterPositionTexels, Vector2i dimensionsTexels, ActiveLevel& level, bool isPoint);
 const TileSet* getTileSet(const TileMap& map, s32 blockId);
 
+struct LayerData {
+    Depth depth;
+    f32 parallax = 1.0;
+};
+
 struct TileLayer {
     std::string name;
     s32 width;
     s32 height;
+    LayerData metadata;
     std::unique_ptr<s32[]> data;
 };
 
@@ -55,11 +61,7 @@ struct TileMap {
     s32 heightTiles;
     s32 tileSize;
 
-    // maybe a vector would be better...
-    TileLayer baseLayer;
-    TileLayer collisionLayer;
-    TileLayer foregroundLayer;
-    TileLayer backgroundLayer;
+    std::vector<TileLayer> layers;
     std::vector<TileSet> tilesets;
 };
 

@@ -92,27 +92,32 @@ TileMap TileMap::parse(const char* path, ActiveLevel& level) {
     return map;
 }
 
+Depth getLayerDepth(nlohmann::json layer, Depth defaultDepth) {
+    Depth layerDepth = defaultDepth;
+    if (layer.contains("properties")) {
+        for (auto& property : layer["properties"]) {
+            std::string propertytype = property["propertytype"];
+            if (propertytype == "Depth") {
+                layerDepth = property["value"];
+                break;
+            }
+        }
+    }
+    return layerDepth;
+}
+
 void parseTileLayer(nlohmann::json layer, TileMap& map) {
     s32 width = layer["width"];
     s32 height = layer["height"];
     const auto& name = layer["name"];
     std::string tname = name;
+    Depth layerDepth = getLayerDepth(layer, Depth::Level);
 
     std::vector<s32> layerData = layer["data"].get<std::vector<s32>>();
-    TileLayer tLayer = {tname, width, height, std::unique_ptr<s32[]>(new s32[width * height]())};
+    TileLayer tLayer = {tname, width, height, {layerDepth}, std::unique_ptr<s32[]>(new s32[width * height]())};
     memcpy(tLayer.data.get(), layerData.data(), layerData.size() * sizeof(s32));
 
-    if (tname == "Collision") {
-        map.collisionLayer = std::move(tLayer);
-    } else if (tname == "Base") {
-        map.baseLayer = std::move(tLayer);
-    } else if (tname == "Foreground") {
-        map.foregroundLayer = std::move(tLayer);
-    } else if (tname == "Background") {
-        map.backgroundLayer = std::move(tLayer);
-    } else {
-        print("unrecognized layer name: ", tname);
-    }
+    map.layers.push_back(std::move(tLayer));
 }
 
 void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
@@ -120,6 +125,10 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
     auto& ecs = ecs::ECS::getInstance();
 
     using json = nlohmann::json;
+
+    Depth layerDepth = getLayerDepth(layer, Depth::Level);
+    LayerData layerData = {layerDepth};
+
     json& objects = layer["objects"];
     std::unordered_map<s32, s32> idToIndex;
     for (size_t ix = 0; ix < objects.size(); ix++) {
@@ -174,7 +183,7 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
                 continue;
             }
 
-            creatorFunc(property["value"], objects, idToIndex, thisId, level, entity);
+            creatorFunc(property["value"], objects, idToIndex, thisId, level, entity, layerData);
         }
     }
 }
@@ -184,8 +193,12 @@ void parseImageLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
     if (!eEntity.isExpected()) {
         return;
     }
+
     ecs::Entity entity = eEntity.value();
     level.childEntities.insert(entity);
+
+    Depth layerDepth = getLayerDepth(layer, Depth::Level);
+    LayerData layerData = {layerDepth};
 
     Vector2i position(layer["x"], layer["y"]);
 
@@ -218,8 +231,7 @@ void parseImageLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
 
     entity.add(trans);
 
-    // TODO use parallax for depth?
-    entity.add(Sprite(Depth::BackgroundNoParallax, frame.value()));
+    entity.add(Sprite(layerData.depth, frame.value()));
 }
 
 Expected<TileSet> parseTileset(std::string basename, s32 firstgid) {

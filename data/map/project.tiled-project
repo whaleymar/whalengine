@@ -297,6 +297,24 @@
             ]
         },
         {
+            "id": 19,
+            "name": "Depth",
+            "storageType": "int",
+            "type": "enum",
+            "values": [
+                "Background3",
+                "Background2",
+                "Background1",
+                "Level",
+                "Player",
+                "Foreground3",
+                "Foreground2",
+                "Foreground1",
+                "Debug"
+            ],
+            "valuesAsFlags": false
+        },
+        {
             "color": "#ffffaaff",
             "drawFill": true,
             "id": 5,

@@ -9,6 +9,13 @@
          "offsetx":0,
          "offsety":96,
          "opacity":1,
+         "properties":[
+                {
+                 "name":"Depth",
+                 "propertytype":"Depth",
+                 "type":"int",
+                 "value":0
+                }],
          "type":"imagelayer",
          "visible":true,
          "x":0,
@@ -32,6 +39,13 @@
                  "y":96
                 }],
          "opacity":1,
+         "properties":[
+                {
+                 "name":"Depth",
+                 "propertytype":"Depth",
+                 "type":"int",
+                 "value":3
+                }],
          "type":"objectgroup",
          "visible":true,
          "x":0,
@@ -66,6 +80,13 @@
          "id":1,
          "name":"Base",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"Depth",
+                 "propertytype":"Depth",
+                 "type":"int",
+                 "value":3
+                }],
          "type":"tilelayer",
          "visible":true,
          "width":60,

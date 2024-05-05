@@ -6,28 +6,14 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 ## Current Goal: 
 - text system (on hold)
 - tiled parser
-    - parse map data (DONE)
-    - display correct sprites (DONE)
-    - bake collision mesh (DONE)
-    - level name and world coordinates (DONE)
-    - stitching levels together (DONE) 
-    - enable hot-reloading (DONE)
     - support rotations / flips?
-    - store tile material data (DONE)
-    - image layers (DONE)
     - object layers
-        - parsing (DONE)
-        - component factory (DONE)
-        - component factory functions
-        - Tiled class default arguments (DONE)
+        - component factory functions (mostly done)
         - special metadata
             - spawn points
-            - camera strat (DONE)
+            - camera strat (might want to rework)
         - Templates
     - parallax
-    - move tiled map(s) and tilesets into data/ directory (DONE)
-- game class (DONE)
-- moving camera (DONE)
 
 - #cleanup stuff
 

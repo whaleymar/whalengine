@@ -38,30 +38,27 @@ public:
     void freeBuffer();
 };
 
-enum class Depth {
-    BackgroundFar,   // parallax
-    BackgroundMid,   // parallax
-    BackgroundNear,  // parallax
-    BackgroundNoParallax,
-    Player,
-    Foreground,
-    Debug
-};
+enum class Depth { Background3, Background2, Background1, Level, Player, Foreground3, Foreground2, Foreground1, Debug };
 
+// layers with parallax will be between -1 and 0 (numbers come from map data)
 inline constexpr f32 depthToFloat(Depth depth) {
     switch (depth) {
-    case Depth::BackgroundFar:
-        return -0.9;
-    case Depth::BackgroundMid:
-        return -0.8;
-    case Depth::BackgroundNear:
-        return -0.7;
-    case Depth::BackgroundNoParallax:
-        return -0.1;
-    case Depth::Player:
+    case Depth::Background3:
         return 0.0;
-    case Depth::Foreground:
+    case Depth::Background2:
         return 0.1;
+    case Depth::Background1:
+        return 0.2;
+    case Depth::Level:
+        return 0.3;
+    case Depth::Player:
+        return 0.4;
+    case Depth::Foreground3:
+        return 0.5;
+    case Depth::Foreground2:
+        return 0.6;
+    case Depth::Foreground1:
+        return 0.7;
     case Depth::Debug:
         return 0.9;
     }

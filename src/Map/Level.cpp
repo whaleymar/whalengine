@@ -50,70 +50,50 @@ std::optional<Error> loadLevel(const Level level) {
 
     std::vector<std::vector<s32>> collisionGrid;
     for (s32 x = 0; x < map.widthTiles; x++) {
-        std::vector<s32> collisionColumn;
+        // std::vector<s32> collisionColumn;
         for (s32 y = 0; y < map.heightTiles; y++) {
             Transform trans = Transform(Transform::tiles(x, map.heightTiles - y).position + worldOffsetPixels);
             s32 ix = map.widthTiles * y + x;
-            s32 blockID = map.baseLayer.data.get()[ix];
 
-            if (blockID != 0) {
-                // for now, am assuming everything in the base layer has collision
-                collisionColumn.push_back(1);
+            for (auto& layer : map.layers) {
+                s32 blockID = layer.data.get()[ix];
 
-                Expected<Frame> frame = getTileFrame(map, blockID);
-                if (!frame.isExpected()) {
-                    print(frame.error());
-                    auto eEntity = createBlock(trans);
-                    if (eEntity.isExpected()) {
-                        lvl.childEntities.insert(eEntity.value());
+                if (blockID != 0) {
+                    // for now, am assuming everything in the base layer has collision
+                    // collisionColumn.push_back(1);
+
+                    Expected<Frame> frame = getTileFrame(map, blockID);
+                    if (!frame.isExpected()) {
+                        print(frame.error());
+                        auto eEntity = createBlock(trans);
+                        if (eEntity.isExpected()) {
+                            lvl.childEntities.insert(eEntity.value());
+                        }
+                    } else {
+                        Sprite sprite = Sprite(layer.metadata.depth, frame.value());
+
+                        if (layer.metadata.depth == Depth::Level || layer.metadata.depth == Depth::Player) {
+                            // not using collision mesh because i lose material info
+                            const TileSet* tset = getTileSet(map, blockID);
+                            Material material = tset->materials[blockID - tset->firstgid];
+                            auto eEntity = createBlock(trans, sprite, material);
+                            if (eEntity.isExpected()) {
+                                lvl.childEntities.insert(eEntity.value());
+                            }
+
+                        } else {
+                            auto eEntity = createDecal(trans, sprite);
+                            if (eEntity.isExpected()) {
+                                lvl.childEntities.insert(eEntity.value());
+                            }
+                        }
                     }
                 } else {
-                    Sprite sprite = Sprite(Depth::Player, frame.value());
-                    // auto eEntity = createDecal(trans, sprite);
-                    const TileSet* tset = getTileSet(map, blockID);
-                    Material material = tset->materials[blockID - tset->firstgid];
-                    auto eEntity = createBlock(trans, sprite, material);
-                    if (eEntity.isExpected()) {
-                        lvl.childEntities.insert(eEntity.value());
-                    }
-                }
-            } else {
-                collisionColumn.push_back(0);
-            }
-
-            if (map.backgroundLayer.data != nullptr) {
-                blockID = map.backgroundLayer.data.get()[ix];
-                if (blockID != 0) {
-                    Expected<Frame> frame = getTileFrame(map, blockID);
-                    if (!frame.isExpected()) {
-                        print(frame.error());
-                    } else {
-                        Sprite sprite = Sprite(Depth::BackgroundNoParallax, frame.value());
-                        auto eEntity = createDecal(trans, sprite);
-                        if (eEntity.isExpected()) {
-                            lvl.childEntities.insert(eEntity.value());
-                        }
-                    }
-                }
-            }
-
-            if (map.foregroundLayer.data != nullptr) {
-                blockID = map.foregroundLayer.data.get()[ix];
-                if (blockID != 0) {
-                    Expected<Frame> frame = getTileFrame(map, blockID);
-                    if (!frame.isExpected()) {
-                        print(frame.error());
-                    } else {
-                        Sprite sprite = Sprite(Depth::Foreground, frame.value());
-                        auto eEntity = createDecal(trans, sprite);
-                        if (eEntity.isExpected()) {
-                            lvl.childEntities.insert(eEntity.value());
-                        }
-                    }
+                    // collisionColumn.push_back(0);
                 }
             }
         }
-        collisionGrid.push_back(collisionColumn);
+        // collisionGrid.push_back(collisionColumn);
     }
 
     // std::vector<SolidCollider> mesh;
