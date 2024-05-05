@@ -137,6 +137,7 @@ void Game::mainloop() {
     // System::audio.play(music);
 
     mWindow->setFocus();
+    bool isTimeNormal = true;
     while (true) {
         pollEvents();
         if (System::input.isQuit()) {
@@ -191,6 +192,16 @@ void Game::mainloop() {
         }
         if (System::input.isDebug()) {
             drawColliders();
+        }
+        if (System::input.isTimeDebug()) {
+            System::input.reset(InputType::TIMETEST);
+            if (isTimeNormal) {
+                System::dt.setMultiplier(2.0);
+                isTimeNormal = false;
+            } else {
+                System::dt.setMultiplier(1.0);
+                isTimeNormal = true;
+            }
         }
 #endif
 
