@@ -260,8 +260,9 @@ bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity,
     return false;
 }
 
-SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material, ActorCollisionCallback onCollisionEnter_, Vector2i collisionDir)
-    : IUseCollision(AABB(half), material), mCollisionNormal(collisionDir), mOnCollisionEnter(onCollisionEnter_) {
+SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material, ActorCollisionCallback onCollisionEnter_, s32 xCollisionNormal,
+                             s32 yCollisionNormal)
+    : IUseCollision(AABB(half), material), mCollisionNormal(xCollisionNormal, yCollisionNormal), mOnCollisionEnter(onCollisionEnter_) {
     mCollider.setPosition(position);
 }
 

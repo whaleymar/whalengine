@@ -22,7 +22,7 @@ class SolidCollider : public IUseCollision {
 public:
     SolidCollider() = default;
     SolidCollider(Vector2f position, Vector2i half, Material material = Material::None, ActorCollisionCallback onCollisionEnter_ = nullptr,
-                  Vector2i collisionDir = {0, 0});
+                  s32 xCollisionNormal = 0, s32 yCollisionNormal = 0);
 
     void move(f32 x, f32 y, bool isManualMove = false);
     std::vector<ActorCollider*> getRidingActors() const;
