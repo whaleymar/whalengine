@@ -150,6 +150,10 @@ void createTestPlatform() {
         // platform.get<SolidCollider>().setCollisionCallback(&killEntityCallback);
     }
 
-    auto block = createBlock(Transform::tiles(9, -13), Draw(Color::MAGENTA)).value();
-    block.get<SolidCollider>().setCollisionDir(CollisionDir::UP);
+    auto block = createBlock(Transform::tiles(5, -9), Draw(Color::MAGENTA)).value();
+    // block.get<SolidCollider>().setCollisionDir(CollisionDir::LEFT);  // WORKS
+    // block.get<SolidCollider>().setCollisionDir(CollisionDir::RIGHT);  // WORKS
+    // block.get<SolidCollider>().setCollisionDir(CollisionDir::DOWN);  // WORKS
+    block.get<SolidCollider>().setCollisionDir(CollisionDir::UP);  // WORKS
+    block.add(Name("ONE WAY COLLIDER"));
 }

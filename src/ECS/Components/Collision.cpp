@@ -103,7 +103,7 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
         } else {
-            if (moveSign == 1 && tryCornerCorrection(solids, nextPos, amount.x())) {
+            if (moveSign == 1 && tryCornerCorrection(solids, nextPos, amount.x(), moveNormal)) {
                 continue;  // avoided collision
             }
             if (callback != nullptr) {
@@ -179,12 +179,46 @@ void ActorCollider::momentumNotUsed() {
 
 bool ActorCollider::checkIsGrounded(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, SolidCollider** groundCollider) {
     for (auto& [entity, solid] : solids) {
-        if (isRiding(solid)) {
+        if (solid->isGround() && isRiding(solid)) {
             *groundCollider = solid;
             return true;
         }
     }
     return false;
+}
+
+// returns true if a collision CAN happen given the move normal & collision direction
+bool checkDirectionalCollision(AABB actor, AABB solid, Vector2i moveNormal, CollisionDir collisionDir) {
+    switch (collisionDir) {
+    case CollisionDir::ALL:
+        return true;
+
+    case CollisionDir::LEFT:
+        if (moveNormal.x() <= 0 || actor.right() != solid.left()) {
+            return false;
+        }
+        break;
+
+    case CollisionDir::RIGHT:
+        if (moveNormal.x() >= 0 || actor.left() != solid.right()) {
+            return false;
+        }
+        break;
+
+    case CollisionDir::DOWN:
+        if (moveNormal.y() <= 0 || actor.top() != solid.bottom()) {
+            return false;
+        }
+        break;
+
+    case CollisionDir::UP:
+        if (moveNormal.y() >= 0 || actor.bottom() != solid.top()) {
+            return false;
+        }
+        break;
+    }
+
+    return true;
 }
 
 // this currently only works for solid objects
@@ -200,15 +234,11 @@ std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::pair
         }
 
         // check for one-way collision skips
-        CollisionDir collisionDir = collider->getCollisionDir();
-        if (collisionDir != CollisionDir::ALL) {
-            if ((moveNormal.x() > 0 && collisionDir != CollisionDir::LEFT) || (moveNormal.x() < 0 && collisionDir != CollisionDir::RIGHT)) {
-                continue;
-            }
-            if ((moveNormal.y() > 0 && collisionDir != CollisionDir::DOWN) || (moveNormal.y() < 0 && collisionDir != CollisionDir::UP)) {
-                continue;
-            }
+        const CollisionDir collisionDir = collider->getCollisionDir();
+        if (!checkDirectionalCollision(getCollider(), collider->getCollider(), moveNormal, collisionDir)) {
+            continue;
         }
+
         std::optional<HitInfo> hitInfo = movedCollider.collide(collider->getCollider());
         if (hitInfo != std::nullopt) {
             hitInfo->other = collider->getEntity();
@@ -226,8 +256,11 @@ void ActorCollider::squish(const HitInfo hitInfo) {
 
 bool ActorCollider::isRiding(const SolidCollider* solid) const {
     // check for collision 1 unit down
+    // (making sure to use the unmoved collider for the directional collision check so the edges are properly aligned)
     auto movedCollider = AABB(mCollider.center + Vector2i::unitDown, mCollider.half);
-    if (movedCollider.isOverlapping(solid->getCollider())) {
+    if (movedCollider.isOverlapping(solid->getCollider()) &&
+        (solid->getCollisionDir() == CollisionDir::ALL ||
+         checkDirectionalCollision(getCollider(), solid->getCollider(), {0, -1}, solid->getCollisionDir()))) {
         return true;
     }
     return false;
@@ -235,12 +268,13 @@ bool ActorCollider::isRiding(const SolidCollider* solid) const {
 
 // Try to wiggle out of collision if barely clipping another collider.
 // Returns true if successful.
-bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPosition, s32 moveSignX) {
+bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPosition, s32 moveSignX,
+                                        Vector2i moveNormal) {
     // if we are on a half texel x coord, start at 0.5 texels of movement
     if (moveSignX >= 0) {
         for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
             Vector2i nextPos = nextPosition + Vector2i(i, 0);
-            if (!checkCollision(solids, nextPos, {1, 0})) {
+            if (!checkCollision(solids, nextPos, moveNormal)) {
                 mCollider.setPosition(nextPos);
                 return true;
             }
@@ -249,7 +283,7 @@ bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity,
     if (moveSignX <= 0) {
         for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
             Vector2i nextPos = nextPosition + Vector2i(-i, 0);
-            if (!checkCollision(solids, nextPos, {-1, 0})) {
+            if (!checkCollision(solids, nextPos, moveNormal)) {
                 mCollider.setPosition(nextPos);
                 return true;
             }
@@ -346,6 +380,10 @@ std::vector<ActorCollider*> SolidCollider::getRidingActors() const {
 void SolidCollider::setCollisionCallback(ActorCollisionCallback callback) {
     mOnCollisionEnter = callback;
     SolidsManager::getInstance()->setUpdateNeeded();
+}
+
+bool SolidCollider::isGround() const {
+    return mCollisionDir == CollisionDir::ALL || mCollisionDir == CollisionDir::UP;
 }
 
 }  // namespace whal

@@ -31,7 +31,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 
 ## Physics
 - Trigger colliders
-- one way collision (should be easy, just check that move axis and sign match the member var)
 - fixed updates at 60fps so rounding doesn't fuck me
 
 ## Map 
@@ -44,6 +43,9 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
     - Templates
 - parallax
 
+## Graphics
+- outline shader
+- repeating texture
 
 ## Non-ECS Systems
 - chunk loading/unloading (quad tree?)

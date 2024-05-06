@@ -29,6 +29,7 @@ public:
     void move(f32 x, f32 y, bool isManualMove = false);
     std::vector<ActorCollider*> getRidingActors() const;
     void setCollisionCallback(ActorCollisionCallback callback);
+    bool isGround() const;
     ActorCollisionCallback getOnCollisionEnter() const { return mOnCollisionEnter; }
     CollisionDir getCollisionDir() const { return mCollisionDir; }
     void setCollisionDir(CollisionDir dir) { mCollisionDir = dir; }
@@ -70,7 +71,7 @@ public:
     virtual bool isRiding(const SolidCollider* solid) const;
 
 private:
-    bool tryCornerCorrection(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPos, s32 moveSign);
+    bool tryCornerCorrection(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPos, s32 moveSign, Vector2i moveNormal);
 
     Vector2f mStoredMomentum;
     Vector2i mMomentumFramesLeft = {0, 0};
