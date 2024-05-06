@@ -333,9 +333,16 @@ void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
 void SolidCollider::moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
                                   std::vector<ActorCollider*>& riding, bool isManualMove) {
     f32 dt = System::dt();
+    Vector2i moveNormal;
+    if (isXDirection) {
+        moveNormal = {sign(toMoveRounded), 0};
+    } else {
+        moveNormal = {0, sign(toMoveRounded)};
+    }
     for (auto& [entity, actor] : ActorsManager::getInstance()->getAllActors()) {
         // push takes priority over carry
-        if (mCollider.isOverlapping(actor->getCollider())) {
+        if (mCollider.isOverlapping(actor->getCollider()) &&
+            checkDirectionalCollision(actor->getCollider(), getCollider(), moveNormal, getCollisionDir())) {
             f32 actorEdge = (actor->getCollider().*edgeFunc)();
             toMoveRounded = solidEdge - actorEdge;
             if (isXDirection) {
