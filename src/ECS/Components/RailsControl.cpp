@@ -18,6 +18,7 @@ RailsControl::CheckPoint RailsControl::getTarget() const {
 
 void RailsControl::startManually() {
     isVelocityUpdateNeeded = true;
+    curActionTime = waitTime;
 }
 
 void RailsControl::step() {

@@ -15,19 +15,23 @@ class Entity;
 }
 
 // using TriggerCallback = void (*)(HitInfo, Entity self, Entity other);
-using CollisionCallback = void (ActorCollider::*)(HitInfo);
+using ActorCollisionCallback = void (*)(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo);
+// using CollisionCallback = void (*)(ecs::Entity self, HitInfo hitinfo);
 
 class SolidCollider : public IUseCollision {
 public:
     SolidCollider() = default;
-    SolidCollider(Vector2f position, Vector2i half, Material material = Material::None);
+    SolidCollider(Vector2f position, Vector2i half, Material material = Material::None, ActorCollisionCallback onCollisionEnter_ = nullptr);
 
     void move(f32 x, f32 y, bool isManualMove = false);
     std::vector<ActorCollider*> getRidingActors() const;
+    void setCollisionCallback(ActorCollisionCallback callback);
+    ActorCollisionCallback getOnCollisionEnter() const { return mOnCollisionEnter; }
 
 private:
     void moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
                        std::vector<ActorCollider*>& riding, bool isManualMove);
+    ActorCollisionCallback mOnCollisionEnter;
 };
 
 class ActorCollider : public IUseCollision {
@@ -35,8 +39,8 @@ public:
     ActorCollider() = default;
     ActorCollider(Vector2f position, Vector2i half);
 
-    std::optional<HitInfo> moveX(const Vector2f amount, const CollisionCallback callback);
-    std::optional<HitInfo> moveY(const Vector2f amount, const CollisionCallback callback);
+    std::optional<HitInfo> moveX(const Vector2f amount, const ActorCollisionCallback callback);
+    std::optional<HitInfo> moveY(const Vector2f amount, const ActorCollisionCallback callback);
     bool isAlive() const { return mIsAlive; }
     void setMomentum(const f32 momentum, const bool isXDirection);
     void addMomentum(const f32 momentum, const bool isXDirection);
@@ -48,10 +52,10 @@ public:
     bool isMomentumStoredX() const { return mMomentumFramesLeft.x() > 0; }
     bool isMomentumStoredY() const { return mMomentumFramesLeft.y() > 0; }
     void momentumNotUsed();
-    bool checkIsGrounded(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids, SolidCollider** groundSolid);
+    bool checkIsGrounded(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, SolidCollider** groundSolid);
 
     template <typename T>
-    std::optional<HitInfo> checkCollision(const std::vector<std::tuple<ecs::Entity, T*>>& objects, const Vector2i position) const;
+    std::optional<HitInfo> checkCollision(const std::vector<std::pair<ecs::Entity, T*>>& objects, const Vector2i position) const;
 
     // squish is a CollisionCallback. Not sure if I will define others
     // TODO these can't be virtual bc ECS
@@ -59,12 +63,14 @@ public:
     virtual bool isRiding(const SolidCollider* solid) const;
 
 private:
-    bool tryCornerCorrection(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPos, s32 moveSign);
+    bool tryCornerCorrection(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPos, s32 moveSign);
 
     Vector2f mStoredMomentum;
     Vector2i mMomentumFramesLeft = {0, 0};
     // f32 mMass = 1; // could give solids a mass and use mass ratio to calculate force
     bool mIsAlive = true;
 };
+
+void defaultSquish(ActorCollider* selfCollider, ecs::Entity self, HitInfo hitinfo);
 
 }  // namespace whal

@@ -37,7 +37,7 @@ Expected<ActiveLevel*> Scene::getLoadedLevel(Level level) {
     if (errOpt) {
         return errOpt.value();
     }
-    ActiveLevel* result = &loadedLevels[-1];
+    ActiveLevel* result = &loadedLevels[loadedLevels.size() - 1];
     assert(result->filepath == level.filepath && "Last active level doesn't match passed arg");
     return result;
 }

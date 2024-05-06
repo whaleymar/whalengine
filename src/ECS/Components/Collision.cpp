@@ -16,6 +16,10 @@ namespace whal {
 constexpr s32 MOMENTUM_LIFETIME_FRAMES = 10;
 constexpr s32 CORNERCORRECTIONWIGGLE = 4 * SPIXELS_PER_TEXEL;
 
+void defaultSquish(ActorCollider* selfCollider, ecs::Entity self, HitInfo hitinfo) {
+    selfCollider->squish(hitinfo);
+}
+
 ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(AABB(half)) {
     mCollider.setPosition(position);
 }
@@ -46,7 +50,7 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
 // so it would make sense to have a single Collider component which is a container for all these things
 // and it holds an enum or something saying its type
 
-std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const CollisionCallback callback) {
+std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const ActorCollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
     s32 toMove = std::round(amount.x());
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
@@ -65,7 +69,7 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const Collisi
             toMove -= moveSign;
         } else {
             if (callback != nullptr) {
-                ((*this).*callback)(hitInfo.value());
+                callback(this, getEntity(), hitInfo.value());
             }
             return hitInfo;
         }
@@ -73,7 +77,7 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const Collisi
     return std::nullopt;
 }
 
-std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const CollisionCallback callback) {
+std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
     s32 toMove = std::round(amount.y());
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
@@ -82,6 +86,7 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
         SolidCollider* groundCollider = nullptr;
         if (amount.y() <= 0 && checkIsGrounded(solids, &groundCollider)) {
             HitInfo hitinfo(Vector2i(0, -1));
+            hitinfo.other = groundCollider->getEntity();
             hitinfo.otherMaterial = groundCollider->getMaterial();
             return hitinfo;
         } else {
@@ -102,7 +107,7 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
                 continue;  // avoided collision
             }
             if (callback != nullptr) {
-                ((*this).*callback)(hitInfo.value());
+                callback(this, getEntity(), hitInfo.value());
             }
             return hitInfo;
         }
@@ -111,6 +116,7 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
     SolidCollider* groundCollider = nullptr;
     if (amount.y() <= 0 && checkIsGrounded(solids, &groundCollider)) {
         HitInfo hitinfo(Vector2i(0, -1));
+        hitinfo.other = groundCollider->getEntity();
         hitinfo.otherMaterial = groundCollider->getMaterial();
         return hitinfo;
     } else {
@@ -171,7 +177,7 @@ void ActorCollider::momentumNotUsed() {
     }
 }
 
-bool ActorCollider::checkIsGrounded(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids, SolidCollider** groundCollider) {
+bool ActorCollider::checkIsGrounded(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, SolidCollider** groundCollider) {
     for (auto& [entity, solid] : solids) {
         if (isRiding(solid)) {
             *groundCollider = solid;
@@ -182,7 +188,7 @@ bool ActorCollider::checkIsGrounded(const std::vector<std::tuple<ecs::Entity, So
 }
 
 template <typename T>
-std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::tuple<ecs::Entity, T*>>& objects, const Vector2i position) const {
+std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::pair<ecs::Entity, T*>>& objects, const Vector2i position) const {
     static_assert(std::is_base_of_v<IUseCollision, T>, "collider must inherit IUseCollision");
 
     auto movedCollider = AABB(position, mCollider.half);
@@ -216,7 +222,7 @@ bool ActorCollider::isRiding(const SolidCollider* solid) const {
 
 // Try to wiggle out of collision if barely clipping another collider.
 // Returns true if successful.
-bool ActorCollider::tryCornerCorrection(const std::vector<std::tuple<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPosition, s32 moveSignX) {
+bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPosition, s32 moveSignX) {
     // if we are on a half texel x coord, start at 0.5 texels of movement
     if (moveSignX >= 0) {
         for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
@@ -240,7 +246,8 @@ bool ActorCollider::tryCornerCorrection(const std::vector<std::tuple<ecs::Entity
     return false;
 }
 
-SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material) : IUseCollision(AABB(half), material) {
+SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material, ActorCollisionCallback onCollisionEnter_)
+    : IUseCollision(AABB(half), material), mOnCollisionEnter(onCollisionEnter_) {
     mCollider.setPosition(position);
 }
 
@@ -285,9 +292,9 @@ void SolidCollider::moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool i
             f32 actorEdge = (actor->getCollider().*edgeFunc)();
             toMoveRounded = solidEdge - actorEdge;
             if (isXDirection) {
-                actor->moveX(Vector2f(toMoveRounded, 0), &ActorCollider::squish);
+                actor->moveX(Vector2f(toMoveRounded, 0), &defaultSquish);
             } else {
-                actor->moveY(Vector2f(0, toMoveRounded), &ActorCollider::squish);
+                actor->moveY(Vector2f(0, toMoveRounded), &defaultSquish);
             }
             if (isManualMove) {
                 actor->maintainMomentum(isXDirection);
@@ -321,6 +328,11 @@ std::vector<ActorCollider*> SolidCollider::getRidingActors() const {
         }
     }
     return riding;
+}
+
+void SolidCollider::setCollisionCallback(ActorCollisionCallback callback) {
+    mOnCollisionEnter = callback;
+    SolidsManager::getInstance()->setUpdateNeeded();
 }
 
 }  // namespace whal

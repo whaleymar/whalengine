@@ -14,7 +14,7 @@ void ActorsManager::update() {
     if (!mIsUpdateNeeded) {
         return;
     }
-    std::vector<std::tuple<ecs::Entity, ActorCollider*>> newActorList;
+    std::vector<std::pair<ecs::Entity, ActorCollider*>> newActorList;
 
     for (auto& [entityid, entity] : getEntitiesRef()) {
         auto pCollider = &entity.get<ActorCollider>();
@@ -46,18 +46,33 @@ void SolidsManager::update() {
     if (!mIsUpdateNeeded) {
         return;
     }
-    std::vector<std::tuple<ecs::Entity, SolidCollider*>> newSolidList;
+    // put colliders with callbacks first so they get priority in collision checks
+    std::vector<std::pair<ecs::Entity, SolidCollider*>> newSolids;
+    std::vector<std::pair<ecs::Entity, SolidCollider*>> newSolidsWithCallbacks;
     for (auto& [entityid, entity] : getEntitiesRef()) {
         auto pCollider = &entity.get<SolidCollider>();
-        newSolidList.push_back({entity, pCollider});
+        if (pCollider->getOnCollisionEnter() == nullptr) {
+            newSolids.push_back({entity, pCollider});
+        } else {
+            newSolidsWithCallbacks.push_back({entity, pCollider});
+        }
     }
-    mSolids = std::move(newSolidList);
+    // mSolids = std::move(newSolids);
+    mSolids.clear();
+    mSolids.reserve(newSolidsWithCallbacks.size() + newSolids.size());
+    mSolids.insert(mSolids.end(), newSolidsWithCallbacks.begin(), newSolidsWithCallbacks.end());
+    mSolids.insert(mSolids.end(), newSolids.begin(), newSolids.end());
+
     mIsUpdateNeeded = false;
 }
 
 void SolidsManager::onAdd(ecs::Entity entity) {
-    mSolids.push_back({entity, &entity.get<SolidCollider>()});
-    entity.get<SolidCollider>().setEntity(entity);
+    SolidCollider* pCollider = &entity.get<SolidCollider>();
+    mSolids.push_back({entity, pCollider});
+    pCollider->setEntity(entity);
+    if (pCollider->getOnCollisionEnter() != nullptr) {
+        mIsUpdateNeeded = true;
+    }
 #ifndef NDEBUG
     entity.get<SolidCollider>().getCollider().vao.initArray();
     entity.get<SolidCollider>().getCollider().vbo.initBuffer();

@@ -2,6 +2,7 @@
 
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
+#include "ECS/Components/Name.h"
 #include "ECS/Components/RailsControl.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Entities/Block.h"
@@ -13,6 +14,9 @@
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Map/Level.h"
+#include "Util/Print.h"
+
+void createTestPlatform();
 
 std::optional<Error> loadMap() {
     using namespace whal;
@@ -26,11 +30,10 @@ std::optional<Error> loadTestMap() {
     if (!player.isExpected()) {
         return player.error();
     }
-    // auto testBlock =
-    //     createBlock(Transform::tiles(0, 0),
-    //                 Sprite(Depth::Player, GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE).getFrame("tile/translucent").value()));
-    // createBlock(Transform::tiles(0, -1), Draw(Color::MAGENTA));
-    return loadMap();
+    // createTestPlatform();
+    auto err = loadMap();
+    createTestPlatform();
+    return err;
 }
 
 std::optional<Error> loadDebugScene() {
@@ -118,4 +121,32 @@ std::optional<Error> loadDebugScene() {
                                    2));
 
     return std::nullopt;
+}
+
+void startRailsMovement(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo) {
+    ecs::Entity solidEntity = hitinfo.other;
+    auto& rails = solidEntity.get<RailsControl>();
+    if (rails.isWaiting && rails.curTarget == 0) {
+        rails.startManually();
+    }
+}
+
+void killEntityCallback(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo) {
+    actorEntity.kill();
+}
+
+void createTestPlatform() {
+    for (s32 x = 2; x < 6; x += 3) {
+        auto platform = createBlock(Transform::tiles(x, -15)).value();
+        auto pathControl = RailsControl(14,
+                                        {
+                                            {Transform::tiles(x, -15).position, RailsControl::Movement::LINEAR},
+                                            {Transform::tiles(x, -10).position, RailsControl::Movement::EASEI_CUBE},
+                                        },
+                                        2, false);
+        platform.add<RailsControl>(pathControl);
+        platform.add(Name("callback platform"));
+        platform.get<SolidCollider>().setCollisionCallback(&startRailsMovement);
+        // platform.get<SolidCollider>().setCollisionCallback(&killEntityCallback);
+    }
 }

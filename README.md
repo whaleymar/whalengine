@@ -22,7 +22,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 ## Components
 - Light 
 - Trigger
-- collision callback (move object, kill player, play animation, etc.)
 
 ## Entity Prefabs
 - particle
@@ -33,12 +32,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 ## Physics
 - Trigger colliders
 - one way collision (should be easy, just check that move axis and sign match the member var)
-- moving platforms are jittery
-- X axis momentum is weird
-    - jumping off platform gives very little x momentum 
-    - moving in same direction as momentum gives too much speed AND is inconsistent -> use 2 players overlapped and i get completely different speeds
-    - moving in opposite direction as momentum completely negates it 
-    - trying to walk off platform in same direction it's moving is buggy
 - fixed updates at 60fps so rounding doesn't fuck me
 
 ## Map 

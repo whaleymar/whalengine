@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/Name.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Tags.h"
 #include "ECS/Components/Transform.h"
@@ -57,7 +58,7 @@ void PhysicsSystem::update() {
         }
     }
 
-    for (auto& [entityid, entity] : getEntitiesRef()) {
+    for (auto& [entityid, entity] : getEntitiesCopy()) {
         f32 dt;
         if (entity.has<Camera>()) {
             dt = System::dt.getUnmodified();
@@ -102,10 +103,33 @@ void PhysicsSystem::update() {
                 }
                 rb.value()->isJumping = false;
                 vel.residualImpulse.e[1] = 0;
+
+                // do collision callback
+                if (auto otherSB = hitinfo.value().other.get<SolidCollider>(); otherSB.getOnCollisionEnter() != nullptr) {
+                    otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
+
+                    // check if entity was killed
+                    if (getEntitiesRef().find(entity.id()) == getEntitiesRef().end()) {
+                        continue;
+                    }
+                }
             } else {
                 rb.value()->setNotGrounded();
             }
-            actor.value()->moveX(move, nullptr);
+
+            if (auto hitinfo = actor.value()->moveX(move, nullptr); hitinfo) {
+                auto otherSB = hitinfo->other.get<SolidCollider>();
+
+                // do collision callback
+                if (otherSB.getOnCollisionEnter() != nullptr) {
+                    otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
+
+                    // check if entity was killed
+                    if (getEntitiesRef().find(entity.id()) == getEntitiesRef().end()) {
+                        continue;
+                    }
+                }
+            }
             allActors.push_back(entity);
 
             // RIGIDBODY FLAGS, MOMENTUM, AND COYOTE TIME

@@ -22,6 +22,7 @@ protected:
     AABB mCollider;
     ecs::Entity mSelf;
     Material mMaterial;
+    bool mIsTrigger = false;
     bool mIsCollidable = true;
 };
 
