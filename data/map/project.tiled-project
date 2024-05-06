@@ -52,6 +52,20 @@
             ]
         },
         {
+            "id": 20,
+            "name": "CollisionDir",
+            "storageType": "int",
+            "type": "enum",
+            "values": [
+                "ALL",
+                "LEFT",
+                "RIGHT",
+                "DOWN",
+                "UP"
+            ],
+            "valuesAsFlags": false
+        },
+        {
             "color": "#ffa0a0a4",
             "drawFill": true,
             "id": 10,
@@ -226,6 +240,12 @@
             "drawFill": true,
             "id": 7,
             "members": [
+                {
+                    "name": "CollisionDir",
+                    "propertyType": "CollisionDir",
+                    "type": "int",
+                    "value": 0
+                },
                 {
                     "name": "halflenTexelsX",
                     "type": "int",

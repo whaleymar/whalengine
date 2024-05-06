@@ -85,18 +85,22 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
 
     } else if (componentName == "Component_SolidCollider") {
         Vector2i half;
+        CollisionDir collisionDir;
         for (auto& member : property[KEY_MEMBERS]) {
             std::string memberName = member[KEY_NAME];
             if (memberName == "halflenTexelsX") {
                 half.e[0] = member[KEY_VALUE];
             } else if (memberName == "halflenTexelsY") {
                 half.e[1] = member[KEY_VALUE];
+            } else if (memberName == "CollisionDir") {
+                collisionDir = member[KEY_VALUE];
             } else {
                 print("Skipping member ", memberName, "for", componentName);
             }
         }
         half = Transform::texels(half.x(), half.y()).position;
         DefaultSolidCollider.getCollider().setHalflen(half);
+        DefaultSolidCollider.setCollisionDir(collisionDir);
 
     } else if (componentName == "Component_Draw") {
         for (auto& member : property[KEY_MEMBERS]) {
@@ -270,6 +274,7 @@ void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObject
                                ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
     SolidCollider solid = ComponentFactory::DefaultSolidCollider;
     Vector2i halflenTexels = solid.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
+    CollisionDir collisionDir = solid.getCollisionDir();
 
     if (values.contains("halflenTexelsX")) {
         halflenTexels.e[0] = values["halflenTexelsX"];
@@ -277,10 +282,13 @@ void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObject
     if (values.contains("halflenTexelsY")) {
         halflenTexels.e[1] = values["halflenTexelsY"];
     }
+    if (values.contains("CollisionDir")) {
+        collisionDir = values["CollisionDir"];
+    }
 
     Vector2i half = Transform::texels(halflenTexels.x(), halflenTexels.y()).position;
     Vector2i center = entity.get<Transform>().position + Vector2i(0, half.y());
-    entity.add(SolidCollider(toFloatVec(center), half));
+    entity.add(SolidCollider(toFloatVec(center), half, Material::None, nullptr, collisionDir));
 }
 
 void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
