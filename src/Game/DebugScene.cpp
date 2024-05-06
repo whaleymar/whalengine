@@ -149,4 +149,7 @@ void createTestPlatform() {
         platform.get<SolidCollider>().setCollisionCallback(&startRailsMovement);
         // platform.get<SolidCollider>().setCollisionCallback(&killEntityCallback);
     }
+
+    // auto block = createBlock(Transform::tiles(9, -14), Draw(Color::MAGENTA)).value();
+    // block.get<SolidCollider>().setCollisionNormal({1, 0});
 }

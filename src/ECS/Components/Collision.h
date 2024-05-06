@@ -21,16 +21,20 @@ using ActorCollisionCallback = void (*)(ActorCollider* selfCollider, ecs::Entity
 class SolidCollider : public IUseCollision {
 public:
     SolidCollider() = default;
-    SolidCollider(Vector2f position, Vector2i half, Material material = Material::None, ActorCollisionCallback onCollisionEnter_ = nullptr);
+    SolidCollider(Vector2f position, Vector2i half, Material material = Material::None, ActorCollisionCallback onCollisionEnter_ = nullptr,
+                  Vector2i collisionDir = {0, 0});
 
     void move(f32 x, f32 y, bool isManualMove = false);
     std::vector<ActorCollider*> getRidingActors() const;
     void setCollisionCallback(ActorCollisionCallback callback);
     ActorCollisionCallback getOnCollisionEnter() const { return mOnCollisionEnter; }
+    Vector2i getCollisionNormal() const { return mCollisionNormal; }
+    void setCollisionNormal(Vector2i normal) { mCollisionNormal = normal; }
 
 private:
     void moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
                        std::vector<ActorCollider*>& riding, bool isManualMove);
+    Vector2i mCollisionNormal;  // 0 for either direction, 1 for top/right, -1 for bottom/left
     ActorCollisionCallback mOnCollisionEnter;
 };
 
@@ -55,7 +59,8 @@ public:
     bool checkIsGrounded(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, SolidCollider** groundSolid);
 
     template <typename T>
-    std::optional<HitInfo> checkCollision(const std::vector<std::pair<ecs::Entity, T*>>& objects, const Vector2i position) const;
+    std::optional<HitInfo> checkCollision(const std::vector<std::pair<ecs::Entity, T*>>& objects, const Vector2i position,
+                                          const Vector2i moveNormal) const;
 
     // squish is a CollisionCallback. Not sure if I will define others
     // TODO these can't be virtual bc ECS

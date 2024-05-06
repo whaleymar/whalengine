@@ -60,10 +60,10 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const ActorCo
     }
 
     const s32 moveSign = sign(toMove);
-    const auto moveVector = Vector2i(moveSign, 0);
+    const auto moveNormal = Vector2i(moveSign, 0);
     while (toMove != 0) {
-        auto nextPos = mCollider.getPosition() + moveVector;
-        auto hitInfo = checkCollision(solids, nextPos);
+        auto nextPos = mCollider.getPosition() + moveNormal;
+        auto hitInfo = checkCollision(solids, nextPos, moveNormal);
         if (hitInfo == std::nullopt) {
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
@@ -95,10 +95,10 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
     }
 
     const s32 moveSign = sign(toMove);
-    const auto moveVector = Vector2i(0, moveSign);
+    const auto moveNormal = Vector2i(0, moveSign);
     while (toMove != 0) {
-        auto nextPos = mCollider.getPosition() + moveVector;
-        auto hitInfo = checkCollision(solids, nextPos);
+        auto nextPos = mCollider.getPosition() + moveNormal;
+        auto hitInfo = checkCollision(solids, nextPos, moveNormal);
         if (hitInfo == std::nullopt) {
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
@@ -187,14 +187,28 @@ bool ActorCollider::checkIsGrounded(const std::vector<std::pair<ecs::Entity, Sol
     return false;
 }
 
+// this currently only works for solid objects
 template <typename T>
-std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::pair<ecs::Entity, T*>>& objects, const Vector2i position) const {
+std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::pair<ecs::Entity, T*>>& objects, const Vector2i position,
+                                                     const Vector2i moveNormal) const {
     static_assert(std::is_base_of_v<IUseCollision, T>, "collider must inherit IUseCollision");
 
     auto movedCollider = AABB(position, mCollider.half);
     for (auto& [entity, collider] : objects) {
         if (!collider->isCollidable()) {
             continue;
+        }
+
+        // check for one-way collision skips
+        Vector2i collisionNormal = collider->getCollisionNormal();
+        if (moveNormal.x()) {
+            if (moveNormal.x() == collisionNormal.x()) {
+                continue;
+            }
+        } else if (moveNormal.y()) {
+            if (moveNormal.y() == collisionNormal.y()) {
+                continue;
+            }
         }
         std::optional<HitInfo> hitInfo = movedCollider.collide(collider->getCollider());
         if (hitInfo != std::nullopt) {
@@ -227,7 +241,7 @@ bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity,
     if (moveSignX >= 0) {
         for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
             Vector2i nextPos = nextPosition + Vector2i(i, 0);
-            if (!checkCollision(solids, nextPos)) {
+            if (!checkCollision(solids, nextPos, {1, 0})) {
                 mCollider.setPosition(nextPos);
                 return true;
             }
@@ -236,7 +250,7 @@ bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity,
     if (moveSignX <= 0) {
         for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
             Vector2i nextPos = nextPosition + Vector2i(-i, 0);
-            if (!checkCollision(solids, nextPos)) {
+            if (!checkCollision(solids, nextPos, {-1, 0})) {
                 mCollider.setPosition(nextPos);
                 return true;
             }
@@ -246,8 +260,8 @@ bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity,
     return false;
 }
 
-SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material, ActorCollisionCallback onCollisionEnter_)
-    : IUseCollision(AABB(half), material), mOnCollisionEnter(onCollisionEnter_) {
+SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material, ActorCollisionCallback onCollisionEnter_, Vector2i collisionDir)
+    : IUseCollision(AABB(half), material), mCollisionNormal(collisionDir), mOnCollisionEnter(onCollisionEnter_) {
     mCollider.setPosition(position);
 }
 
