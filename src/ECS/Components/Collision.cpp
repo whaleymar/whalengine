@@ -200,13 +200,12 @@ std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::pair
         }
 
         // check for one-way collision skips
-        Vector2i collisionNormal = collider->getCollisionNormal();
-        if (moveNormal.x()) {
-            if (moveNormal.x() == collisionNormal.x()) {
+        CollisionDir collisionDir = collider->getCollisionDir();
+        if (collisionDir != CollisionDir::ALL) {
+            if ((moveNormal.x() > 0 && collisionDir != CollisionDir::LEFT) || (moveNormal.x() < 0 && collisionDir != CollisionDir::RIGHT)) {
                 continue;
             }
-        } else if (moveNormal.y()) {
-            if (moveNormal.y() == collisionNormal.y()) {
+            if ((moveNormal.y() > 0 && collisionDir != CollisionDir::DOWN) || (moveNormal.y() < 0 && collisionDir != CollisionDir::UP)) {
                 continue;
             }
         }
@@ -260,9 +259,8 @@ bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity,
     return false;
 }
 
-SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material, ActorCollisionCallback onCollisionEnter_, s32 xCollisionNormal,
-                             s32 yCollisionNormal)
-    : IUseCollision(AABB(half), material), mCollisionNormal(xCollisionNormal, yCollisionNormal), mOnCollisionEnter(onCollisionEnter_) {
+SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material, ActorCollisionCallback onCollisionEnter_, CollisionDir collisionDir)
+    : IUseCollision(AABB(half), material), mCollisionDir(collisionDir), mOnCollisionEnter(onCollisionEnter_) {
     mCollider.setPosition(position);
 }
 

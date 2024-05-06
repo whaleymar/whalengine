@@ -18,23 +18,25 @@ class Entity;
 using ActorCollisionCallback = void (*)(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo);
 // using CollisionCallback = void (*)(ecs::Entity self, HitInfo hitinfo);
 
+enum class CollisionDir : u8 { ALL, LEFT, RIGHT, DOWN, UP };
+
 class SolidCollider : public IUseCollision {
 public:
     SolidCollider() = default;
     SolidCollider(Vector2f position, Vector2i half, Material material = Material::None, ActorCollisionCallback onCollisionEnter_ = nullptr,
-                  s32 xCollisionNormal = 0, s32 yCollisionNormal = 0);
+                  CollisionDir collisionDir = CollisionDir::ALL);
 
     void move(f32 x, f32 y, bool isManualMove = false);
     std::vector<ActorCollider*> getRidingActors() const;
     void setCollisionCallback(ActorCollisionCallback callback);
     ActorCollisionCallback getOnCollisionEnter() const { return mOnCollisionEnter; }
-    Vector2i getCollisionNormal() const { return mCollisionNormal; }
-    void setCollisionNormal(Vector2i normal) { mCollisionNormal = normal; }
+    CollisionDir getCollisionDir() const { return mCollisionDir; }
+    void setCollisionDir(CollisionDir dir) { mCollisionDir = dir; }
 
 private:
     void moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
                        std::vector<ActorCollider*>& riding, bool isManualMove);
-    Vector2i mCollisionNormal;  // 0 for either direction, 1 for top/right, -1 for bottom/left
+    CollisionDir mCollisionDir;
     ActorCollisionCallback mOnCollisionEnter;
 };
 
