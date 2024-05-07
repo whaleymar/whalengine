@@ -24,41 +24,19 @@ ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(A
     mCollider.setPosition(position);
 }
 
-// TODO Triggers
-// CURRENT PLAN
-/*
- * Trigger component, holds callback which takes, self(?), other, and hitinfo
- * Pass "self" Entity into actor.move and solid.move
- *
- * in actor.move: check collision with solids. For solids which have collision turned off but have trigger components, add their entity IDs to a list
- *   => after movement is done, run each callback
- *   => if they have collision on, also add to list but then break
- * in actor.move: check collision with actors. For actors which have collision turned off but have trigger components, do same list thingy
- *   => isCollidable only affects whether other actors can collide with an entity
- *   => if I don't want the actor to interact with solids, it should be a solid
- * in actor.move: if the actor has collision turned off don't worry about other triggers -- only check for collidable actors/solids
- *   => add each collidable entity passed through to list & run moving entity's trigger callback on them after movement
- *   => only break from movement loop if colliding with solid
- *
- * in solid.move:
- *   => if solid.isCollidable == true, run callback on each actor we hit AND push/move the actor
- *   => if                    == false run callback on each actor we hit but don't push/move
- */
-
-// UPDATED THOUGHTS
-// an entity will never have multiple colliders, multiple triggers, or, a collider + trigger
-// so it would make sense to have a single Collider component which is a container for all these things
-// and it holds an enum or something saying its type
-
 std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const ActorCollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
-    s32 toMove = std::round(amount.x());
-    auto const& solids = SolidsManager::getInstance()->getAllSolids();
+
+    // include fractional movement from previous calls
+    mXRemainder += amount.x();
+    s32 toMove = std::round(mXRemainder);
 
     if (toMove == 0) {
         return std::nullopt;
     }
+    auto const& solids = SolidsManager::getInstance()->getAllSolids();
 
+    mXRemainder -= toMove;
     const s32 moveSign = sign(toMove);
     const auto moveNormal = Vector2i(moveSign, 0);
     while (toMove != 0) {
@@ -79,7 +57,10 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const ActorCo
 
 std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
-    s32 toMove = std::round(amount.y());
+
+    // include fractional movement from previous calls
+    mYRemainder += amount.y();
+    s32 toMove = std::round(mYRemainder);
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
 
     if (toMove == 0) {
@@ -94,6 +75,7 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
         }
     }
 
+    mYRemainder -= toMove;
     const s32 moveSign = sign(toMove);
     const auto moveNormal = Vector2i(0, moveSign);
     while (toMove != 0) {
@@ -299,11 +281,16 @@ SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material
 }
 
 void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
-    s32 toMoveX = std::round(x);
-    s32 toMoveY = std::round(y);
+    mXRemainder += x;
+    mYRemainder += y;
+
+    s32 toMoveX = std::round(mXRemainder);
+    s32 toMoveY = std::round(mYRemainder);
     if (toMoveX == 0 && toMoveY == 0) {
         return;
     }
+    mXRemainder -= toMoveX;
+    mYRemainder -= toMoveY;
 
     // check riding status *before* moving
     auto riding = getRidingActors();

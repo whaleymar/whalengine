@@ -22,6 +22,8 @@ public:
 protected:
     AABB mCollider;
     ecs::Entity mSelf;
+    f32 mXRemainder = 0.0;
+    f32 mYRemainder = 0.0;
     Material mMaterial;
     bool mIsTrigger = false;
     bool mIsCollidable = true;
