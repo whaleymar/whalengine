@@ -188,7 +188,7 @@ bool ActorCollider::checkIsGrounded(const std::vector<std::pair<ecs::Entity, Sol
 }
 
 // returns true if a collision CAN happen given the move normal & collision direction
-bool checkDirectionalCollision(AABB actor, AABB solid, Vector2i moveNormal, CollisionDir collisionDir) {
+bool checkDirectionalCollision(const AABB& actor, const AABB& solid, Vector2i moveNormal, CollisionDir collisionDir) {
     switch (collisionDir) {
     case CollisionDir::ALL:
         return true;

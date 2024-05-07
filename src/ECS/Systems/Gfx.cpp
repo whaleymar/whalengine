@@ -5,6 +5,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Shader.h"
 #include "Gfx/VertexObject.h"
+#include "Util/Print.h"
 #include "Util/Vector.h"
 
 #include "ECS/Components/Draw.h"

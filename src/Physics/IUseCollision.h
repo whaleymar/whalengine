@@ -10,7 +10,8 @@ class IUseCollision {
 public:
     IUseCollision() = default;
     IUseCollision(AABB collider, Material material = Material::None) : mCollider(collider), mMaterial(material){};
-    AABB getCollider() const { return mCollider; }
+    const AABB& getCollider() const { return mCollider; }
+    AABB& getColliderMut() { return mCollider; }
     Material getMaterial() const { return mMaterial; }
     ecs::Entity getEntity() const { return mSelf; }
     bool isCollidable() const { return mIsCollidable; }

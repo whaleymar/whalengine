@@ -31,16 +31,16 @@ void ActorsManager::onAdd(ecs::Entity entity) {
     mActors.push_back({entity, &entity.get<ActorCollider>()});
     entity.get<ActorCollider>().setEntity(entity);
 #ifndef NDEBUG
-    entity.get<ActorCollider>().getCollider().vao.initArray();
-    entity.get<ActorCollider>().getCollider().vbo.initBuffer();
+    entity.get<ActorCollider>().getColliderMut().vao.initArray();
+    entity.get<ActorCollider>().getColliderMut().vbo.initBuffer();
 #endif
 }
 
 void ActorsManager::onRemove(ecs::Entity entity) {
     mIsUpdateNeeded = true;
 #ifndef NDEBUG
-    entity.get<ActorCollider>().getCollider().vao.freeArray();
-    entity.get<ActorCollider>().getCollider().vbo.freeBuffer();
+    entity.get<ActorCollider>().getColliderMut().vao.freeArray();
+    entity.get<ActorCollider>().getColliderMut().vbo.freeBuffer();
 #endif
 }
 
@@ -76,16 +76,16 @@ void SolidsManager::onAdd(ecs::Entity entity) {
         mIsUpdateNeeded = true;
     }
 #ifndef NDEBUG
-    entity.get<SolidCollider>().getCollider().vao.initArray();
-    entity.get<SolidCollider>().getCollider().vbo.initBuffer();
+    entity.get<SolidCollider>().getColliderMut().vao.initArray();
+    entity.get<SolidCollider>().getColliderMut().vbo.initBuffer();
 #endif
 }
 
 void SolidsManager::onRemove(ecs::Entity entity) {
     mIsUpdateNeeded = true;
 #ifndef NDEBUG
-    entity.get<SolidCollider>().getCollider().vao.freeArray();
-    entity.get<SolidCollider>().getCollider().vbo.freeBuffer();
+    entity.get<SolidCollider>().getColliderMut().vao.freeArray();
+    entity.get<SolidCollider>().getColliderMut().vbo.freeBuffer();
 #endif
 }
 

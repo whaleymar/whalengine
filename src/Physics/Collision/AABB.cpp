@@ -27,7 +27,7 @@ void AABB::setHalflen(Vector2i half_) {
     half = half_;
 }
 
-const std::optional<HitInfo> AABB::collide(AABB other) const {
+const std::optional<HitInfo> AABB::collide(const AABB& other) const {
     const auto delta = other.center - center;
     const auto overlap = half + other.half;
 
@@ -108,7 +108,7 @@ const std::optional<HitInfo> AABB::collide(Segment segment) const {
     return HitInfo(hitNormal);
 }
 
-bool AABB::isOverlapping(AABB other) const {
+bool AABB::isOverlapping(const AABB& other) const {
     const auto delta = other.center - center;
     const auto overlap = half + other.half;
     return overlap.x() > abs(delta.x()) && overlap.y() > abs(delta.y());

@@ -81,7 +81,7 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
             }
         }
         half = Transform::texels(half.x(), half.y()).position;
-        DefaultActorCollider.getCollider().setHalflen(half);
+        DefaultActorCollider.getColliderMut().setHalflen(half);
 
     } else if (componentName == "Component_SolidCollider") {
         Vector2i half;
@@ -99,7 +99,7 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
             }
         }
         half = Transform::texels(half.x(), half.y()).position;
-        DefaultSolidCollider.getCollider().setHalflen(half);
+        DefaultSolidCollider.getColliderMut().setHalflen(half);
         DefaultSolidCollider.setCollisionDir(collisionDir);
 
     } else if (componentName == "Component_Draw") {

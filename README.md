@@ -4,6 +4,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 # To Do 
 
 ## Current Goal: 
+- put velocity in texels/second instead of tiles/second
 
 ## Camera / Follow
 - different movement types (easein/out stuff)
@@ -28,6 +29,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - death plane
 
 ## Physics
+- i think it's time for actors to collide with each other
 - fixed updates at 60fps so rounding doesn't fuck me
 
 ## Map 
