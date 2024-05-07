@@ -6,6 +6,7 @@
 
 #include "ECS/Components/Transform.h"
 #include "ECS/Entities/Camera.h"
+#include "ECS/Systems/CallbackSystem.h"
 #include "ECS/Systems/RelationshipManager.h"
 #include "ECS/Systems/TagTrackers.h"
 #include "ECS/Systems/TriggerSystem.h"
@@ -112,6 +113,7 @@ void Game::mainloop() {
     auto lifetimeSystem = ecs.registerSystem<LifetimeSystem>();
     ecs.registerSystem<MovingActorTracker>();  // dependency of TriggerSystem
     auto triggerSystem = ecs.registerSystem<TriggerSystem>();
+    auto frameEndSystem = ecs.registerSystem<OnFrameEndSystem>();
 
     // single-component systems for running psuedo-destructors / updating some global var
     auto actorsMgr = ActorsManager::getInstance();
@@ -174,9 +176,14 @@ void Game::mainloop() {
             actorsMgr->update();
             solidsMgr->update();
         }
+        lifetimeSystem->update();
 
         // Update Scene
         updateLevelCamera();
+
+        // Only rendering remains, so we can do "end of frame" stuff now
+        frameEndSystem->update();
+        ecs.killEntities();
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -210,13 +217,12 @@ void Game::mainloop() {
         }
         if (System::input.isKillPlayer()) {
             System::input.reset(InputType::KILLPLAYER);
-            for (auto [entityid, entity] : PlayerSystem::instance()->getEntitiesCopy()) {
+            for (auto [entityid, entity] : PlayerSystem::instance()->getEntitiesRef()) {
                 entity.kill();
             }
         }
 #endif
 
-        lifetimeSystem->update();
         mWindow->swapBuffers();
     }
 }

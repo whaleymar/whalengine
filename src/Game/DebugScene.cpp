@@ -149,8 +149,8 @@ void createTestPlatform() {
                                         2, false);
         platform.add<RailsControl>(pathControl);
         platform.add(Name("callback platform"));
-        platform.get<SolidCollider>().setCollisionCallback(&startRailsMovement);
-        // platform.get<SolidCollider>().setCollisionCallback(&killEntityCallback);
+        // platform.get<SolidCollider>().setCollisionCallback(&startRailsMovement);
+        platform.get<SolidCollider>().setCollisionCallback(&killEntityCallback);
     }
 
     auto block = createBlock(Transform::tiles(5, -9), Draw(Color::MAGENTA)).value();

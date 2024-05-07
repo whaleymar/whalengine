@@ -4,7 +4,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 # To Do 
 
 ## Current Goal: 
-- make entity.kill()s happen at end of frame
 
 ## Camera / Follow
 - different movement types (easein/out stuff)

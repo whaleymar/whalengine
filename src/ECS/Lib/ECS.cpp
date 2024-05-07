@@ -12,10 +12,17 @@ Expected<Entity> ECS::entity() const {
     return mEntityManager->createEntity();
 }
 
-void ECS::kill(Entity entity) const {
-    mSystemManager->entityDestroyed(entity);  // this goes first so onRemove can fetch components before they're deallocated
-    mEntityManager->destroyEntity(entity);
-    mComponentManager->entityDestroyed(entity);
+void ECS::kill(Entity entity) {
+    mToKill.push_back(entity);
+}
+
+void ECS::killEntities() {
+    for (auto entity : mToKill) {
+        mSystemManager->entityDestroyed(entity);  // this goes first so onRemove can fetch components before they're deallocated
+        mEntityManager->destroyEntity(entity);
+        mComponentManager->entityDestroyed(entity);
+    }
+    mToKill.clear();
 }
 
 Expected<Entity> ECS::copy(Entity prefab) const {

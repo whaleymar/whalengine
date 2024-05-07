@@ -11,7 +11,7 @@ void TriggerSystem::update() {
         std::vector<ecs::Entity> newInsideList;
         auto& trigger = entity.get<TriggerZone>();
 
-        for (auto [actorid, actor] : MovingActorTracker::getEntitiesCopy()) {
+        for (auto [actorid, actor] : MovingActorTracker::getEntitiesRef()) {
             bool wasInside = std::find(trigger.insideEntities.begin(), trigger.insideEntities.end(), actor) != trigger.insideEntities.end();
 
             if (actor.get<ActorCollider>().getCollider().isOverlapping(trigger)) {

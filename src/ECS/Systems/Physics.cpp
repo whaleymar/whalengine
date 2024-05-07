@@ -3,7 +3,6 @@
 #include <cmath>
 
 #include "ECS/Components/Collision.h"
-#include "ECS/Components/Name.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Tags.h"
 #include "ECS/Components/Transform.h"
@@ -12,7 +11,6 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
-#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
@@ -58,7 +56,7 @@ void PhysicsSystem::update() {
         }
     }
 
-    for (auto& [entityid, entity] : getEntitiesCopy()) {
+    for (auto& [entityid, entity] : getEntitiesRef()) {
         f32 dt;
         if (entity.has<Camera>()) {
             dt = System::dt.getUnmodified();
@@ -107,11 +105,6 @@ void PhysicsSystem::update() {
                 // do collision callback
                 if (auto otherSB = hitinfo.value().other.get<SolidCollider>(); otherSB.getOnCollisionEnter() != nullptr) {
                     otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
-
-                    // check if entity was killed
-                    if (getEntitiesRef().find(entity.id()) == getEntitiesRef().end()) {
-                        continue;
-                    }
                 }
             } else {
                 rb.value()->setNotGrounded();
@@ -123,11 +116,6 @@ void PhysicsSystem::update() {
                 // do collision callback
                 if (otherSB.getOnCollisionEnter() != nullptr) {
                     otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
-
-                    // check if entity was killed
-                    if (getEntitiesRef().find(entity.id()) == getEntitiesRef().end()) {
-                        continue;
-                    }
                 }
             }
             allActors.push_back(entity);
@@ -209,11 +197,6 @@ void PhysicsSystem::update() {
     for (auto& entity : allActors) {
         Transform& trans = entity.get<Transform>();
         ActorCollider& actor = entity.get<ActorCollider>();
-
-        if (!actor.isAlive()) {
-            entity.kill();
-            continue;
-        }
 
         // position is bottom-middle of collider
         trans.position = actor.getCollider().getPositionEdge(Vector2i::unitDown);

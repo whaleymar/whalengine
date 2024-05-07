@@ -46,7 +46,6 @@ public:
 
     std::optional<HitInfo> moveX(const Vector2f amount, const ActorCollisionCallback callback);
     std::optional<HitInfo> moveY(const Vector2f amount, const ActorCollisionCallback callback);
-    bool isAlive() const { return mIsAlive; }
     void setMomentum(const f32 momentum, const bool isXDirection);
     void addMomentum(const f32 momentum, const bool isXDirection);
     void maintainMomentum(const bool isXDirection);
@@ -74,7 +73,6 @@ private:
     Vector2f mStoredMomentum;
     Vector2i mMomentumFramesLeft = {0, 0};
     // f32 mMass = 1; // could give solids a mass and use mass ratio to calculate force
-    bool mIsAlive = true;
 };
 
 void defaultSquish(ActorCollider* selfCollider, ecs::Entity self, HitInfo hitinfo);

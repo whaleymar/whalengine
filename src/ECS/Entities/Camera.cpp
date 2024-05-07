@@ -1,5 +1,6 @@
 #include "Camera.h"
 
+#include "ECS/Components/Callback.h"
 #include "ECS/Components/Name.h"
 #include "ECS/Components/RailsControl.h"
 #include "ECS/Components/Relationships.h"
@@ -30,7 +31,10 @@ Expected<ecs::Entity> createCamera(ecs::Entity target) {
 }
 
 void onCameraAtDestination(ecs::Entity cameraEntity, RailsControl& rails) {
-    cameraEntity.remove<RailsControl>();
+    auto frameEndCallback = [](ecs::Entity entity) {
+        entity.remove<RailsControl>();
+    };  // don't call this immediately cause it will mutate the Rails system's entity list while it's iterating
+    cameraEntity.add(OnFrameEnd(frameEndCallback));
     cameraEntity.add<Velocity>();  // railscontrol removed it
     System::dt.setMultiplier(1.0);
 }

@@ -251,7 +251,7 @@ std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::pair
 }
 
 void ActorCollider::squish(const HitInfo hitInfo) {
-    mIsAlive = false;
+    getEntity().kill();
 }
 
 bool ActorCollider::isRiding(const SolidCollider* solid) const {

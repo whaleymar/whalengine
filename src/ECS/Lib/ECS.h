@@ -356,8 +356,6 @@ public:
     void entityDestroyed(const Entity entity) const {
         System::eventMgr.triggerEvent(Event::DEATH_EVENT, entity);
         // TODO make thread safe
-        // TODO it should run at the end of a frame/gametick; o.w. systems that kill their entities fuck themselves (ALSO do the same for component
-        // removal?)
         for (const auto& system : mSystems) {
             auto const ix = system->getEntitiesVirtual().find(entity.id());
             if (ix != system->getEntitiesVirtual().end()) {
@@ -409,7 +407,8 @@ public:
 
     // ENTITY
     Expected<Entity> entity() const;
-    void kill(Entity entity) const;
+    void kill(Entity entity);
+    void killEntities();
 
     Expected<Entity> copy(Entity entity) const;
 
@@ -476,6 +475,7 @@ private:
     std::unique_ptr<EntityManager> mEntityManager;
     std::unique_ptr<ComponentManager> mComponentManager;
     std::unique_ptr<SystemManager> mSystemManager;
+    std::vector<Entity> mToKill;
 };
 
 template <typename T>
@@ -513,28 +513,4 @@ bool Entity::has() const {
     return ECS::getInstance().hasComponent<T>(*this);
 }
 
-// I don't like this because prefabs still exist as regular entities in the ECS. A new one is created if the original dies, but I don't have a good
-// way of checking if an entity has been destroyed. I *could* check if that ID is registered, but there's no guarantee it is the same as the original
-// entity, plus it's slow I don't think this error-proneness is worth the convenience func returns Expected<ecs::Entity>
-// #define DEFINE_PREFAB_FACTORY(func) \
-//     ecs::Entity create##func() { \
-//         static ecs::Entity prefab; \
-//         static bool isCached = false; \
-//         if (!isCached) { \
-//             Expected<ecs::Entity> expected = func(); \
-//             if (!expected.isExpected()) { \
-//                 print("Failed to initialize prefab for function: ", func, "\nDue to: ", expected.error()); \
-//                 std::abort(); \
-//             } \
-//             prefab = expected.value(); \
-//             isCached = true; \
-//             return prefab; \
-//         } \
-//         Expected<ecs::Entity> copy = prefab.copy(); \
-//         if (!copy.isExpected()) { \
-//             print("Failed to copy entity: ", func, "\nDue to: ", copy.error()); \
-//         } \
-//         return copy.value(); \
-//     }
-//
 }  // namespace whal::ecs

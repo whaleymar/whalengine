@@ -15,7 +15,7 @@ namespace whal {
 constexpr f32 CHECKPOINT_DISTANCE_THRESHOLD = 4;  // in pixels
 
 void RailsSystem::update() {
-    for (auto& [entityid, entity] : getEntitiesCopy()) {
+    for (auto& [entityid, entity] : getEntitiesRef()) {
         f32 dt;
         if (entity.has<Camera>()) {
             dt = System::dt.getUnmodified();
@@ -83,10 +83,6 @@ void RailsSystem::update() {
                 entity.set(Transform(rails.getTarget().position));
             }
 
-            // if (entity.has<Name>()) {
-            //     print("name:", entity.get<Name>());
-            // }
-            // print("got to destination in ", rails.curActionTime, "seconds");
             entity.remove<Velocity>();
             rails.isWaiting = true;
             rails.curActionTime = 0;
@@ -99,8 +95,6 @@ void RailsSystem::update() {
             // moving to next checkpoint
             if (rails.isVelocityUpdateNeeded) {
                 f32 speed = rails.getSpeed(transform.position);
-                // f32 speed = rails.getSpeedNew();
-                // print("Speed", speed);
                 entity.set(Velocity(delta.norm() * speed));
             }
             rails.curActionTime += dt;

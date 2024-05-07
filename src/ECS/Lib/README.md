@@ -19,10 +19,8 @@ The main changes are:
 ### Need:
 
 - thread-safe system methods
-- should call entity kill functions once at the end of each frame, otherwise could interupt actively running systems
 - auto-call systems
     - system scheduler (every X frames / ongamestart / ongameend) + chaining (run sys1, then sys2; sys3 no dependencies so can thread)
-- ECS::Query<T...> method which gives const list of entities with those types
 
 # Nice to have
 
