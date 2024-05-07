@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <type_traits>
 
 #include "ECS/Systems/CollisionManager.h"
 #include "Gfx/GfxUtil.h"
@@ -14,7 +13,7 @@
 namespace whal {
 
 constexpr s32 MOMENTUM_LIFETIME_FRAMES = 10;
-constexpr s32 CORNERCORRECTIONWIGGLE = 4 * SPIXELS_PER_TEXEL;
+constexpr s32 CORNERCORRECTIONWIGGLE = 3 * SPIXELS_PER_TEXEL;
 
 void defaultSquish(ActorCollider* selfCollider, ecs::Entity self, HitInfo hitinfo) {
     selfCollider->squish(hitinfo);
@@ -35,14 +34,18 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const ActorCo
         return std::nullopt;
     }
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
+    // auto const& actors = ActorsManager::getInstance()->getAllActors();
 
     mXRemainder -= toMove;
     const s32 moveSign = sign(toMove);
     const auto moveNormal = Vector2i(moveSign, 0);
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveNormal;
-        auto hitInfo = checkCollision(solids, nextPos, moveNormal);
-        if (hitInfo == std::nullopt) {
+        auto hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
+        // if (!hitInfo) {
+        //     hitInfo = checkCollisionActors(actors, nextPos);
+        // }
+        if (!hitInfo) {
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
         } else {
@@ -62,10 +65,12 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
     mYRemainder += amount.y();
     s32 toMove = std::round(mYRemainder);
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
+    // auto const& actors = ActorsManager::getInstance()->getAllActors();
 
     if (toMove == 0) {
-        SolidCollider* groundCollider = nullptr;
-        if (amount.y() <= 0 && checkIsGrounded(solids, &groundCollider)) {
+        IUseCollision* groundCollider = nullptr;
+        // if (amount.y() <= 0 && (checkIsGrounded(solids, &groundCollider) || checkIsGroundedOnActors(actors, &groundCollider))) {
+        if (amount.y() <= 0 && (checkIsGrounded(solids, &groundCollider))) {
             HitInfo hitinfo(Vector2i(0, -1));
             hitinfo.other = groundCollider->getEntity();
             hitinfo.otherMaterial = groundCollider->getMaterial();
@@ -80,8 +85,11 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
     const auto moveNormal = Vector2i(0, moveSign);
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveNormal;
-        auto hitInfo = checkCollision(solids, nextPos, moveNormal);
-        if (hitInfo == std::nullopt) {
+        auto hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
+        // if (!hitInfo) {
+        //     hitInfo = checkCollisionActors(actors, nextPos);
+        // }
+        if (!hitInfo) {
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
         } else {
@@ -95,8 +103,9 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
         }
     }
 
-    SolidCollider* groundCollider = nullptr;
-    if (amount.y() <= 0 && checkIsGrounded(solids, &groundCollider)) {
+    IUseCollision* groundCollider = nullptr;
+    // if (amount.y() <= 0 && (checkIsGrounded(solids, &groundCollider) || checkIsGroundedOnActors(actors, &groundCollider))) {
+    if (amount.y() <= 0 && (checkIsGrounded(solids, &groundCollider))) {
         HitInfo hitinfo(Vector2i(0, -1));
         hitinfo.other = groundCollider->getEntity();
         hitinfo.otherMaterial = groundCollider->getMaterial();
@@ -159,10 +168,24 @@ void ActorCollider::momentumNotUsed() {
     }
 }
 
-bool ActorCollider::checkIsGrounded(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, SolidCollider** groundCollider) {
-    for (auto& [entity, solid] : solids) {
-        if (solid->isGround() && isRiding(solid)) {
+bool ActorCollider::checkIsGrounded(const std::vector<SolidCollider*>& solids, IUseCollision** groundCollider) {
+    for (auto& solid : solids) {
+        if (solid->isCollidable() && solid->isGround() && isRiding(solid)) {
             *groundCollider = solid;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ActorCollider::checkIsGroundedOnActors(const std::vector<ActorCollider*>& actors, IUseCollision** groundCollider) {
+    for (auto& actor : actors) {
+        if (!actor->isCollidable() || this == actor) {
+            continue;
+        }
+        auto movedCollider = AABB(mCollider.center + Vector2i::unitDown, mCollider.half);
+        if (movedCollider.isOverlapping(actor->getCollider())) {
+            *groundCollider = actor;
             return true;
         }
     }
@@ -203,14 +226,10 @@ bool checkDirectionalCollision(const AABB& actor, const AABB& solid, Vector2i mo
     return true;
 }
 
-// RESEARCH this currently only works for solid objects
-template <typename T>
-std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::pair<ecs::Entity, T*>>& objects, const Vector2i position,
-                                                     const Vector2i moveNormal) const {
-    static_assert(std::is_base_of_v<IUseCollision, T>, "collider must inherit IUseCollision");
-
+std::optional<HitInfo> ActorCollider::checkCollisionSolids(const std::vector<SolidCollider*>& solids, const Vector2i position,
+                                                           const Vector2i moveNormal) const {
     auto movedCollider = AABB(position, mCollider.half);
-    for (auto& [entity, collider] : objects) {
+    for (auto& collider : solids) {
         if (!collider->isCollidable()) {
             continue;
         }
@@ -224,7 +243,26 @@ std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::pair
         std::optional<HitInfo> hitInfo = movedCollider.collide(collider->getCollider());
         if (hitInfo != std::nullopt) {
             hitInfo->other = collider->getEntity();
+            hitInfo->isOtherSolid = true;
             hitInfo->otherMaterial = collider->getMaterial();
+            return hitInfo;
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::optional<HitInfo> ActorCollider::checkCollisionActors(const std::vector<ActorCollider*>& actors, const Vector2i position) const {
+    auto movedCollider = AABB(position, mCollider.half);
+    for (auto& actor : actors) {
+        if (!actor->isCollidable() || this == actor) {
+            continue;
+        }
+
+        std::optional<HitInfo> hitInfo = movedCollider.collide(actor->getCollider());
+        if (hitInfo != std::nullopt) {
+            hitInfo->other = actor->getEntity();
+            hitInfo->otherMaterial = actor->getMaterial();
             return hitInfo;
         }
     }
@@ -250,13 +288,12 @@ bool ActorCollider::isRiding(const SolidCollider* solid) const {
 
 // Try to wiggle out of collision if barely clipping another collider.
 // Returns true if successful.
-bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPosition, s32 moveSignX,
-                                        Vector2i moveNormal) {
+bool ActorCollider::tryCornerCorrection(const std::vector<SolidCollider*>& solids, Vector2i nextPosition, s32 moveSignX, Vector2i moveNormal) {
     // if we are on a half texel x coord, start at 0.5 texels of movement
     if (moveSignX >= 0) {
         for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
             Vector2i nextPos = nextPosition + Vector2i(i, 0);
-            if (!checkCollision(solids, nextPos, moveNormal)) {
+            if (!checkCollisionSolids(solids, nextPos, moveNormal)) {
                 mCollider.setPosition(nextPos);
                 return true;
             }
@@ -265,7 +302,7 @@ bool ActorCollider::tryCornerCorrection(const std::vector<std::pair<ecs::Entity,
     if (moveSignX <= 0) {
         for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
             Vector2i nextPos = nextPosition + Vector2i(-i, 0);
-            if (!checkCollision(solids, nextPos, moveNormal)) {
+            if (!checkCollisionSolids(solids, nextPos, moveNormal)) {
                 mCollider.setPosition(nextPos);
                 return true;
             }
@@ -326,7 +363,7 @@ void SolidCollider::moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool i
     } else {
         moveNormal = {0, sign(toMoveRounded)};
     }
-    for (auto& [entity, actor] : ActorsManager::getInstance()->getAllActors()) {
+    for (auto& actor : ActorsManager::getInstance()->getAllActors()) {
         // push takes priority over carry
         if (mCollider.isOverlapping(actor->getCollider()) &&
             checkDirectionalCollision(actor->getCollider(), getCollider(), moveNormal, getCollisionDir())) {
@@ -363,7 +400,7 @@ void SolidCollider::moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool i
 
 std::vector<ActorCollider*> SolidCollider::getRidingActors() const {
     std::vector<ActorCollider*> riding;
-    for (auto& [entity, actor] : ActorsManager::getInstance()->getAllActors()) {
+    for (auto& actor : ActorsManager::getInstance()->getAllActors()) {
         if (actor->isRiding(this)) {
             riding.push_back(actor);
         }

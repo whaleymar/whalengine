@@ -16,12 +16,13 @@ struct AABB;
 //     Right = 1 << 3,
 //     Grounded = 1 << 4,
 //     HeadBonk = 1 << 5,
-//     Actor = 1<<6,
+//     Solid = 1<<6,
 // };
 
 struct HitInfo {
     Vector2i normal;
     ecs::Entity other;
+    bool isOtherSolid = false;
     Material otherMaterial = Material::None;
 
     HitInfo();

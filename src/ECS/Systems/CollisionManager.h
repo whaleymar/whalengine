@@ -18,10 +18,10 @@ public:
     void onAdd(ecs::Entity entity) override;
     void onRemove(ecs::Entity entity) override;
 
-    const std::vector<std::pair<ecs::Entity, ActorCollider*>>& getAllActors() const { return mActors; }
+    const std::vector<ActorCollider*>& getAllActors() const { return mActors; }
 
 private:
-    std::vector<std::pair<ecs::Entity, ActorCollider*>> mActors;
+    std::vector<ActorCollider*> mActors;
     bool mIsUpdateNeeded = false;
 };
 
@@ -37,10 +37,10 @@ public:
     void onRemove(ecs::Entity entity) override;
     void setUpdateNeeded() { mIsUpdateNeeded = true; }
 
-    const std::vector<std::pair<ecs::Entity, SolidCollider*>>& getAllSolids() const { return mSolids; };
+    const std::vector<SolidCollider*>& getAllSolids() const { return mSolids; };
 
 private:
-    std::vector<std::pair<ecs::Entity, SolidCollider*>> mSolids;
+    std::vector<SolidCollider*> mSolids;
     size_t mNumCallbackColliders = 0;
     bool mIsUpdateNeeded = false;
 };

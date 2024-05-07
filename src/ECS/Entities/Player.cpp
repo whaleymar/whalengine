@@ -91,7 +91,7 @@ bool brain(Animator& animator, ecs::Entity entity) {
 
     // animation did not change
     bool frameChanged = basicAnimation(animator, entity);
-    if (frameChanged && animator.getAnimation().id == RUN && animator.curFrameIx % 2 == 0) {
+    if (frameChanged && animator.getAnimation().id == RUN && animator.curFrameIx % 2 == 1) {
         System::audio.play(Sfx::FOOTSTEPTEST, 0.08);
     }
     return frameChanged;

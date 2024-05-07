@@ -5,6 +5,9 @@
 
 namespace whal {
 
+// TODO `Attach` component which just sets its transform to match its target + has some offset value -- good for something like spikes on a moving
+// platform
+
 // in general, dead zone should be bigger than lookahead
 struct Follow {
     Follow() = default;
@@ -24,9 +27,10 @@ struct Follow {
     bool isMovingY = false;
     bool isTargetInitialized = false;
 
+#ifndef NDEBUG
     ecs::Entity debugTargetTracker;
     ecs::Entity debugPositionTracker;
-    bool debugHitTarget = false;
+#endif  // !NDEBUG
 };
 
 // give system which deletes children in ondelete

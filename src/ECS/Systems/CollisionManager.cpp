@@ -16,11 +16,11 @@ void ActorsManager::update() {
     if (!mIsUpdateNeeded) {
         return;
     }
-    std::vector<std::pair<ecs::Entity, ActorCollider*>> newActorList;
+    std::vector<ActorCollider*> newActorList;
 
     for (auto& [entityid, entity] : getEntitiesRef()) {
         auto pCollider = &entity.get<ActorCollider>();
-        newActorList.push_back({entity, pCollider});
+        newActorList.push_back(pCollider);
     }
 
     mActors = std::move(newActorList);
@@ -28,8 +28,9 @@ void ActorsManager::update() {
 }
 
 void ActorsManager::onAdd(ecs::Entity entity) {
-    mActors.push_back({entity, &entity.get<ActorCollider>()});
-    entity.get<ActorCollider>().setEntity(entity);
+    auto pCollider = &entity.get<ActorCollider>();
+    mActors.push_back(pCollider);
+    pCollider->setEntity(entity);
 #ifndef NDEBUG
     entity.get<ActorCollider>().getColliderMut().vao.initArray();
     entity.get<ActorCollider>().getColliderMut().vbo.initBuffer();
@@ -49,17 +50,17 @@ void SolidsManager::update() {
         return;
     }
     // put colliders with callbacks first so they get priority in collision checks
-    std::vector<std::pair<ecs::Entity, SolidCollider*>> newSolids;
-    std::vector<std::pair<ecs::Entity, SolidCollider*>> newSolidsWithCallbacks;
+    std::vector<SolidCollider*> newSolids;
+    std::vector<SolidCollider*> newSolidsWithCallbacks;
     for (auto& [entityid, entity] : getEntitiesRef()) {
         auto pCollider = &entity.get<SolidCollider>();
         if (pCollider->getOnCollisionEnter() == nullptr) {
-            newSolids.push_back({entity, pCollider});
+            newSolids.push_back(pCollider);
         } else {
-            newSolidsWithCallbacks.push_back({entity, pCollider});
+            newSolidsWithCallbacks.push_back(pCollider);
         }
     }
-    // mSolids = std::move(newSolids);
+
     mSolids.clear();
     mSolids.reserve(newSolidsWithCallbacks.size() + newSolids.size());
     mSolids.insert(mSolids.end(), newSolidsWithCallbacks.begin(), newSolidsWithCallbacks.end());
@@ -70,7 +71,7 @@ void SolidsManager::update() {
 
 void SolidsManager::onAdd(ecs::Entity entity) {
     SolidCollider* pCollider = &entity.get<SolidCollider>();
-    mSolids.push_back({entity, pCollider});
+    mSolids.push_back(pCollider);
     pCollider->setEntity(entity);
     if (pCollider->getOnCollisionEnter() != nullptr) {
         mIsUpdateNeeded = true;
@@ -115,10 +116,10 @@ void drawColliders() {
     auto cameraPosF = toFloatVec(getCameraPosition());
     glUniform2fv(program.cameraPositionUniform, 1, cameraPosF.e);
 
-    for (const auto& [entity, collider] : ActorsManager::getInstance()->getAllActors()) {
+    for (const auto& collider : ActorsManager::getInstance()->getAllActors()) {
         drawCollider(program, collider->getCollider(), Color::MAGENTA);
     }
-    for (const auto& [entity, collider] : SolidsManager::getInstance()->getAllSolids()) {
+    for (const auto& collider : SolidsManager::getInstance()->getAllSolids()) {
         drawCollider(program, collider->getCollider(), Color::RED);
     }
     for (const auto& [entityid, entity] : TriggerSystem::getEntitiesRef()) {

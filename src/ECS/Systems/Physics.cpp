@@ -11,6 +11,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
+#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
@@ -103,14 +104,17 @@ void PhysicsSystem::update() {
                 vel.residualImpulse.e[1] = 0;
 
                 // do collision callback
-                if (auto otherSB = hitinfo.value().other.get<SolidCollider>(); otherSB.getOnCollisionEnter() != nullptr) {
-                    otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
+                if (hitinfo->isOtherSolid) {
+                    auto otherSB = hitinfo.value().other.get<SolidCollider>();
+                    if (otherSB.getOnCollisionEnter() != nullptr) {
+                        otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
+                    }
                 }
             } else {
                 rb.value()->setNotGrounded();
             }
 
-            if (auto hitinfo = actor.value()->moveX(move, nullptr); hitinfo) {
+            if (auto hitinfo = actor.value()->moveX(move, nullptr); hitinfo && hitinfo->isOtherSolid) {
                 auto otherSB = hitinfo->other.get<SolidCollider>();
 
                 // do collision callback
@@ -140,6 +144,9 @@ void PhysicsSystem::update() {
                 if (isMomentumStored && rb.value()->momentumCooldownFrames <= 0) {
                     // velocity in tiles per second, momentum in pixels
                     vel.stable += actor.value()->getMomentum() * TILES_PER_PIXEL;
+                    if (entity.has<Player>()) {
+                        print("momentum:", actor.value()->getMomentum());
+                    }
                     actor.value()->resetMomentum();
                     rb.value()->momentumCooldownFrames = MOMENTUM_COOLDOWN_FRAMES;
                 } else if (rb.value()->momentumCooldownFrames > 0) {

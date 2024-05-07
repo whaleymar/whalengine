@@ -124,13 +124,10 @@ void FollowSystem::update() {
             follow.isMovingY = false;
         }
 
-        follow.debugTargetTracker.set(Transform(follow.currentTarget));
-        follow.debugPositionTracker.set(trans);
-
-        // if (System::frame.getFrame() == 0) {
-        //     print("Camera Target", follow.currentTarget);
-        //     print("deadZoneTexels:", follow.deadZoneTexels);
-        // }
+#ifndef NDEBUG
+        // follow.debugTargetTracker.set(Transform(follow.currentTarget));
+        // follow.debugPositionTracker.set(trans);
+#endif  // !NDEBUG
     }
 }
 

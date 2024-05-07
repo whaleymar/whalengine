@@ -39,6 +39,7 @@ private:
     ActorCollisionCallback mOnCollisionEnter;
 };
 
+// TODO material in constructor
 class ActorCollider : public IUseCollision {
 public:
     ActorCollider() = default;
@@ -56,11 +57,11 @@ public:
     bool isMomentumStoredX() const { return mMomentumFramesLeft.x() > 0; }
     bool isMomentumStoredY() const { return mMomentumFramesLeft.y() > 0; }
     void momentumNotUsed();
-    bool checkIsGrounded(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, SolidCollider** groundSolid);
+    bool checkIsGrounded(const std::vector<SolidCollider*>& solids, IUseCollision** groundCollider);
+    bool checkIsGroundedOnActors(const std::vector<ActorCollider*>& actors, IUseCollision** groundCollider);
 
-    template <typename T>
-    std::optional<HitInfo> checkCollision(const std::vector<std::pair<ecs::Entity, T*>>& objects, const Vector2i position,
-                                          const Vector2i moveNormal) const;
+    std::optional<HitInfo> checkCollisionSolids(const std::vector<SolidCollider*>& solids, const Vector2i position, const Vector2i moveNormal) const;
+    std::optional<HitInfo> checkCollisionActors(const std::vector<ActorCollider*>& actors, const Vector2i position) const;
 
     // squish is a CollisionCallback. Not sure if I will define others
     // TODO these can't be virtual bc ECS
@@ -68,7 +69,7 @@ public:
     virtual bool isRiding(const SolidCollider* solid) const;
 
 private:
-    bool tryCornerCorrection(const std::vector<std::pair<ecs::Entity, SolidCollider*>>& solids, Vector2i nextPos, s32 moveSign, Vector2i moveNormal);
+    bool tryCornerCorrection(const std::vector<SolidCollider*>& solids, Vector2i nextPos, s32 moveSign, Vector2i moveNormal);
 
     Vector2f mStoredMomentum;
     Vector2i mMomentumFramesLeft = {0, 0};
