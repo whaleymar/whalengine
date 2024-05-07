@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include "ECS/Components/Transform.h"
 #include "Physics/Collision/HitInfo.h"
 #include "Physics/Collision/Segment.h"
 #include "Util/Vector.h"
@@ -23,7 +24,7 @@ struct AABB {
 
     AABB(Vector2i half);
     AABB(Vector2i center, Vector2i half);
-    static AABB fromBottom(Vector2i bottom, Vector2i half);
+    AABB(Transform transform, Vector2i half);
     void setPosition(Vector2i position);
     void setPosition(Vector2f position);
     void setPositionFromBottom(Vector2i position);

@@ -1,0 +1,31 @@
+#include "TriggerSystem.h"
+#include "ECS/Components/Collision.h"
+// #include "ECS/Components/Transform.h"
+// #include "ECS/Components/Velocity.h"
+#include "ECS/Components/TriggerZone.h"
+
+namespace whal {
+
+void TriggerSystem::update() {
+    for (auto [entityid, entity] : getEntitiesRef()) {
+        std::vector<ecs::Entity> newInsideList;
+        auto& trigger = entity.get<TriggerZone>();
+
+        for (auto [actorid, actor] : MovingActorTracker::getEntitiesCopy()) {
+            bool wasInside = std::find(trigger.insideEntities.begin(), trigger.insideEntities.end(), actor) != trigger.insideEntities.end();
+
+            if (actor.get<ActorCollider>().getCollider().isOverlapping(trigger)) {
+                newInsideList.push_back(actor);
+                if (!wasInside && trigger.onTriggerEnter != nullptr) {
+                    trigger.onTriggerEnter(actor);
+                }
+            } else if (wasInside && trigger.onTriggerExit != nullptr) {
+                trigger.onTriggerExit(actor);
+            }
+        }
+
+        trigger.insideEntities = std::move(newInsideList);
+    }
+}
+
+}  // namespace whal

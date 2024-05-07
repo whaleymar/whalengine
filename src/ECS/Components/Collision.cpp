@@ -221,7 +221,7 @@ bool checkDirectionalCollision(AABB actor, AABB solid, Vector2i moveNormal, Coll
     return true;
 }
 
-// this currently only works for solid objects
+// RESEARCH this currently only works for solid objects
 template <typename T>
 std::optional<HitInfo> ActorCollider::checkCollision(const std::vector<std::pair<ecs::Entity, T*>>& objects, const Vector2i position,
                                                      const Vector2i moveNormal) const {

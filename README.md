@@ -4,7 +4,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 # To Do 
 
 ## Current Goal: 
-- physics rework
+- make entity.kill()s happen at end of frame
 
 ## Camera / Follow
 - different movement types (easein/out stuff)
@@ -21,7 +21,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 
 ## Components
 - Light 
-- Trigger
 
 ## Entity Prefabs
 - particle
@@ -30,7 +29,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - death plane
 
 ## Physics
-- Trigger colliders
 - fixed updates at 60fps so rounding doesn't fuck me
 
 ## Map 

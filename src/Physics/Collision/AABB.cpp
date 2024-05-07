@@ -1,5 +1,6 @@
 #include "Physics/Collision/AABB.h"
 
+#include "ECS/Components/Transform.h"
 #include "Util/MathUtil.h"
 #include "Util/Vector.h"
 
@@ -8,9 +9,7 @@ namespace whal {
 AABB::AABB(Vector2i half_) : center(Vector2i::zero), half(half_) {}
 AABB::AABB(Vector2i center_, Vector2i half_) : center(center_), half(half_) {}
 
-AABB AABB::fromBottom(Vector2i bottom, Vector2i half) {
-    return AABB({bottom.x(), bottom.y() + half.y()}, half);
-}
+AABB::AABB(Transform transform, Vector2i half_) : center({transform.position.x(), transform.position.y() + half_.y()}), half(half_) {}
 
 void AABB::setPosition(Vector2i position) {
     center = position;

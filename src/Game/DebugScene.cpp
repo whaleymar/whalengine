@@ -5,6 +5,7 @@
 #include "ECS/Components/Name.h"
 #include "ECS/Components/RailsControl.h"
 #include "ECS/Components/Transform.h"
+#include "ECS/Components/TriggerZone.h"
 #include "ECS/Entities/Block.h"
 #include "ECS/Entities/Camera.h"
 #include "ECS/Entities/Player.h"
@@ -17,6 +18,7 @@
 #include "Util/Print.h"
 
 void createTestPlatform();
+void createTestTrigger();
 
 std::optional<Error> loadMap() {
     using namespace whal;
@@ -33,6 +35,7 @@ std::optional<Error> loadTestMap() {
     // createTestPlatform();
     auto err = loadMap();
     createTestPlatform();
+    createTestTrigger();
     return err;
 }
 
@@ -156,4 +159,15 @@ void createTestPlatform() {
     // block.get<SolidCollider>().setCollisionDir(CollisionDir::DOWN);  // WORKS
     block.get<SolidCollider>().setCollisionDir(CollisionDir::UP);  // WORKS
     block.add(Name("ONE WAY COLLIDER"));
+}
+
+void createTestTrigger() {
+    // TriggerCallback callback = [](ecs::Entity entity) { System::audio.play(Sfx::ENEMY_CRY); };
+    TriggerCallback callback = [](ecs::Entity entity) { entity.kill(); };
+
+    // TriggerZone trigger = TriggerZone(Transform::tiles(5, -5), {4, 4}, callback);
+    // TriggerZone trigger = TriggerZone(Transform::tiles(5, -9), {4, 4}, nullptr);
+    TriggerZone trigger = TriggerZone(Transform::tiles(5, -9), {4, 4}, nullptr, callback);
+    auto newEntity = ecs::ECS::getInstance().entity().value();
+    newEntity.add(trigger);
 }

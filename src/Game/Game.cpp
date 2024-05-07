@@ -4,9 +4,11 @@
 
 #include <SDL2/SDL.h>
 
+#include "ECS/Components/Transform.h"
 #include "ECS/Entities/Camera.h"
 #include "ECS/Systems/RelationshipManager.h"
 #include "ECS/Systems/TagTrackers.h"
+#include "ECS/Systems/TriggerSystem.h"
 #include "Game/Events.h"
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
@@ -108,6 +110,8 @@ void Game::mainloop() {
     auto drawSystem = ecs.registerSystem<DrawSystem>();
     auto animationSystem = ecs.registerSystem<AnimationSystem>();
     auto lifetimeSystem = ecs.registerSystem<LifetimeSystem>();
+    ecs.registerSystem<MovingActorTracker>();  // dependency of TriggerSystem
+    auto triggerSystem = ecs.registerSystem<TriggerSystem>();
 
     // single-component systems for running psuedo-destructors / updating some global var
     auto actorsMgr = ActorsManager::getInstance();
@@ -163,6 +167,7 @@ void Game::mainloop() {
         pathSystem->update();
         followMgr->update();
         physicsSystem->update();
+        triggerSystem->update();
 
         if (System::frame.getFrame() % 10 == 0) {
             // these sync the collision manager

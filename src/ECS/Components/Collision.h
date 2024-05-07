@@ -14,9 +14,7 @@ namespace ecs {
 class Entity;
 }
 
-// using TriggerCallback = void (*)(HitInfo, Entity self, Entity other);
 using ActorCollisionCallback = void (*)(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo);
-// using CollisionCallback = void (*)(ecs::Entity self, HitInfo hitinfo);
 
 enum class CollisionDir : u8 { ALL, LEFT, RIGHT, DOWN, UP };
 
