@@ -9,6 +9,7 @@
 #include "Physics/IUseCollision.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
+#include "Util/Print.h"
 
 namespace whal {
 
@@ -116,7 +117,8 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
         } else {
-            if (moveSign == 1 && tryCornerCorrection(solids, nextPos, amount.x(), moveNormal)) {
+            if (moveSign == 1 && ((hitInfo->isOtherSolid && (tryCornerCorrection(solids, nextPos, amount.x(), moveNormal))) ||
+                                  (hitInfo->isOtherSemiSolid && (tryCornerCorrectionSemiSolids(semiSolids, nextPos, amount.x()))))) {
                 continue;  // avoided collision
             }
             if (callback != nullptr) {
@@ -252,6 +254,7 @@ std::optional<HitInfo> ActorCollider::checkCollisionSemiSolids(const std::vector
         std::optional<HitInfo> hitInfo = movedCollider.collide(collider->getCollider());
         if (hitInfo != std::nullopt) {
             hitInfo->other = collider->getEntity();
+            hitInfo->isOtherSemiSolid = true;
             hitInfo->otherMaterial = collider->getMaterial();
             return hitInfo;
         }
@@ -311,6 +314,30 @@ bool ActorCollider::tryCornerCorrection(const std::vector<SolidCollider*>& solid
         for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
             Vector2i nextPos = nextPosition + Vector2i(-i, 0);
             if (!checkCollisionSolids(solids, nextPos, moveNormal)) {
+                mCollider.setPosition(nextPos);
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool ActorCollider::tryCornerCorrectionSemiSolids(const std::vector<SemiSolidCollider*>& semis, Vector2i nextPosition, s32 moveSignX) {
+    // if we are on a half texel x coord, start at 0.5 texels of movement
+    if (moveSignX >= 0) {
+        for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
+            Vector2i nextPos = nextPosition + Vector2i(i, 0);
+            if (!checkCollisionSemiSolids(semis, nextPos)) {
+                mCollider.setPosition(nextPos);
+                return true;
+            }
+        }
+    }
+    if (moveSignX <= 0) {
+        for (s32 i = SPIXELS_PER_TEXEL - nextPosition.x() % SPIXELS_PER_TEXEL; i <= CORNERCORRECTIONWIGGLE; i += SPIXELS_PER_TEXEL) {
+            Vector2i nextPos = nextPosition + Vector2i(-i, 0);
+            if (!checkCollisionSemiSolids(semis, nextPos)) {
                 mCollider.setPosition(nextPos);
                 return true;
             }
@@ -493,6 +520,7 @@ std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const SemiSoli
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
     std::optional<HitInfo> hitInfo;
     bool neverMoved = true;
+    s32 toMoveOriginal = toMove;
     // TODO check for collision with other SemiSolids
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveNormal;
@@ -519,10 +547,10 @@ std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const SemiSoli
     bool wasCollidable = mIsCollidable;
     mIsCollidable = false;
 
-    if (toMove > 0) {
-        moveActors(toMove, amount, true, mCollider.right(), &AABB::left, riding, isManualMove);
+    if (toMoveOriginal > 0) {
+        moveActors(toMoveOriginal, amount, true, mCollider.right(), &AABB::left, riding, isManualMove);
     } else {
-        moveActors(toMove, amount, true, mCollider.left(), &AABB::right, riding, isManualMove);
+        moveActors(toMoveOriginal, amount, true, mCollider.left(), &AABB::right, riding, isManualMove);
     }
 
     mIsCollidable = wasCollidable;
@@ -560,6 +588,7 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const SemiSoli
     // move one pixel at a time, checking for collision with solids
     std::optional<HitInfo> hitInfo;
     bool neverMoved = true;
+    s32 toMoveOriginal = toMove;
     // TODO check for collision with other SemiSolids
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveNormal;
@@ -586,10 +615,10 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const SemiSoli
     bool wasCollidable = mIsCollidable;
     mIsCollidable = false;
 
-    if (toMove > 0) {
-        moveActors(toMove, amount, false, mCollider.top(), &AABB::bottom, riding, isManualMove);
+    if (toMoveOriginal > 0) {
+        moveActors(toMoveOriginal, amount, false, mCollider.top(), &AABB::bottom, riding, isManualMove);
     } else {
-        moveActors(toMove, amount, false, mCollider.bottom(), &AABB::top, riding, isManualMove);
+        moveActors(toMoveOriginal, amount, false, mCollider.bottom(), &AABB::top, riding, isManualMove);
     }
 
     mIsCollidable = wasCollidable;
@@ -635,6 +664,7 @@ std::optional<HitInfo> SemiSolidCollider::checkCollisionSemiSolids(const std::ve
         std::optional<HitInfo> hitInfo = movedCollider.collide(semi->getCollider());
         if (hitInfo != std::nullopt) {
             hitInfo->other = semi->getEntity();
+            hitInfo->isOtherSemiSolid = true;
             hitInfo->otherMaterial = semi->getMaterial();
             return hitInfo;
         }

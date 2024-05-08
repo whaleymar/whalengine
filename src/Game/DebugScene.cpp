@@ -171,9 +171,23 @@ void createTestTrigger() {
 
 void createTestSemiSolid() {
     auto newEntity = ecs::ECS::getInstance().entity().value();
-    newEntity.add(Draw(RGB(0.5, 0.5, 0.5)));
-    Transform trans = Transform::tiles(3, 10);
+    newEntity.add(Draw(RGB(0.34, 0.5, 0.9)));
+    Transform trans = Transform::tiles(18, 19);
+    // Transform trans = Transform::tiles(10, -14);
+    // auto pathControl = RailsControl(8,
+    //                                 {
+    //                                     {Transform::tiles(10, -14).position, RailsControl::Movement::LINEAR},
+    //                                     {Transform::tiles(10, -10).position, RailsControl::Movement::LINEAR},
+    //                                 },
+    //                                 2, true);
+    // auto pathControl = RailsControl(8,
+    //                                 {
+    //                                     {Transform::tiles(10, -14).position, RailsControl::Movement::LINEAR},
+    //                                     {Transform::tiles(12, -14).position, RailsControl::Movement::LINEAR},
+    //                                 },
+    //                                 1, true);
     newEntity.add(trans);
+    // newEntity.add(pathControl);
     newEntity.add<Velocity>();
     newEntity.add<RigidBody>();
     auto collider = SemiSolidCollider(toFloatVec(trans.position + Vector2i(0, 8)), Vector2i(8, 8), Material::None, nullptr);

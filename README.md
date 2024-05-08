@@ -5,8 +5,8 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 
 ## Current Goal: 
 - semisolid colliders / physics rework 
-    - actor::moveY corner correction 
     - self collision 
+    - callbacks
     - todos in collision.h/cpp
     - componentfactory + tiled 
 
@@ -83,6 +83,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - isNearZero not working
 - cppcheck issues
 - depth test broken for Draw components (low priority)
+- actors sometimes fall through one way solids if the solid is moving fast enough, probably because solids don't move one pixel at a time, so if the actor isn't already riding the solid, it misses the solid's boundary
 
 ## Research
 - things i might want to reconsider in the future -- ctrl+f for "RESEARCH" 

@@ -52,7 +52,8 @@ public:
     virtual bool isRiding(const SolidCollider* solid) const;
 
 private:
-    bool tryCornerCorrection(const std::vector<SolidCollider*>& solids, Vector2i nextPos, s32 moveSign, Vector2i moveNormal);
+    bool tryCornerCorrection(const std::vector<SolidCollider*>& solids, Vector2i nextPos, s32 moveSignX, Vector2i moveNormal);
+    bool tryCornerCorrectionSemiSolids(const std::vector<SemiSolidCollider*>& semis, Vector2i nextPos, s32 moveSignX);
 
     Vector2f mStoredMomentum = {0, 0};
     Vector2i mMomentumFramesLeft = {0, 0};
@@ -91,7 +92,7 @@ private:
 // More specifically, it
 //     - carries/pushes actors when moving, and stops actors that move into it
 //     - stops when moving into a solid, and is carried/pushed by moving solids
-//     - stops when moving into other SemiSolidColliders
+//     - stops when moving into other SemiSolidColliders (may change in the future)
 //
 // Other stuff: can be grounded, does not have corner correction, does not have momentum(?), can be destroyed, no one-way collision variants
 class SemiSolidCollider : public SolidCollider {
@@ -111,12 +112,9 @@ public:
     // still not sure if/how/should i use component inheritance with my ECS, but I'll stay consistent for now
     virtual void squish(const HitInfo hitInfo);
     virtual bool isRiding(const SolidCollider* solid) const;
-
-    // private:
-    // Vector2f mStoredMomentum = {0, 0};
-    // Vector2i mMomentumFramesLeft = {0, 0};
 };
 
 void defaultSquish(ActorCollider* selfCollider, ecs::Entity self, HitInfo hitinfo);
 void defaultSquishSemiSolid(SemiSolidCollider* selfCollider, ecs::Entity self, HitInfo hitinfo);
+
 }  // namespace whal
