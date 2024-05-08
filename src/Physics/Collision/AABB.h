@@ -32,9 +32,11 @@ struct AABB {
     const std::optional<HitInfo> collide(const AABB& other) const;
     const std::optional<HitInfo> collide(Segment segment) const;
     bool isOverlapping(const AABB& other) const;
-    Vector2i getPositionEdge(Vector2i unitDir) const;
+    Vector2i getPositionEdge(Vector2i unitDir) const;  // TODO delete this and use top/bottom/etc instead
 
     Vector2i getPosition() const { return center; }
+
+    // TODO these should return ints
     f32 top() const { return center.y() + half.y(); }
     f32 bottom() const { return center.y() - half.y(); }
     f32 right() const { return center.x() + half.x(); }

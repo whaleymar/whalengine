@@ -123,6 +123,7 @@
                          "type":"class",
                          "value":
                             {
+                             "CollisionDir":0,
                              "halflenTexelsX":12,
                              "halflenTexelsY":4
                             }

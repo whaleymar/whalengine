@@ -4,8 +4,10 @@
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Name.h"
 #include "ECS/Components/RailsControl.h"
+#include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/TriggerZone.h"
+#include "ECS/Components/Velocity.h"
 #include "ECS/Entities/Block.h"
 #include "ECS/Entities/Camera.h"
 #include "ECS/Entities/Player.h"
@@ -19,6 +21,7 @@
 
 void createTestPlatform();
 void createTestTrigger();
+void createTestSemiSolid();
 
 std::optional<Error> loadMap() {
     using namespace whal;
@@ -36,6 +39,7 @@ std::optional<Error> loadTestMap() {
     auto err = loadMap();
     createTestPlatform();
     createTestTrigger();
+    createTestSemiSolid();
     return err;
 }
 
@@ -127,6 +131,7 @@ std::optional<Error> loadDebugScene() {
 }
 
 void startRailsMovement(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo) {
+    print("called startRailsMovement");
     ecs::Entity solidEntity = hitinfo.other;
     auto& rails = solidEntity.get<RailsControl>();
     if (rails.isWaiting && rails.curTarget == 0) {
@@ -152,13 +157,6 @@ void createTestPlatform() {
         platform.get<SolidCollider>().setCollisionCallback(&startRailsMovement);
         // platform.get<SolidCollider>().setCollisionCallback(&killEntityCallback);
     }
-
-    auto block = createBlock(Transform::tiles(5, -9), Draw(Color::MAGENTA)).value();
-    // block.get<SolidCollider>().setCollisionDir(CollisionDir::LEFT);  // WORKS
-    // block.get<SolidCollider>().setCollisionDir(CollisionDir::RIGHT);  // WORKS
-    // block.get<SolidCollider>().setCollisionDir(CollisionDir::DOWN);  // WORKS
-    block.get<SolidCollider>().setCollisionDir(CollisionDir::UP);  // WORKS
-    block.add(Name("ONE WAY COLLIDER"));
 }
 
 void createTestTrigger() {
@@ -167,7 +165,18 @@ void createTestTrigger() {
 
     // TriggerZone trigger = TriggerZone(Transform::tiles(5, -5), {4, 4}, callback);
     // TriggerZone trigger = TriggerZone(Transform::tiles(5, -9), {4, 4}, nullptr);
-    TriggerZone trigger = TriggerZone(Transform::tiles(5, -9), {4, 4}, nullptr, callback);
+    TriggerZone trigger = TriggerZone(Transform::tiles(2, -9), {8, 8}, nullptr, callback);
     auto newEntity = ecs::ECS::getInstance().entity().value();
     newEntity.add(trigger);
+}
+
+void createTestSemiSolid() {
+    auto newEntity = ecs::ECS::getInstance().entity().value();
+    newEntity.add(Draw(RGB(0.5, 0.5, 0.5)));
+    Transform trans = Transform::tiles(3, 10);
+    newEntity.add(trans);
+    newEntity.add<Velocity>();
+    newEntity.add<RigidBody>();
+    auto collider = SemiSolidCollider(toFloatVec(trans.position + Vector2i(0, 8)), Vector2i(8, 8), Material::None, nullptr);
+    newEntity.add(collider);
 }

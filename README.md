@@ -4,7 +4,12 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 # To Do 
 
 ## Current Goal: 
-- semisolid colliders
+- semisolid colliders / physics rework 
+    - actor::moveY corner correction 
+    - self collision 
+
+    - somehow i broke the collisioncallback priority thingy for solids
+    - mb i can pass a isGroundedCheckNeeded to moveY so i only check for rigidbodies?
 - put velocity in texels/second instead of tiles/second
 
 ## Camera / Follow
@@ -36,8 +41,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - death plane
 
 ## Physics
-- i think it's time for actors to collide with each other
-    - semisolid collider
+- idea: overlapping actors nudge each other away or exert a force or something
 - fixed updates at 60fps so rounding doesn't fuck me
 
 ## Map 

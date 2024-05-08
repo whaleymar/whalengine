@@ -17,10 +17,12 @@ struct RGB {
 
 namespace Color {
 
-const RGB WHITE = {1.0, 1.0, 1.0};
-const RGB RED = {1.0, 0.0, 0.0};
-const RGB MAGENTA = {1.0, 0.0, 1.0};
-const RGB EMERALD = {0.314, 0.8, 0.377};
+static const RGB WHITE = {1.0, 1.0, 1.0};
+static const RGB RED = {1.0, 0.0, 0.0};
+static const RGB MAGENTA = {1.0, 0.0, 1.0};
+static const RGB EMERALD = {0.314, 0.8, 0.377};
+static const RGB PURPLE = RGB::fromInts(198, 51, 242);
+static const RGB PINK = RGB::fromInts(242, 116, 217);
 
 }  // namespace Color
 

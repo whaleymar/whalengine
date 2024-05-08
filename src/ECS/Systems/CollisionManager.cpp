@@ -90,6 +90,39 @@ void SolidsManager::onRemove(ecs::Entity entity) {
 #endif
 }
 
+void SemiSolidsManager::update() {
+    if (!mIsUpdateNeeded) {
+        return;
+    }
+    std::vector<SemiSolidCollider*> newSolidsList;
+
+    for (auto& [entityid, entity] : getEntitiesRef()) {
+        auto pCollider = &entity.get<SemiSolidCollider>();
+        newSolidsList.push_back(pCollider);
+    }
+
+    mSemiSolids = std::move(newSolidsList);
+    mIsUpdateNeeded = false;
+}
+
+void SemiSolidsManager::onAdd(ecs::Entity entity) {
+    SemiSolidCollider* pCollider = &entity.get<SemiSolidCollider>();
+    mSemiSolids.push_back(pCollider);
+    pCollider->setEntity(entity);
+#ifndef NDEBUG
+    entity.get<SemiSolidCollider>().getColliderMut().vao.initArray();
+    entity.get<SemiSolidCollider>().getColliderMut().vbo.initBuffer();
+#endif
+}
+
+void SemiSolidsManager::onRemove(ecs::Entity entity) {
+    mIsUpdateNeeded = true;
+#ifndef NDEBUG
+    entity.get<SemiSolidCollider>().getColliderMut().vao.freeArray();
+    entity.get<SemiSolidCollider>().getColliderMut().vbo.freeBuffer();
+#endif
+}
+
 #ifndef NDEBUG
 
 // void drawCollider(ShaderProgram program, const IUseCollision* collider, const RGB color) {
@@ -121,6 +154,9 @@ void drawColliders() {
     }
     for (const auto& collider : SolidsManager::getInstance()->getAllSolids()) {
         drawCollider(program, collider->getCollider(), Color::RED);
+    }
+    for (const auto& collider : SemiSolidsManager::getInstance()->getAllSemiSolids()) {
+        drawCollider(program, collider->getCollider(), Color::PINK);
     }
     for (const auto& [entityid, entity] : TriggerSystem::getEntitiesRef()) {
         drawCollider(program, entity.get<TriggerZone>(), Color::EMERALD);

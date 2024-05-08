@@ -118,6 +118,7 @@ void Game::mainloop() {
     // single-component systems for running psuedo-destructors / updating some global var
     auto actorsMgr = ActorsManager::getInstance();
     auto solidsMgr = SolidsManager::getInstance();
+    auto semiSolidsMgr = SemiSolidsManager::getInstance();
     auto followMgr = ecs.registerSystem<FollowSystem>();
     // these don't have update methods:
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
@@ -175,6 +176,7 @@ void Game::mainloop() {
             // these sync the collision manager
             actorsMgr->update();
             solidsMgr->update();
+            semiSolidsMgr->update();
         }
         lifetimeSystem->update();
 

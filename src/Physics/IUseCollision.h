@@ -29,4 +29,9 @@ protected:
     bool mIsCollidable = true;
 };
 
+enum class CollisionDir : u8 { ALL, LEFT, RIGHT, DOWN, UP };
+
+// returns true if a collision CAN happen given the move normal & collision direction
+bool checkDirectionalCollision(const AABB& actor, const AABB& solid, Vector2i moveNormal, CollisionDir collisionDir);
+
 }  // namespace whal

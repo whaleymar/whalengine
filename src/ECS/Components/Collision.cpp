@@ -19,6 +19,10 @@ void defaultSquish(ActorCollider* selfCollider, ecs::Entity self, HitInfo hitinf
     selfCollider->squish(hitinfo);
 }
 
+void defaultSquishSemiSolid(SemiSolidCollider* selfCollider, ecs::Entity self, HitInfo hitinfo) {
+    selfCollider->squish(hitinfo);
+}
+
 ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(AABB(half)) {
     mCollider.setPosition(position);
 }
@@ -34,6 +38,7 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const ActorCo
         return std::nullopt;
     }
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
+    auto const& semiSolids = SemiSolidsManager::getInstance()->getAllSemiSolids();
     // auto const& actors = ActorsManager::getInstance()->getAllActors();
 
     mXRemainder -= toMove;
@@ -42,9 +47,10 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const ActorCo
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveNormal;
         auto hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
-        // if (!hitInfo) {
-        //     hitInfo = checkCollisionActors(actors, nextPos);
-        // }
+        if (!hitInfo) {
+            hitInfo = checkCollisionSemiSolids(semiSolids, nextPos);
+        }
+
         if (!hitInfo) {
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
@@ -65,19 +71,23 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
     mYRemainder += amount.y();
     s32 toMove = std::round(mYRemainder);
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
+    auto const& semiSolids = SemiSolidsManager::getInstance()->getAllSemiSolids();
     // auto const& actors = ActorsManager::getInstance()->getAllActors();
 
-    if (toMove == 0) {
+    auto groundedCheck = [this](f32 amountY, const std::vector<SolidCollider*>& solids,
+                                const std::vector<SemiSolidCollider*>& semis) -> std::optional<HitInfo> {
         IUseCollision* groundCollider = nullptr;
-        // if (amount.y() <= 0 && (checkIsGrounded(solids, &groundCollider) || checkIsGroundedOnActors(actors, &groundCollider))) {
-        if (amount.y() <= 0 && (checkIsGrounded(solids, &groundCollider))) {
+        if (amountY <= 0 && ((checkIsGrounded(solids, &groundCollider)) || checkIsGroundedOnSemiSolids(semis, &groundCollider))) {
             HitInfo hitinfo(Vector2i(0, -1));
             hitinfo.other = groundCollider->getEntity();
             hitinfo.otherMaterial = groundCollider->getMaterial();
             return hitinfo;
-        } else {
-            return std::nullopt;
         }
+        return std::nullopt;
+    };
+
+    if (toMove == 0) {
+        return groundedCheck(amount.y(), solids, semiSolids);
     }
 
     mYRemainder -= toMove;
@@ -86,9 +96,10 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveNormal;
         auto hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
-        // if (!hitInfo) {
-        //     hitInfo = checkCollisionActors(actors, nextPos);
-        // }
+        if (!hitInfo) {
+            hitInfo = checkCollisionSemiSolids(semiSolids, nextPos);
+        }
+
         if (!hitInfo) {
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
@@ -103,16 +114,7 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
         }
     }
 
-    IUseCollision* groundCollider = nullptr;
-    // if (amount.y() <= 0 && (checkIsGrounded(solids, &groundCollider) || checkIsGroundedOnActors(actors, &groundCollider))) {
-    if (amount.y() <= 0 && (checkIsGrounded(solids, &groundCollider))) {
-        HitInfo hitinfo(Vector2i(0, -1));
-        hitinfo.other = groundCollider->getEntity();
-        hitinfo.otherMaterial = groundCollider->getMaterial();
-        return hitinfo;
-    } else {
-        return std::nullopt;
-    }
+    return groundedCheck(amount.y(), solids, semiSolids);
 }
 
 void ActorCollider::setMomentum(const f32 momentum, const bool isXDirection) {
@@ -178,6 +180,16 @@ bool ActorCollider::checkIsGrounded(const std::vector<SolidCollider*>& solids, I
     return false;
 }
 
+bool ActorCollider::checkIsGroundedOnSemiSolids(const std::vector<SemiSolidCollider*>& semis, IUseCollision** groundCollider) {
+    for (auto& semi : semis) {
+        if (semi->isCollidable() && isRiding(semi)) {
+            *groundCollider = semi;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool ActorCollider::checkIsGroundedOnActors(const std::vector<ActorCollider*>& actors, IUseCollision** groundCollider) {
     for (auto& actor : actors) {
         if (!actor->isCollidable() || this == actor) {
@@ -190,40 +202,6 @@ bool ActorCollider::checkIsGroundedOnActors(const std::vector<ActorCollider*>& a
         }
     }
     return false;
-}
-
-// returns true if a collision CAN happen given the move normal & collision direction
-bool checkDirectionalCollision(const AABB& actor, const AABB& solid, Vector2i moveNormal, CollisionDir collisionDir) {
-    switch (collisionDir) {
-    case CollisionDir::ALL:
-        return true;
-
-    case CollisionDir::LEFT:
-        if (moveNormal.x() <= 0 || actor.right() != solid.left()) {
-            return false;
-        }
-        break;
-
-    case CollisionDir::RIGHT:
-        if (moveNormal.x() >= 0 || actor.left() != solid.right()) {
-            return false;
-        }
-        break;
-
-    case CollisionDir::DOWN:
-        if (moveNormal.y() <= 0 || actor.top() != solid.bottom()) {
-            return false;
-        }
-        break;
-
-    case CollisionDir::UP:
-        if (moveNormal.y() >= 0 || actor.bottom() != solid.top()) {
-            return false;
-        }
-        break;
-    }
-
-    return true;
 }
 
 std::optional<HitInfo> ActorCollider::checkCollisionSolids(const std::vector<SolidCollider*>& solids, const Vector2i position,
@@ -244,6 +222,24 @@ std::optional<HitInfo> ActorCollider::checkCollisionSolids(const std::vector<Sol
         if (hitInfo != std::nullopt) {
             hitInfo->other = collider->getEntity();
             hitInfo->isOtherSolid = true;
+            hitInfo->otherMaterial = collider->getMaterial();
+            return hitInfo;
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::optional<HitInfo> ActorCollider::checkCollisionSemiSolids(const std::vector<SemiSolidCollider*>& semis, const Vector2i position) const {
+    auto movedCollider = AABB(position, mCollider.half);
+    for (auto& collider : semis) {
+        if (!collider->isCollidable()) {
+            continue;
+        }
+
+        std::optional<HitInfo> hitInfo = movedCollider.collide(collider->getCollider());
+        if (hitInfo != std::nullopt) {
+            hitInfo->other = collider->getEntity();
             hitInfo->otherMaterial = collider->getMaterial();
             return hitInfo;
         }
@@ -331,31 +327,38 @@ void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
 
     // check riding status *before* moving
     auto riding = getRidingActors();
+    auto ridingSemiSolids = getRidingSemiSolids();
 
     // turn off collision so actors moved by the solid don't get stuck on it
     bool wasCollidable = mIsCollidable;
     mIsCollidable = false;
     if (toMoveX > 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(toMoveX, 0));
-        moveDirection(toMoveX, x, true, mCollider.right(), &AABB::left, riding, isManualMove);
+        moveActors(toMoveX, x, true, mCollider.right(), &AABB::left, riding, isManualMove);
+        moveSemiSolids(true, toMoveX, mCollider.right(), &AABB::left, ridingSemiSolids, isManualMove);
+
     } else if (toMoveX < 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(toMoveX, 0));
-        moveDirection(toMoveX, x, true, mCollider.left(), &AABB::right, riding, isManualMove);
+        moveActors(toMoveX, x, true, mCollider.left(), &AABB::right, riding, isManualMove);
+        moveSemiSolids(true, toMoveX, mCollider.left(), &AABB::right, ridingSemiSolids, isManualMove);
     }
 
     if (toMoveY > 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(0, toMoveY));
-        moveDirection(toMoveY, y, false, mCollider.top(), &AABB::bottom, riding, isManualMove);
+        moveActors(toMoveY, y, false, mCollider.top(), &AABB::bottom, riding, isManualMove);
+        moveSemiSolids(false, toMoveY, mCollider.top(), &AABB::bottom, ridingSemiSolids, isManualMove);
+
     } else if (toMoveY < 0) {
         mCollider.setPosition(mCollider.getPosition() + Vector2i(0, toMoveY));
-        moveDirection(toMoveY, y, false, mCollider.bottom(), &AABB::top, riding, isManualMove);
+        moveActors(toMoveY, y, false, mCollider.bottom(), &AABB::top, riding, isManualMove);
+        moveSemiSolids(false, toMoveY, mCollider.bottom(), &AABB::top, ridingSemiSolids, isManualMove);
     }
 
     mIsCollidable = wasCollidable;
 }
 
-void SolidCollider::moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
-                                  std::vector<ActorCollider*>& riding, bool isManualMove) {
+void SolidCollider::moveActors(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
+                               std::vector<ActorCollider*>& riding, bool isManualMove) {
     f32 dt = System::dt();
     Vector2i moveNormal;
     if (isXDirection) {
@@ -398,11 +401,52 @@ void SolidCollider::moveDirection(f32 toMoveRounded, f32 toMoveUnrounded, bool i
     }
 }
 
+void SolidCollider::moveSemiSolids(bool isXDirection, s32 toMoveRounded, s32 solidEdge, EdgeGetter edgeFunc, std::vector<SemiSolidCollider*>& riding,
+                                   bool isManualMove) {
+    Vector2i moveNormal;
+    if (isXDirection) {
+        moveNormal = {sign(toMoveRounded), 0};
+    } else {
+        moveNormal = {0, sign(toMoveRounded)};
+    }
+    for (auto& semiSolid : SemiSolidsManager::getInstance()->getAllSemiSolids()) {
+        // push takes priority over carry
+        if (mCollider.isOverlapping(semiSolid->getCollider()) &&
+            checkDirectionalCollision(semiSolid->getCollider(), getCollider(), moveNormal, getCollisionDir())) {
+            s32 actorEdge = (semiSolid->getCollider().*edgeFunc)();
+            toMoveRounded = solidEdge - actorEdge;
+            if (isXDirection) {
+                semiSolid->moveX(toMoveRounded, &defaultSquishSemiSolid);
+            } else {
+                semiSolid->moveY(toMoveRounded, &defaultSquishSemiSolid);
+            }
+        } else if (std::find(riding.begin(), riding.end(), semiSolid) != riding.end()) {
+            // I might change this for solids moving down faster than gravity RESEARCH
+            if (isXDirection) {
+                semiSolid->moveX(toMoveRounded, nullptr);
+            } else {
+                semiSolid->moveY(toMoveRounded, nullptr);
+            }
+        }
+    }
+}
+
 std::vector<ActorCollider*> SolidCollider::getRidingActors() const {
     std::vector<ActorCollider*> riding;
     for (auto& actor : ActorsManager::getInstance()->getAllActors()) {
         if (actor->isRiding(this)) {
             riding.push_back(actor);
+        }
+    }
+    return riding;
+}
+
+std::vector<SemiSolidCollider*> SolidCollider::getRidingSemiSolids() const {
+    // RESEARCH should a destination vector be passed here and ^ to avoid copying?
+    std::vector<SemiSolidCollider*> riding;
+    for (auto& semi : SemiSolidsManager::getInstance()->getAllSemiSolids()) {
+        if (semi->isRiding(this)) {
+            riding.push_back(semi);
         }
     }
     return riding;
@@ -415,6 +459,202 @@ void SolidCollider::setCollisionCallback(ActorCollisionCallback callback) {
 
 bool SolidCollider::isGround() const {
     return mCollisionDir == CollisionDir::ALL || mCollisionDir == CollisionDir::UP;
+}
+
+SemiSolidCollider::SemiSolidCollider(Vector2f position, Vector2i half, Material material, ActorCollisionCallback onCollisionEnter_)
+    : SolidCollider(position, half, material, onCollisionEnter_) {}
+
+std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const SemiSolidCollisionCallback callback, bool isManualMove) {
+    mXRemainder += amount;
+    s32 toMove = std::round(mXRemainder);
+    if (toMove == 0) {
+        return std::nullopt;
+    }
+    mXRemainder -= toMove;
+    const s32 moveSign = sign(toMove);
+    const auto moveNormal = Vector2i(moveSign, 0);
+
+    // check riding status *before* moving
+    auto riding = getRidingActors();
+
+    // move one pixel at a time, checking for collision with solids
+    auto const& solids = SolidsManager::getInstance()->getAllSolids();
+    std::optional<HitInfo> hitInfo;
+    bool neverMoved = true;
+    // TODO check for collision with other SemiSolids
+    while (toMove != 0) {
+        auto nextPos = mCollider.getPosition() + moveNormal;
+        hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
+        if (!hitInfo) {
+            mCollider.setPosition(nextPos);
+            toMove -= moveSign;
+            neverMoved = false;
+        } else {
+            if (callback != nullptr) {
+                callback(this, getEntity(), hitInfo.value());
+            }
+            break;
+        }
+    }
+
+    // done w/ movement. now check if there are overlapping actors
+    // if we never moved, can skip this step
+    if (neverMoved) {
+        return hitInfo;
+    }
+
+    // turn off collision so actor moved by us don't get stuck
+    bool wasCollidable = mIsCollidable;
+    mIsCollidable = false;
+
+    if (toMove > 0) {
+        moveActors(toMove, amount, true, mCollider.right(), &AABB::left, riding, isManualMove);
+    } else {
+        moveActors(toMove, amount, true, mCollider.left(), &AABB::right, riding, isManualMove);
+    }
+
+    mIsCollidable = wasCollidable;
+    return hitInfo;
+}
+
+std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const SemiSolidCollisionCallback callback, bool isManualMove) {
+    mYRemainder += amount;
+    s32 toMove = std::round(mYRemainder);
+    auto const& solids = SolidsManager::getInstance()->getAllSolids();
+
+    auto groundedCheck = [this](const f32 amount, const std::vector<SolidCollider*>& solids) -> std::optional<HitInfo> {
+        IUseCollision* groundCollider = nullptr;
+        if (amount <= 0 && checkIsGrounded(solids, &groundCollider)) {
+            HitInfo hitinfo(Vector2i(0, -1));
+            hitinfo.other = groundCollider->getEntity();
+            hitinfo.otherMaterial = groundCollider->getMaterial();
+            return hitinfo;
+        }
+        return std::nullopt;
+    };
+
+    if (toMove == 0) {
+        return groundedCheck(amount, solids);
+    }
+
+    mYRemainder -= toMove;
+    const s32 moveSign = sign(toMove);
+    const auto moveNormal = Vector2i(0, moveSign);
+
+    // check riding status *before* moving
+    // TODO pass this into moveX/Y so I'm not duplicating work
+    auto riding = getRidingActors();
+
+    // move one pixel at a time, checking for collision with solids
+    std::optional<HitInfo> hitInfo;
+    bool neverMoved = true;
+    // TODO check for collision with other SemiSolids
+    while (toMove != 0) {
+        auto nextPos = mCollider.getPosition() + moveNormal;
+        hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
+        if (!hitInfo) {
+            mCollider.setPosition(nextPos);
+            toMove -= moveSign;
+            neverMoved = false;
+        } else {
+            if (callback != nullptr) {
+                callback(this, getEntity(), hitInfo.value());
+            }
+            break;
+        }
+    }
+
+    // done w/ movement. now check if there are overlapping actors
+    // if we never moved (immediately hit a solid), can skip this step
+    if (neverMoved) {
+        return hitInfo;
+    }
+
+    // turn off collision so actor moved by us don't get stuck
+    bool wasCollidable = mIsCollidable;
+    mIsCollidable = false;
+
+    if (toMove > 0) {
+        moveActors(toMove, amount, false, mCollider.top(), &AABB::bottom, riding, isManualMove);
+    } else {
+        moveActors(toMove, amount, false, mCollider.bottom(), &AABB::top, riding, isManualMove);
+    }
+
+    mIsCollidable = wasCollidable;
+    if (!hitInfo) {
+        return groundedCheck(amount, solids);
+    }
+    return hitInfo;
+}
+
+std::optional<HitInfo> SemiSolidCollider::checkCollisionSolids(const std::vector<SolidCollider*>& solids, const Vector2i position,
+                                                               const Vector2i moveNormal) const {
+    auto movedCollider = AABB(position, mCollider.half);
+    for (auto& collider : solids) {
+        if (!collider->isCollidable()) {
+            continue;
+        }
+
+        // check for one-way collision skips
+        const CollisionDir collisionDir = collider->getCollisionDir();
+        if (!checkDirectionalCollision(getCollider(), collider->getCollider(), moveNormal, collisionDir)) {
+            continue;
+        }
+
+        std::optional<HitInfo> hitInfo = movedCollider.collide(collider->getCollider());
+        if (hitInfo != std::nullopt) {
+            hitInfo->other = collider->getEntity();
+            hitInfo->isOtherSolid = true;
+            hitInfo->otherMaterial = collider->getMaterial();
+            return hitInfo;
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::optional<HitInfo> SemiSolidCollider::checkCollisionSemiSolids(const std::vector<SemiSolidCollider*>& semisolids, const Vector2i position) const {
+    auto movedCollider = AABB(position, mCollider.half);
+    for (auto& semi : semisolids) {
+        if (!semi->isCollidable() || this == semi) {
+            continue;
+        }
+
+        std::optional<HitInfo> hitInfo = movedCollider.collide(semi->getCollider());
+        if (hitInfo != std::nullopt) {
+            hitInfo->other = semi->getEntity();
+            hitInfo->otherMaterial = semi->getMaterial();
+            return hitInfo;
+        }
+    }
+
+    return std::nullopt;
+}
+
+bool SemiSolidCollider::checkIsGrounded(const std::vector<SolidCollider*>& solids, IUseCollision** groundCollider) {
+    for (auto& solid : solids) {
+        if (solid->isCollidable() && solid->isGround() && isRiding(solid)) {
+            *groundCollider = solid;
+            return true;
+        }
+    }
+    return false;
+}
+
+void SemiSolidCollider::squish(const HitInfo hitInfo) {
+    getEntity().kill();
+}
+
+bool SemiSolidCollider::isRiding(const SolidCollider* solid) const {
+    // check for collision 1 unit down
+    // (making sure to use the unmoved collider for the directional collision check so the edges are properly aligned)
+    auto movedCollider = AABB(mCollider.center + Vector2i::unitDown, mCollider.half);
+    if (movedCollider.isOverlapping(solid->getCollider()) &&
+        (solid->getCollisionDir() == CollisionDir::ALL ||
+         checkDirectionalCollision(getCollider(), solid->getCollider(), {0, -1}, solid->getCollisionDir()))) {
+        return true;
+    }
+    return false;
 }
 
 }  // namespace whal

@@ -11,7 +11,6 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
-#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
@@ -40,6 +39,7 @@ void applyFriction(Vector2f& velocity, f32 frictionMultiplier) {
 
 void PhysicsSystem::update() {
     std::vector<ecs::Entity> allActors;
+    std::vector<ecs::Entity> allSemiSolids;
 
     // sync collider in case position changed in another system
     // is a little inefficient to do it this way (vs separating the systems)
@@ -54,6 +54,8 @@ void PhysicsSystem::update() {
             actor.value()->setPositionFromBottom(trans.position);
         } else if (std::optional<SolidCollider*> solid = entity.tryGet<SolidCollider>(); solid) {
             solid.value()->setPositionFromBottom(trans.position);
+        } else if (std::optional<SemiSolidCollider*> semisolid = entity.tryGet<SemiSolidCollider>(); semisolid) {
+            semisolid.value()->setPositionFromBottom(trans.position);
         }
     }
 
@@ -89,9 +91,14 @@ void PhysicsSystem::update() {
 
         std::optional<RigidBody*> rb = entity.tryGet<RigidBody>();
         std::optional<ActorCollider*> actor = entity.tryGet<ActorCollider>();
+        std::optional<SemiSolidCollider*> semisolid = std::nullopt;
+        if (!actor) {
+            semisolid = entity.tryGet<SemiSolidCollider>();
+        }
+
+        // only actors and semisolds can be grounded (because they're the only ones that interact with the ground)
         if (rb && actor) {
             // MOVEMENT + GROUNDED CHECKS
-            //// only actors can be grounded (because they're the only ones that interact with the ground)
             //// no callback needed when actor moves into solid
             const bool wasGrounded = rb.value()->isGrounded;
             if (auto hitinfo = actor.value()->moveY(move, nullptr); hitinfo) {
@@ -144,9 +151,6 @@ void PhysicsSystem::update() {
                 if (isMomentumStored && rb.value()->momentumCooldownFrames <= 0) {
                     // velocity in tiles per second, momentum in pixels
                     vel.stable += actor.value()->getMomentum() * TILES_PER_PIXEL;
-                    if (entity.has<Player>()) {
-                        print("momentum:", actor.value()->getMomentum());
-                    }
                     actor.value()->resetMomentum();
                     rb.value()->momentumCooldownFrames = MOMENTUM_COOLDOWN_FRAMES;
                 } else if (rb.value()->momentumCooldownFrames > 0) {
@@ -158,6 +162,62 @@ void PhysicsSystem::update() {
             actor.value()->moveX(move, nullptr);
             actor.value()->moveY(move, nullptr);
             allActors.push_back(entity);
+
+        } else if (semisolid && rb) {
+            // TODO
+
+            // MOVEMENT + GROUNDED CHECKS
+            //// no callback needed when semisolid moves into solid
+            const bool wasGrounded = rb.value()->isGrounded;
+            if (auto hitinfo = semisolid.value()->moveY(move.y(), nullptr); hitinfo) {
+                if (move.y() <= 0) {
+                    rb.value()->setGrounded(hitinfo.value().otherMaterial);
+                } else {
+                    rb.value()->setNotGrounded();
+                }
+                rb.value()->isJumping = false;
+                vel.residualImpulse.e[1] = 0;
+
+                // do collision callback
+                // TODO need generic collision callback here
+                // if (hitinfo->isOtherSolid) {
+                //     auto otherSB = hitinfo.value().other.get<SolidCollider>();
+                //     if (otherSB.getOnCollisionEnter() != nullptr) {
+                //         otherSB.getOnCollisionEnter()(semisolid.value(), entity, hitinfo.value());
+                //     }
+                // }
+            } else {
+                rb.value()->setNotGrounded();
+            }
+
+            if (auto hitinfo = semisolid.value()->moveX(move.x(), nullptr); hitinfo && hitinfo->isOtherSolid) {
+                auto otherSB = hitinfo->other.get<SolidCollider>();
+
+                // TODO
+                // do collision callback
+                // if (otherSB.getOnCollisionEnter() != nullptr) {
+                //     otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
+                // }
+            }
+            allSemiSolids.push_back(entity);
+
+            // RESEARCH this makes me think i should separate jumping/coyote stuff into its own platformer component
+            // RIGIDBODY FLAGS, AND COYOTE TIME
+            if (rb.value()->isGrounded) {
+                rb.value()->isLanding = !wasGrounded;
+
+            } else {
+                if (wasGrounded && !rb.value()->isJumping) {
+                    rb.value()->coyoteSecondsRemaining = rb.value()->coyoteTimeSecondsMax;
+                } else if (rb.value()->coyoteSecondsRemaining > 0) {
+                    rb.value()->coyoteSecondsRemaining -= dt;
+                }
+            }
+
+        } else if (semisolid) {
+            semisolid.value()->moveX(move.x(), nullptr, false);
+            semisolid.value()->moveY(move.y(), nullptr, false);
+            allSemiSolids.push_back(entity);
 
         } else if (std::optional<SolidCollider*> solid = entity.tryGet<SolidCollider>(); solid) {
             solid.value()->move(move.x(), move.y());
@@ -200,13 +260,20 @@ void PhysicsSystem::update() {
         }
     }
 
-    // actors can be moved by other colliders, so wait until all collisions are processed to update position
+    // actors/semisolids can be moved by other colliders, so wait until all collisions are processed to update position
     for (auto& entity : allActors) {
         Transform& trans = entity.get<Transform>();
         ActorCollider& actor = entity.get<ActorCollider>();
 
         // position is bottom-middle of collider
         trans.position = actor.getCollider().getPositionEdge(Vector2i::unitDown);
+    }
+    for (auto& entity : allSemiSolids) {
+        Transform& trans = entity.get<Transform>();
+        SemiSolidCollider& semi = entity.get<SemiSolidCollider>();
+
+        // position is bottom-middle of collider
+        trans.position = semi.getCollider().getPositionEdge(Vector2i::unitDown);
     }
 }
 

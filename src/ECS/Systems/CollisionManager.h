@@ -6,6 +6,7 @@ namespace whal {
 
 class ActorCollider;
 class SolidCollider;
+class SemiSolidCollider;
 
 class ActorsManager : public ecs::ISystem<ActorCollider> {
 public:
@@ -37,11 +38,29 @@ public:
     void onRemove(ecs::Entity entity) override;
     void setUpdateNeeded() { mIsUpdateNeeded = true; }
 
-    const std::vector<SolidCollider*>& getAllSolids() const { return mSolids; };
+    const std::vector<SolidCollider*>& getAllSolids() const { return mSolids; }
 
 private:
     std::vector<SolidCollider*> mSolids;
     size_t mNumCallbackColliders = 0;
+    bool mIsUpdateNeeded = false;
+};
+
+class SemiSolidsManager : public ecs::ISystem<SemiSolidCollider> {
+public:
+    static std::shared_ptr<SemiSolidsManager> getInstance() {
+        static std::shared_ptr<SemiSolidsManager> instance = ecs::ECS::getInstance().registerSystem<SemiSolidsManager>();
+        return instance;
+    }
+
+    void update() override;
+    void onAdd(ecs::Entity entity) override;
+    void onRemove(ecs::Entity entity) override;
+
+    const std::vector<SemiSolidCollider*> getAllSemiSolids() const { return mSemiSolids; }
+
+private:
+    std::vector<SemiSolidCollider*> mSemiSolids;
     bool mIsUpdateNeeded = false;
 };
 
