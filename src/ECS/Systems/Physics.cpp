@@ -11,6 +11,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
+#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
@@ -115,6 +116,12 @@ void PhysicsSystem::update() {
                     auto otherSB = hitinfo.value().other.get<SolidCollider>();
                     if (otherSB.getOnCollisionEnter() != nullptr) {
                         otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
+                    }
+                } else if (entity.has<Player>()) {
+                    // TEMP
+                    auto solidOpt = hitinfo.value().other.tryGet<SolidCollider>();
+                    if (solidOpt) {
+                        print("GOT SOLID BUT NOT SET IN HITINFO");
                     }
                 }
             } else {

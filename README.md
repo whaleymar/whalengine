@@ -7,8 +7,9 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - semisolid colliders / physics rework 
     - actor::moveY corner correction 
     - self collision 
+    - todos in collision.h/cpp
+    - componentfactory + tiled 
 
-    - somehow i broke the collisioncallback priority thingy for solids
     - mb i can pass a isGroundedCheckNeeded to moveY so i only check for rigidbodies?
 - put velocity in texels/second instead of tiles/second
 

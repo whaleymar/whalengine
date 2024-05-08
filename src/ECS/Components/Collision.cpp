@@ -72,17 +72,29 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const ActorCo
     s32 toMove = std::round(mYRemainder);
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
     auto const& semiSolids = SemiSolidsManager::getInstance()->getAllSemiSolids();
-    // auto const& actors = ActorsManager::getInstance()->getAllActors();
 
     auto groundedCheck = [this](f32 amountY, const std::vector<SolidCollider*>& solids,
                                 const std::vector<SemiSolidCollider*>& semis) -> std::optional<HitInfo> {
         IUseCollision* groundCollider = nullptr;
-        if (amountY <= 0 && ((checkIsGrounded(solids, &groundCollider)) || checkIsGroundedOnSemiSolids(semis, &groundCollider))) {
+        if (amountY > 0) {
+            return std::nullopt;
+        }
+
+        if (checkIsGrounded(solids, &groundCollider)) {
             HitInfo hitinfo(Vector2i(0, -1));
             hitinfo.other = groundCollider->getEntity();
             hitinfo.otherMaterial = groundCollider->getMaterial();
+            hitinfo.isOtherSolid = true;
             return hitinfo;
         }
+        if (checkIsGroundedOnSemiSolids(semis, &groundCollider)) {
+            HitInfo hitinfo(Vector2i(0, -1));
+            hitinfo.other = groundCollider->getEntity();
+            hitinfo.otherMaterial = groundCollider->getMaterial();
+            hitinfo.isOtherSemiSolid = true;
+            return hitinfo;
+        }
+
         return std::nullopt;
     };
 

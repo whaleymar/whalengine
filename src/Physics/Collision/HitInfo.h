@@ -17,12 +17,15 @@ struct AABB;
 //     Grounded = 1 << 4,
 //     HeadBonk = 1 << 5,
 //     Solid = 1<<6,
+//     SemiSolid
 // };
 
+// once i hit 17 bytes I'll use the bitfield
 struct HitInfo {
     Vector2i normal;
     ecs::Entity other;
     bool isOtherSolid = false;
+    bool isOtherSemiSolid = false;
     Material otherMaterial = Material::None;
 
     HitInfo();

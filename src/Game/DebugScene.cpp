@@ -131,7 +131,6 @@ std::optional<Error> loadDebugScene() {
 }
 
 void startRailsMovement(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo) {
-    print("called startRailsMovement");
     ecs::Entity solidEntity = hitinfo.other;
     auto& rails = solidEntity.get<RailsControl>();
     if (rails.isWaiting && rails.curTarget == 0) {
