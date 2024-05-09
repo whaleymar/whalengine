@@ -732,4 +732,37 @@ bool SemiSolidCollider::isRiding(const SolidCollider* solid) const {
     return false;
 }
 
+void SemiSolidCollider::moveSemiSolids(bool isXDirection, s32 toMoveRounded, s32 solidEdge, EdgeGetter edgeFunc,
+                                       std::vector<SemiSolidCollider*>& riding, bool isManualMove) {
+    Vector2i moveNormal;
+    if (isXDirection) {
+        moveNormal = {sign(toMoveRounded), 0};
+    } else {
+        moveNormal = {0, sign(toMoveRounded)};
+    }
+    for (auto& semiSolid : SemiSolidsManager::getInstance()->getAllSemiSolids()) {
+        if (!semiSolid->isCollidable()) {
+            continue;
+        }
+        // push takes priority over carry
+        if (mCollider.isOverlapping(semiSolid->getCollider()) &&
+            checkDirectionalCollision(semiSolid->getCollider(), getCollider(), moveNormal, getCollisionDir())) {
+            s32 actorEdge = (semiSolid->getCollider().*edgeFunc)();
+            toMoveRounded = solidEdge - actorEdge;
+            if (isXDirection) {
+                semiSolid->moveX(toMoveRounded, nullptr);
+            } else {
+                semiSolid->moveY(toMoveRounded, nullptr);
+            }
+        } else if (std::find(riding.begin(), riding.end(), semiSolid) != riding.end()) {
+            // I might change this for solids moving down faster than gravity RESEARCH
+            if (isXDirection) {
+                semiSolid->moveX(toMoveRounded, nullptr);
+            } else {
+                semiSolid->moveY(toMoveRounded, nullptr);
+            }
+        }
+    }
+}
+
 }  // namespace whal

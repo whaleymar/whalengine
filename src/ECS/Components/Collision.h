@@ -79,8 +79,8 @@ protected:
     void moveActors(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
                     std::vector<ActorCollider*>& riding, bool isManualMove);
 
-    void moveSemiSolids(bool isXDirection, s32 toMoveRounded, s32 solidEdge, EdgeGetter edgeFunc, std::vector<SemiSolidCollider*>& riding,
-                        bool isManualMove);
+    virtual void moveSemiSolids(bool isXDirection, s32 toMoveRounded, s32 solidEdge, EdgeGetter edgeFunc, std::vector<SemiSolidCollider*>& riding,
+                                bool isManualMove);
 
 private:
     CollisionDir mCollisionDir;
@@ -91,7 +91,7 @@ private:
 // More specifically, it
 //     - carries/pushes actors when moving, and stops actors that move into it
 //     - stops when moving into a solid, and is carried/pushed by moving solids
-//     - stops when moving into other SemiSolidColliders (may change in the future)
+//     - carries/pushes other semisolids -- RESEARCH maybe this should be configurable, so some just stop instead of pushing each other
 //
 // Other stuff: can be grounded, does not have corner correction, does not have momentum(?), can be destroyed, no one-way collision variants
 class SemiSolidCollider : public SolidCollider {
@@ -111,6 +111,10 @@ public:
     // still not sure if/how/should i use component inheritance with my ECS, but I'll stay consistent for now
     virtual void squish(const HitInfo hitInfo);
     virtual bool isRiding(const SolidCollider* solid) const;
+
+protected:
+    void moveSemiSolids(bool isXDirection, s32 toMoveRounded, s32 solidEdge, EdgeGetter edgeFunc, std::vector<SemiSolidCollider*>& riding,
+                        bool isManualMove) override;
 };
 
 void defaultSquish(ActorCollider* selfCollider, ecs::Entity self, HitInfo hitinfo);
