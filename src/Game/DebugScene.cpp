@@ -21,6 +21,7 @@
 void createTestPlatform();
 void createTestTrigger();
 void createTestSemiSolid();
+void createDepthTest();
 
 std::optional<Error> loadMap() {
     using namespace whal;
@@ -39,6 +40,7 @@ std::optional<Error> loadTestMap() {
     // createTestPlatform();
     // createTestTrigger();
     // createTestSemiSolid();
+    createDepthTest();
     return err;
 }
 
@@ -203,4 +205,14 @@ void createTestSemiSolid() {
     newEntity.add<Velocity>();
     newEntity.add<RigidBody>();
     newEntity.add(collider);
+}
+
+void createDepthTest() {
+    auto newEntity = ecs::ECS::getInstance().entity().value();
+    newEntity.add(Draw(RGB(0.2, 0.2, 1.0), {8, 8}, Depth::Background1));
+    newEntity.add(Transform::tiles(7, -14));
+
+    newEntity = ecs::ECS::getInstance().entity().value();
+    newEntity.add(Draw(RGB(0.2, 0.5, .8), {8, 8}, Depth::Foreground1));
+    newEntity.add(Transform::tiles(8, -14));
 }

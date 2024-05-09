@@ -5,8 +5,8 @@
     },
     "activeFile": "testmap.tmj",
     "expandedProjectPaths": [
-        "templates",
-        "."
+        ".",
+        "templates"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -14,11 +14,11 @@
             "expandedObjectLayers": [
                 6
             ],
-            "scale": 2.1889583333333333,
+            "scale": 4,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 159.8934043970686,
-                "y": 95.7076234891025
+                "x": 160,
+                "y": 95.875
             }
         },
         "testmap2.tmj": {

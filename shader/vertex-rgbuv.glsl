@@ -21,7 +21,7 @@ void main() {
 
     vec2 localOffset = offset - cameraPos;
     vec4 totalOffset = projection * vec4(localOffset.x, -1.*localOffset.y, 0., 0.) + vec4(1., -1., 0., 0.);
-    gl_Position = projection * vec4(vert.xy, 0., 1.) + totalOffset;
+    gl_Position = projection * vec4(vert.xyz, 1.) + totalOffset;
 
     fragColor = vertColor;
     fragTexCoord = vertTexCoord;

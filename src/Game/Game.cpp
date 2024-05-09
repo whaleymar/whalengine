@@ -192,8 +192,8 @@ void Game::mainloop() {
 
         animationSystem->update();
 
-        spriteSystem->drawEntities();
         drawSystem->drawEntities();
+        spriteSystem->drawEntities();
 #ifndef NDEBUG
         if (System::input.isMusicDebug()) {
             System::input.reset(InputType::MUSICTEST);
