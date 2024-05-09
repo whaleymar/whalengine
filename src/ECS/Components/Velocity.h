@@ -4,7 +4,7 @@
 
 namespace whal {
 
-// velocity in tiles per second
+// velocity in texels per second
 struct Velocity {
     Velocity() = default;
     Velocity(Vector2f velocity);

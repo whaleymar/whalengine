@@ -20,7 +20,7 @@ struct BufferedInput {
 };
 
 struct PlayerControlRB {
-    PlayerControlRB(f32 moveSpeed_ = 10, f32 jumpHeight_ = 25);
+    PlayerControlRB(f32 moveSpeed_ = 80, f32 jumpHeight_ = 200);
     f32 moveSpeed;   // should be somewhere else... this component should be a tag ?
     f32 jumpHeight;  // not used currently
     BufferedInput jumpBuffer;
@@ -30,7 +30,7 @@ struct PlayerControlRB {
 };
 
 struct PlayerControlFree {
-    PlayerControlFree(f32 moveSpeed_ = 10);
+    PlayerControlFree(f32 moveSpeed_ = 80);
     f32 moveSpeed;
 };
 

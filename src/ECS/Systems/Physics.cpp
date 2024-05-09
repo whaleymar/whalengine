@@ -11,20 +11,19 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
-#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
 
-constexpr f32 GRAVITY = 35;
+constexpr f32 GRAVITY = 280;
 
-constexpr f32 FRICTION_GROUND = 30.0;
-constexpr f32 FRICTION_AIR = 25.0;
-// constexpr f32 FRICTION_AIR = 10.0;
+constexpr f32 FRICTION_GROUND = 240;
+constexpr f32 FRICTION_AIR = 200;
+// constexpr f32 FRICTION_AIR = 80.0;
 constexpr f32 MOVE_EPSILON = 0.1;
 
 constexpr f32 JUMP_PEAK_GRAVITY_MULT = 0.5;
-constexpr f32 JUMP_PEAK_SPEED_MAX = -3.5;  // once Y velocity is below this, no longer considered "jumping"
+constexpr f32 JUMP_PEAK_SPEED_MAX = -28;  // once Y velocity is below this, no longer considered "jumping"
 
 constexpr s32 MOMENTUM_COOLDOWN_FRAMES = 10;
 
@@ -83,8 +82,7 @@ void PhysicsSystem::update() {
         }
 
         const Vector2f totalVelocity = vel.stable + impulse;
-        const Vector2f move = {totalVelocity.x() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL,
-                               totalVelocity.y() * dt * TEXELS_PER_TILE * PIXELS_PER_TEXEL};
+        const Vector2f move = {totalVelocity.x() * dt * PIXELS_PER_TEXEL, totalVelocity.y() * dt * PIXELS_PER_TEXEL};
 
         vel.residualImpulse = {approach(impulse.x(), 0, frictionStepGround), approach(impulse.y(), 0, gravityStep)};
         vel.impulse = {0, 0};

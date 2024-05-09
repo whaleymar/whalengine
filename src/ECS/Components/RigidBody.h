@@ -18,7 +18,7 @@ struct RigidBody {
     void setGrounded(Material material);
     void setNotGrounded();
 
-    f32 jumpInitialVelocity = 15.5;
+    f32 jumpInitialVelocity = 124;
     f32 jumpSecondsMax = 1.25;
     f32 coyoteTimeSecondsMax = 0.1;
 

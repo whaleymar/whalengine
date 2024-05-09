@@ -20,14 +20,14 @@ struct RailsControl {
 
     using ArrivalCallback = void (*)(ecs::Entity, RailsControl&);
 
-    RailsControl(f32 moveSpeed_ = 5, std::vector<CheckPoint> checkPoints_ = {}, f32 waitTime_ = 0, bool isCycle_ = true,
+    RailsControl(f32 moveSpeed_ = 40, std::vector<CheckPoint> checkPoints_ = {}, f32 waitTime_ = 0, bool isCycle_ = true,
                  ArrivalCallback callback = nullptr);
 
 private:
     std::vector<CheckPoint> mCheckpoints;
 
 public:
-    f32 speed;  // tiles per second
+    f32 speed;  // texels per second
     f32 waitTime;
     ArrivalCallback arrivalCallback;
 
