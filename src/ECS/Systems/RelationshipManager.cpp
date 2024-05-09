@@ -91,8 +91,8 @@ void FollowSystem::update() {
         // TEMP
         Velocity& vel = entity.get<Velocity>();
         // Velocity vel = entity.get<Velocity>();
-        f32 targetSpeedX = static_cast<f32>(follow.currentTarget.x() - trans.position.x()) * TILES_PER_PIXEL;
-        f32 targetSpeedY = static_cast<f32>(follow.currentTarget.y() - trans.position.y()) * TILES_PER_PIXEL;
+        f32 targetSpeedX = static_cast<f32>((follow.currentTarget.x() - trans.position.x())) * TEXELS_PER_PIXEL;
+        f32 targetSpeedY = static_cast<f32>(follow.currentTarget.y() - trans.position.y()) * TEXELS_PER_PIXEL;
 
         if (abs(targetSpeedX) > abs(vel.stable.x())) {
             targetSpeedX = lerp(vel.stable.x(), targetSpeedX, follow.damping.x());

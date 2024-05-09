@@ -17,7 +17,6 @@
 #include "Gfx/GLResourceManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Map/Level.h"
-#include "Util/Print.h"
 
 void createTestPlatform();
 void createTestTrigger();
@@ -37,9 +36,9 @@ std::optional<Error> loadTestMap() {
     }
     // createTestPlatform();
     auto err = loadMap();
-    createTestPlatform();
-    createTestTrigger();
-    createTestSemiSolid();
+    // createTestPlatform();
+    // createTestTrigger();
+    // createTestSemiSolid();
     return err;
 }
 
@@ -146,7 +145,7 @@ void createTestPlatform() {
     for (s32 x = 2; x < 6; x += 3) {
         auto trans = Transform::tiles(x, -15);
         auto platform = createBlock(trans).value();
-        auto pathControl = RailsControl(14,
+        auto pathControl = RailsControl(112,
                                         {
                                             {Transform::tiles(x, -15).position, RailsControl::Movement::LINEAR},
                                             {Transform::tiles(x, -10).position, RailsControl::Movement::EASEI_CUBE},
@@ -178,13 +177,13 @@ void createTestSemiSolid() {
     newEntity.add(Draw(RGB(0.34, 0.5, 0.9)));
     Transform trans = Transform::tiles(18, 10);
     // Transform trans = Transform::tiles(10, -14);
-    // auto pathControl = RailsControl(8,
+    // auto pathControl = RailsControl(64,
     //                                 {
     //                                     {Transform::tiles(10, -14).position, RailsControl::Movement::LINEAR},
     //                                     {Transform::tiles(10, -10).position, RailsControl::Movement::LINEAR},
     //                                 },
     //                                 2, true);
-    // auto pathControl = RailsControl(8,
+    // auto pathControl = RailsControl(64,
     //                                 {
     //                                     {Transform::tiles(10, -14).position, RailsControl::Movement::LINEAR},
     //                                     {Transform::tiles(12, -14).position, RailsControl::Movement::LINEAR},

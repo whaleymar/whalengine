@@ -12,7 +12,7 @@
 
 namespace whal {
 
-constexpr f32 CHECKPOINT_DISTANCE_THRESHOLD = 4;  // in pixels
+constexpr f32 SPEED_DIVISOR = 1.0f / 40.0f;
 
 void RailsSystem::update() {
     for (auto& [entityid, entity] : getEntitiesRef()) {
@@ -35,12 +35,12 @@ void RailsSystem::update() {
         // scale checkpoint threshold with speed
         f32 speed = [entity]() -> f32 {
             std::optional<Velocity*> vel = entity.tryGet<Velocity>();
-            if (!vel) {
+            if (!vel || (vel.value()->stable.x() == 0 && vel.value()->stable.y() == 0)) {
                 return 0;
             }
             return vel.value()->stable.len();
         }();
-        f32 epsilon = speed > 1 ? CHECKPOINT_DISTANCE_THRESHOLD * speed * 0.1 : CHECKPOINT_DISTANCE_THRESHOLD;
+        f32 epsilon = speed * SPEED_DIVISOR + 1;
 
         if (rails.isWaiting) {
             // waiting at checkpoint
@@ -70,7 +70,7 @@ void RailsSystem::update() {
                 }
             }
 
-        } else if (distance < epsilon) {
+        } else if (distance <= epsilon) {
             // got to checkpoint, clamp to exact position
 
             // if entity has collider, use its move function

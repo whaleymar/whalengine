@@ -3,7 +3,6 @@
 #include <cmath>
 
 #include "ECS/Components/Collision.h"
-#include "ECS/Components/Name.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Tags.h"
 #include "ECS/Components/Transform.h"
@@ -12,7 +11,6 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
-#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {
@@ -161,8 +159,8 @@ void PhysicsSystem::update() {
 
                 // prevent repeated push forces from accumulating huge speed
                 if (isMomentumStored && rb.value()->momentumCooldownFrames <= 0) {
-                    // velocity in tiles per second, momentum in pixels
-                    vel.stable += actor.value()->getMomentum() * TILES_PER_PIXEL;
+                    // convert to texels/sec
+                    vel.stable += actor.value()->getMomentum() * TEXELS_PER_PIXEL;
                     actor.value()->resetMomentum();
                     rb.value()->momentumCooldownFrames = MOMENTUM_COOLDOWN_FRAMES;
                 } else if (rb.value()->momentumCooldownFrames > 0) {
