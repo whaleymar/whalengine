@@ -1,11 +1,13 @@
 #include "EventListeners.h"
 
 #include "ECS/Components/Draw.h"
+#include "ECS/Components/Name.h"
 #include "ECS/Components/Tags.h"
 #include "ECS/Entities/Player.h"
 #include "ECS/Lib/ECS.h"
 #include "Systems/Audio.h"
 #include "Systems/System.h"
+#include "Util/Print.h"
 
 namespace whal {
 
@@ -17,7 +19,10 @@ void killListeners() {
     System::eventMgr.stopListening(Event::DEATH_EVENT, Listeners::PLAYER_DEATH_LISTENER);
 }
 
-void onPlayerDeath(ecs::Entity entity) {
+void onEntityDeath(ecs::Entity entity) {
+    if (entity.has<Name>()) {
+        print("Killed entity: ", entity.get<Name>());
+    }
     if (!entity.has<Player>()) {
         return;
     }

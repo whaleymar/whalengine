@@ -145,6 +145,9 @@ void Game::mainloop() {
 
     bool isTimeNormal = true;
     mWindow->setFocus();
+    actorsMgr->update();
+    solidsMgr->update();
+    semiSolidsMgr->update();
     while (true) {
         pollEvents();
         if (System::input.isQuit()) {
@@ -172,12 +175,6 @@ void Game::mainloop() {
         physicsSystem->update();
         triggerSystem->update();
 
-        if (System::frame.getFrame() % 10 == 0) {
-            // these sync the collision manager
-            actorsMgr->update();
-            solidsMgr->update();
-            semiSolidsMgr->update();
-        }
         lifetimeSystem->update();
 
         // Update Scene
@@ -186,6 +183,9 @@ void Game::mainloop() {
         // Only rendering remains, so we can do "end of frame" stuff now
         frameEndSystem->update();
         ecs.killEntities();
+        actorsMgr->update();
+        solidsMgr->update();
+        semiSolidsMgr->update();
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

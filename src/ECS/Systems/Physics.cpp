@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/Name.h"
 #include "ECS/Components/RigidBody.h"
 #include "ECS/Components/Tags.h"
 #include "ECS/Components/Transform.h"
@@ -11,6 +12,7 @@
 #include "Gfx/GfxUtil.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
+#include "Util/Print.h"
 #include "Util/Vector.h"
 
 namespace whal {

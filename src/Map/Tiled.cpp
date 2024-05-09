@@ -159,7 +159,7 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
         std::string name = object["name"];
         if (name.size()) {
             entity.add(Name(name.c_str()));
-            print("Created Entity: ", name);
+            // print("Created Entity: ", name);
         }
         level.childEntities.insert(entity);
 
@@ -169,10 +169,10 @@ void parseObjectLayer(nlohmann::json layer, TileMap& map, ActiveLevel& level) {
         s32 thisId = object["id"];
 
         Transform trans = getTransformFromMapPosition(positionTexels, dimensionsTexels, level, false);
-        if (name.size()) {
-            print("\twith pos", positionTexels);
-            print("\tand trans pos", trans.position);
-        }
+        // if (name.size()) {
+        //     print("\twith pos", positionTexels);
+        //     print("\tand trans pos", trans.position);
+        // }
         entity.add(trans);
 
         for (auto& property : object["properties"]) {

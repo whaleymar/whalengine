@@ -8,14 +8,14 @@ namespace ecs {
 class Entity;
 }
 
-void onPlayerDeath(ecs::Entity entity);
+void onEntityDeath(ecs::Entity entity);
 
 void startListeners();
 void killListeners();
 
 namespace Listeners {
 
-inline auto PLAYER_DEATH_LISTENER = EventListener<ecs::Entity>(&onPlayerDeath);
+inline auto PLAYER_DEATH_LISTENER = EventListener<ecs::Entity>(&onEntityDeath);
 
 }
 

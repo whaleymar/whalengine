@@ -516,7 +516,7 @@ std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const Collisio
 
     // move one pixel at a time, checking for collision with solids
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
-    std::optional<HitInfo> hitInfo;
+    std::optional<HitInfo> hitInfo = std::nullopt;
     bool neverMoved = true;
     s32 toMoveOriginal = toMove;
     while (toMove != 0) {
@@ -600,7 +600,7 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const Collisio
     const auto moveNormal = Vector2i(0, moveSign);
 
     // move one pixel at a time, checking for collision with solids
-    std::optional<HitInfo> hitInfo;
+    std::optional<HitInfo> hitInfo = std::nullopt;
     bool neverMoved = true;
     s32 toMoveOriginal = toMove;
     while (toMove != 0) {
@@ -637,8 +637,11 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const Collisio
     }
 
     mIsCollidable = wasCollidable;
-    if (!hitInfo && isGroundedCheckNeeded) {
-        return groundedCheck(amount, solids, semis);
+    if (!hitInfo) {
+        if (isGroundedCheckNeeded) {
+            return groundedCheck(amount, solids, semis);
+        }
+        return std::nullopt;
     }
     return hitInfo;
 }
