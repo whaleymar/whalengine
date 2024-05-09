@@ -9,6 +9,7 @@
 #include "Physics/IUseCollision.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
+#include "Util/Print.h"
 
 namespace whal {
 
@@ -448,6 +449,9 @@ void SolidCollider::moveSemiSolids(bool isXDirection, s32 toMoveRounded, s32 sol
         moveNormal = {0, sign(toMoveRounded)};
     }
     for (auto& semiSolid : SemiSolidsManager::getInstance()->getAllSemiSolids()) {
+        if (!semiSolid->isCollidable()) {
+            continue;
+        }
         // push takes priority over carry
         if (mCollider.isOverlapping(semiSolid->getCollider()) &&
             checkDirectionalCollision(semiSolid->getCollider(), getCollider(), moveNormal, getCollisionDir())) {
@@ -513,21 +517,18 @@ std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const SemiSoli
     const auto moveNormal = Vector2i(moveSign, 0);
 
     // check riding status *before* moving
+    // TODO pass this into moveX/Y so I'm not duplicating work
     auto riding = getRidingActors();
+    auto ridingSemis = getRidingSemiSolids();
 
     // move one pixel at a time, checking for collision with solids
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
-    auto const& semiSolids = SemiSolidsManager::getInstance()->getAllSemiSolids();
     std::optional<HitInfo> hitInfo;
     bool neverMoved = true;
     s32 toMoveOriginal = toMove;
-    // TODO check for collision with other SemiSolids
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveNormal;
         hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
-        if (!hitInfo) {
-            hitInfo = checkCollisionSemiSolids(semiSolids, nextPos);
-        }
         if (!hitInfo) {
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
@@ -546,14 +547,16 @@ std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const SemiSoli
         return hitInfo;
     }
 
-    // turn off collision so actor moved by us don't get stuck
+    // turn off collision so stuff moved by us don't get stuck
     bool wasCollidable = mIsCollidable;
     mIsCollidable = false;
 
     if (toMoveOriginal > 0) {
         moveActors(toMoveOriginal, amount, true, mCollider.right(), &AABB::left, riding, isManualMove);
+        moveSemiSolids(true, toMoveOriginal, mCollider.right(), &AABB::left, ridingSemis, isManualMove);
     } else {
         moveActors(toMoveOriginal, amount, true, mCollider.left(), &AABB::right, riding, isManualMove);
+        moveSemiSolids(true, toMoveOriginal, mCollider.left(), &AABB::right, ridingSemis, isManualMove);
     }
 
     mIsCollidable = wasCollidable;
@@ -602,6 +605,7 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const SemiSoli
     // check riding status *before* moving
     // TODO pass this into moveX/Y so I'm not duplicating work
     auto riding = getRidingActors();
+    auto ridingSemis = getRidingSemiSolids();
 
     // move one pixel at a time, checking for collision with solids
     std::optional<HitInfo> hitInfo;
@@ -610,9 +614,6 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const SemiSoli
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveNormal;
         hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
-        if (!hitInfo) {
-            hitInfo = checkCollisionSemiSolids(semis, nextPos);
-        }
         if (!hitInfo) {
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
@@ -625,20 +626,22 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const SemiSoli
         }
     }
 
-    // done w/ movement. now check if there are overlapping actors
+    // done w/ movement. now check if there are overlapping actors/semisolids
     // if we never moved (immediately hit a solid), can skip this step
     if (neverMoved) {
         return hitInfo;
     }
 
-    // turn off collision so actor moved by us don't get stuck
+    // turn off collision so stuff moved by us don't get stuck
     bool wasCollidable = mIsCollidable;
     mIsCollidable = false;
 
     if (toMoveOriginal > 0) {
         moveActors(toMoveOriginal, amount, false, mCollider.top(), &AABB::bottom, riding, isManualMove);
+        moveSemiSolids(false, toMoveOriginal, mCollider.top(), &AABB::bottom, ridingSemis, isManualMove);
     } else {
         moveActors(toMoveOriginal, amount, false, mCollider.bottom(), &AABB::top, riding, isManualMove);
+        moveSemiSolids(false, toMoveOriginal, mCollider.bottom(), &AABB::top, ridingSemis, isManualMove);
     }
 
     mIsCollidable = wasCollidable;
@@ -721,7 +724,7 @@ bool SemiSolidCollider::isRiding(const SolidCollider* solid) const {
     // check for collision 1 unit down
     // (making sure to use the unmoved collider for the directional collision check so the edges are properly aligned)
     auto movedCollider = AABB(mCollider.center + Vector2i::unitDown, mCollider.half);
-    if (movedCollider.isOverlapping(solid->getCollider()) &&
+    if (solid != this && movedCollider.isOverlapping(solid->getCollider()) &&
         (solid->getCollisionDir() == CollisionDir::ALL ||
          checkDirectionalCollision(getCollider(), solid->getCollider(), {0, -1}, solid->getCollisionDir()))) {
         return true;

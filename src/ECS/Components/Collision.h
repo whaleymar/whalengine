@@ -79,10 +79,10 @@ protected:
     void moveActors(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
                     std::vector<ActorCollider*>& riding, bool isManualMove);
 
-private:
     void moveSemiSolids(bool isXDirection, s32 toMoveRounded, s32 solidEdge, EdgeGetter edgeFunc, std::vector<SemiSolidCollider*>& riding,
                         bool isManualMove);
 
+private:
     CollisionDir mCollisionDir;
     ActorCollisionCallback mOnCollisionEnter;
 };

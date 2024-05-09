@@ -123,7 +123,7 @@
                          "type":"class",
                          "value":
                             {
-                             "CollisionDir":4,
+                             "CollisionDir":0,
                              "halflenTexelsX":12,
                              "halflenTexelsY":4
                             }
@@ -432,6 +432,106 @@
                  "y":70
                 }, 
                 {
+                 "height":8,
+                 "id":32,
+                 "name":"SemiSolidTest",
+                 "properties":[
+                        {
+                         "name":"RigidBody",
+                         "propertytype":"Component_RigidBody",
+                         "type":"class",
+                         "value":
+                            {
+
+                            }
+                        }, 
+                        {
+                         "name":"SemiSolidCollider",
+                         "propertytype":"Component_SemiSolidCollider",
+                         "type":"class",
+                         "value":
+                            {
+                             "halflenTexelsX":4,
+                             "halflenTexelsY":4
+                            }
+                        }, 
+                        {
+                         "name":"Sprite",
+                         "propertytype":"Component_Sprite_NoAnim",
+                         "type":"class",
+                         "value":
+                            {
+                             "Color":"#ff8c00ff",
+                             "Sprite":"tile\/dirtblock"
+                            }
+                        }, 
+                        {
+                         "name":"Velocity",
+                         "propertytype":"Component_Velocity",
+                         "type":"class",
+                         "value":
+                            {
+                             "velX":0
+                            }
+                        }],
+                 "rotation":0,
+                 "type":"Entity",
+                 "visible":true,
+                 "width":8,
+                 "x":158,
+                 "y":38
+                }, 
+                {
+                 "height":8,
+                 "id":31,
+                 "name":"SemiSolidTest",
+                 "properties":[
+                        {
+                         "name":"RigidBody",
+                         "propertytype":"Component_RigidBody",
+                         "type":"class",
+                         "value":
+                            {
+
+                            }
+                        }, 
+                        {
+                         "name":"SemiSolidCollider",
+                         "propertytype":"Component_SemiSolidCollider",
+                         "type":"class",
+                         "value":
+                            {
+                             "halflenTexelsX":4,
+                             "halflenTexelsY":4
+                            }
+                        }, 
+                        {
+                         "name":"Sprite",
+                         "propertytype":"Component_Sprite_NoAnim",
+                         "type":"class",
+                         "value":
+                            {
+                             "Color":"#ff8c00ff",
+                             "Sprite":"tile\/dirtblock"
+                            }
+                        }, 
+                        {
+                         "name":"Velocity",
+                         "propertytype":"Component_Velocity",
+                         "type":"class",
+                         "value":
+                            {
+                             "velX":0
+                            }
+                        }],
+                 "rotation":0,
+                 "type":"Entity",
+                 "visible":true,
+                 "width":8,
+                 "x":158,
+                 "y":56
+                }, 
+                {
                  "gid":2,
                  "height":8,
                  "id":25,
@@ -550,7 +650,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":31,
+ "nextobjectid":33,
  "orientation":"orthogonal",
  "properties":[
         {

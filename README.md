@@ -5,7 +5,7 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 
 ## Current Goal: 
 - semisolid colliders / physics rework 
-    - self collision 
+    - self collision :: pushing another semisolid into a solid should stop both instead of destroying the middle one
     - callbacks
     - todos in collision.h/cpp
 
