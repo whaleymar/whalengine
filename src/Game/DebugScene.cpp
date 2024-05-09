@@ -130,7 +130,7 @@ std::optional<Error> loadDebugScene() {
     return std::nullopt;
 }
 
-void startRailsMovement(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo) {
+void startRailsMovement(IUseCollision* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo) {
     ecs::Entity solidEntity = hitinfo.other;
     auto& rails = solidEntity.get<RailsControl>();
     if (rails.isWaiting && rails.curTarget == 0) {
@@ -138,7 +138,7 @@ void startRailsMovement(ActorCollider* selfCollider, ecs::Entity actorEntity, Hi
     }
 }
 
-void killEntityCallback(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo) {
+void killEntityCallback(IUseCollision* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo) {
     actorEntity.kill();
 }
 
@@ -153,8 +153,12 @@ void createTestPlatform() {
                                         2, false);
         platform.add<RailsControl>(pathControl);
         platform.add(Name("callback platform"));
-        platform.get<SolidCollider>().setCollisionCallback(&startRailsMovement);
+        // platform.get<SolidCollider>().setCollisionCallback(&startRailsMovement);
         // platform.get<SolidCollider>().setCollisionCallback(&killEntityCallback);
+
+        platform.remove<SolidCollider>();
+        platform.add(
+            SemiSolidCollider(toFloatVec(Transform::tiles(x, -15).position + Vector2i(0, 8)), Vector2i(8, 8), Material::None, &startRailsMovement));
     }
 }
 

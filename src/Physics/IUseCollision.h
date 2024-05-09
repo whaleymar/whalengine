@@ -20,6 +20,8 @@ public:
     void setPositionFromBottom(Vector2i bottom) { mCollider.setPositionFromBottom(bottom); }
     void setEntity(ecs::Entity entity) { mSelf = entity; }
 
+    virtual void squish(HitInfo hitinfo) { getEntity().kill(); }
+
 protected:
     AABB mCollider;
     ecs::Entity mSelf;

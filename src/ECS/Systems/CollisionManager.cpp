@@ -94,14 +94,23 @@ void SemiSolidsManager::update() {
     if (!mIsUpdateNeeded) {
         return;
     }
-    std::vector<SemiSolidCollider*> newSolidsList;
-
+    // put colliders with callbacks first so they get priority in collision checks
+    std::vector<SemiSolidCollider*> newSemis;
+    std::vector<SemiSolidCollider*> newSemisWithCallbacks;
     for (auto& [entityid, entity] : getEntitiesRef()) {
         auto pCollider = &entity.get<SemiSolidCollider>();
-        newSolidsList.push_back(pCollider);
+        if (pCollider->getOnCollisionEnter() == nullptr) {
+            newSemis.push_back(pCollider);
+        } else {
+            newSemisWithCallbacks.push_back(pCollider);
+        }
     }
 
-    mSemiSolids = std::move(newSolidsList);
+    mSemiSolids.clear();
+    mSemiSolids.reserve(newSemisWithCallbacks.size() + newSemis.size());
+    mSemiSolids.insert(mSemiSolids.end(), newSemisWithCallbacks.begin(), newSemisWithCallbacks.end());
+    mSemiSolids.insert(mSemiSolids.end(), newSemis.begin(), newSemis.end());
+
     mIsUpdateNeeded = false;
 }
 
@@ -109,6 +118,9 @@ void SemiSolidsManager::onAdd(ecs::Entity entity) {
     SemiSolidCollider* pCollider = &entity.get<SemiSolidCollider>();
     mSemiSolids.push_back(pCollider);
     pCollider->setEntity(entity);
+    if (pCollider->getOnCollisionEnter() != nullptr) {
+        mIsUpdateNeeded = true;
+    }
 #ifndef NDEBUG
     entity.get<SemiSolidCollider>().getColliderMut().vao.initArray();
     entity.get<SemiSolidCollider>().getColliderMut().vbo.initBuffer();

@@ -4,12 +4,8 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 # To Do 
 
 ## Current Goal: 
-- semisolid colliders / physics rework 
-    - self collision :: pushing another semisolid into a solid should stop both instead of destroying the middle one
-    - callbacks
-    - todos in collision.h/cpp
-
-    - mb i can pass a isGroundedCheckNeeded to moveY so i only check for rigidbodies?
+- int in collider constructors
+- mb i can pass a isGroundedCheckNeeded to moveY so i only check for rigidbodies?
 - put velocity in texels/second instead of tiles/second
 
 ## Camera / Follow
@@ -41,7 +37,8 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - death plane
 
 ## Physics
-- idea: overlapping actors nudge each other away or exert a force or something
+- idea: overlapping actors/semisolids nudge each other away or exert a force or something
+- low priority: actors always check for a collision with a solid before a semisolid, so semisolid callbacks don't always run. Could be fixed by storing solids and semisolid pointers together for these collision checks, but it's not a huge deal
 - fixed updates at 60fps so rounding doesn't fuck me
 
 ## Map 

@@ -16,17 +16,16 @@ namespace ecs {
 class Entity;
 }
 
-// TODO consolidate these using IUseCollision* for first arg
-using ActorCollisionCallback = void (*)(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo);
-using SemiSolidCollisionCallback = void (*)(SemiSolidCollider* selfCollider, ecs::Entity ssEntity, HitInfo hitinfo);
+using CollisionCallback = void (*)(IUseCollision* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo);
 
+// TODO make position arguments take Vector2i for all constructors
 class ActorCollider : public IUseCollision {
 public:
     ActorCollider() = default;
     ActorCollider(Vector2f position, Vector2i half, Material material = Material::None);
 
-    std::optional<HitInfo> moveX(const Vector2f amount, const ActorCollisionCallback callback);
-    std::optional<HitInfo> moveY(const Vector2f amount, const ActorCollisionCallback callback);
+    std::optional<HitInfo> moveX(const Vector2f amount, const CollisionCallback callback);
+    std::optional<HitInfo> moveY(const Vector2f amount, const CollisionCallback callback);
     void setMomentum(const f32 momentum, const bool isXDirection);
     void addMomentum(const f32 momentum, const bool isXDirection);
     void maintainMomentum(const bool isXDirection);
@@ -45,9 +44,7 @@ public:
     std::optional<HitInfo> checkCollisionSemiSolids(const std::vector<SemiSolidCollider*>& solids, const Vector2i position) const;
     std::optional<HitInfo> checkCollisionActors(const std::vector<ActorCollider*>& actors, const Vector2i position) const;
 
-    // squish is a CollisionCallback. Not sure if I will define others
-    // TODO these can't be virtual bc ECS
-    virtual void squish(const HitInfo hitInfo);
+    // RESEARCH do i want virtual functions w/ ECS?
     virtual bool isRiding(const SolidCollider* solid) const;
 
 private:
@@ -62,21 +59,20 @@ private:
 class SolidCollider : public IUseCollision {
 public:
     SolidCollider() = default;
-    SolidCollider(Vector2f position, Vector2i half, Material material = Material::None, ActorCollisionCallback onCollisionEnter_ = nullptr,
+    SolidCollider(Vector2f position, Vector2i half, Material material = Material::None, CollisionCallback onCollisionEnter_ = nullptr,
                   CollisionDir collisionDir = CollisionDir::ALL);
 
     void move(f32 x, f32 y, bool isManualMove = false);
     std::vector<ActorCollider*> getRidingActors() const;
     std::vector<SemiSolidCollider*> getRidingSemiSolids() const;
-    void setCollisionCallback(ActorCollisionCallback callback);
+    void setCollisionCallback(CollisionCallback callback);
     bool isGround() const;
-    ActorCollisionCallback getOnCollisionEnter() const { return mOnCollisionEnter; }
+    CollisionCallback getOnCollisionEnter() const { return mOnCollisionEnter; }
     CollisionDir getCollisionDir() const { return mCollisionDir; }
     void setCollisionDir(CollisionDir dir) { mCollisionDir = dir; }
 
 protected:
-    // TODO toMoves should be ints
-    void moveActors(f32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, f32 solidEdge, EdgeGetter edgeFunc,
+    void moveActors(s32 toMoveRounded, f32 toMoveUnrounded, bool isXDirection, s32 solidEdge, EdgeGetter edgeFunc,
                     std::vector<ActorCollider*>& riding, bool isManualMove);
 
     virtual void moveSemiSolids(bool isXDirection, s32 toMoveRounded, s32 solidEdge, EdgeGetter edgeFunc, std::vector<SemiSolidCollider*>& riding,
@@ -84,7 +80,7 @@ protected:
 
 private:
     CollisionDir mCollisionDir;
-    ActorCollisionCallback mOnCollisionEnter;
+    CollisionCallback mOnCollisionEnter;
 };
 
 // A collider which acts like a Solid when interacting with Actors, but acts like an Actor when interacting with solids
@@ -97,10 +93,12 @@ private:
 class SemiSolidCollider : public SolidCollider {
 public:
     SemiSolidCollider() = default;
-    SemiSolidCollider(Vector2f position, Vector2i half, Material material = Material::None, ActorCollisionCallback onCollisionEnter_ = nullptr);
+    SemiSolidCollider(Vector2f position, Vector2i half, Material material = Material::None, CollisionCallback onCollisionEnter_ = nullptr);
 
-    std::optional<HitInfo> moveX(const f32 amount, const SemiSolidCollisionCallback callback, bool isManualMove = false);
-    std::optional<HitInfo> moveY(const f32 amount, const SemiSolidCollisionCallback callback, bool isManualMove = false);
+    std::optional<HitInfo> moveX(const f32 amount, const CollisionCallback callback, std::vector<ActorCollider*>& riding,
+                                 std::vector<SemiSolidCollider*>& ridingSemis, bool isManualMove = false);
+    std::optional<HitInfo> moveY(const f32 amount, const CollisionCallback callback, std::vector<ActorCollider*>& riding,
+                                 std::vector<SemiSolidCollider*>& ridingSemis, bool isManualMove = false);
 
     std::optional<HitInfo> checkCollisionSolids(const std::vector<SolidCollider*>& solids, const Vector2i position, const Vector2i moveNormal) const;
     std::optional<HitInfo> checkCollisionSemiSolids(const std::vector<SemiSolidCollider*>& solids, const Vector2i position) const;
@@ -109,7 +107,6 @@ public:
     bool checkIsGroundedOnSemiSolids(const std::vector<SemiSolidCollider*>& solids, IUseCollision** groundCollider);
 
     // still not sure if/how/should i use component inheritance with my ECS, but I'll stay consistent for now
-    virtual void squish(const HitInfo hitInfo);
     virtual bool isRiding(const SolidCollider* solid) const;
 
 protected:
@@ -117,7 +114,6 @@ protected:
                         bool isManualMove) override;
 };
 
-void defaultSquish(ActorCollider* selfCollider, ecs::Entity self, HitInfo hitinfo);
-void defaultSquishSemiSolid(SemiSolidCollider* selfCollider, ecs::Entity self, HitInfo hitinfo);
+void defaultSquish(IUseCollision* selfCollider, ecs::Entity self, HitInfo hitinfo);
 
 }  // namespace whal

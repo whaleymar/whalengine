@@ -36,13 +36,12 @@ struct AABB {
 
     Vector2i getPosition() const { return center; }
 
-    // TODO these should return ints
-    f32 top() const { return center.y() + half.y(); }
-    f32 bottom() const { return center.y() - half.y(); }
-    f32 right() const { return center.x() + half.x(); }
-    f32 left() const { return center.x() - half.x(); }
+    s32 top() const { return center.y() + half.y(); }
+    s32 bottom() const { return center.y() - half.y(); }
+    s32 right() const { return center.x() + half.x(); }
+    s32 left() const { return center.x() - half.x(); }
 };
 
-using EdgeGetter = f32 (AABB::*)() const;
+using EdgeGetter = s32 (AABB::*)() const;
 
 }  // namespace whal

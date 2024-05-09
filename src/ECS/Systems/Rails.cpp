@@ -82,8 +82,11 @@ void RailsSystem::update() {
                 actor.value()->moveY(delta, nullptr);
                 entity.set(Transform(actor.value()->getCollider().getPositionEdge(Vector2i::unitDown)));
             } else if (std::optional<SemiSolidCollider*> semi = entity.tryGet<SemiSolidCollider>(); semi) {
-                semi.value()->moveX(delta.x(), nullptr, true);
-                semi.value()->moveY(delta.y(), nullptr, true);
+                auto ridingActors = semi.value()->getRidingActors();
+                auto ridingSemis = semi.value()->getRidingSemiSolids();
+
+                semi.value()->moveX(delta.x(), nullptr, ridingActors, ridingSemis, true);
+                semi.value()->moveY(delta.y(), nullptr, ridingActors, ridingSemis, true);
                 entity.set(Transform(semi.value()->getCollider().getPositionEdge(Vector2i::unitDown)));
             } else {
                 entity.set(Transform(rails.getTarget().position));

@@ -56,11 +56,13 @@ public:
     void update() override;
     void onAdd(ecs::Entity entity) override;
     void onRemove(ecs::Entity entity) override;
+    void setUpdateNeeded() { mIsUpdateNeeded = true; }
 
     const std::vector<SemiSolidCollider*> getAllSemiSolids() const { return mSemiSolids; }
 
 private:
     std::vector<SemiSolidCollider*> mSemiSolids;
+    size_t mNumCallbackColliders = 0;
     bool mIsUpdateNeeded = false;
 };
 

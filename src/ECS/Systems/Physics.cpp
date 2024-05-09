@@ -117,23 +117,28 @@ void PhysicsSystem::update() {
                     if (otherSB.getOnCollisionEnter() != nullptr) {
                         otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
                     }
-                } else if (entity.has<Player>()) {
-                    // TEMP
-                    auto solidOpt = hitinfo.value().other.tryGet<SolidCollider>();
-                    if (solidOpt) {
-                        print("GOT SOLID BUT NOT SET IN HITINFO");
+                } else if (hitinfo->isOtherSemiSolid) {
+                    auto otherSS = hitinfo.value().other.get<SemiSolidCollider>();
+                    if (otherSS.getOnCollisionEnter() != nullptr) {
+                        otherSS.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
                     }
                 }
             } else {
                 rb.value()->setNotGrounded();
             }
 
-            if (auto hitinfo = actor.value()->moveX(move, nullptr); hitinfo && hitinfo->isOtherSolid) {
-                auto otherSB = hitinfo->other.get<SolidCollider>();
-
-                // do collision callback
-                if (otherSB.getOnCollisionEnter() != nullptr) {
-                    otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
+            // do collision callback in X direction
+            if (auto hitinfo = actor.value()->moveX(move, nullptr); hitinfo) {
+                if (hitinfo->isOtherSolid) {
+                    auto otherSB = hitinfo.value().other.get<SolidCollider>();
+                    if (otherSB.getOnCollisionEnter() != nullptr) {
+                        otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
+                    }
+                } else if (hitinfo->isOtherSemiSolid) {
+                    auto otherSS = hitinfo.value().other.get<SemiSolidCollider>();
+                    if (otherSS.getOnCollisionEnter() != nullptr) {
+                        otherSS.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
+                    }
                 }
             }
             allActors.push_back(entity);
@@ -171,12 +176,12 @@ void PhysicsSystem::update() {
             allActors.push_back(entity);
 
         } else if (semisolid && rb) {
-            // TODO
-
             // MOVEMENT + GROUNDED CHECKS
             //// no callback needed when semisolid moves into solid
             const bool wasGrounded = rb.value()->isGrounded;
-            if (auto hitinfo = semisolid.value()->moveY(move.y(), nullptr); hitinfo) {
+            auto ridingActors = semisolid.value()->getRidingActors();
+            auto ridingSemis = semisolid.value()->getRidingSemiSolids();
+            if (auto hitinfo = semisolid.value()->moveY(move.y(), nullptr, ridingActors, ridingSemis); hitinfo) {
                 if (move.y() <= 0) {
                     rb.value()->setGrounded(hitinfo.value().otherMaterial);
                 } else {
@@ -186,25 +191,34 @@ void PhysicsSystem::update() {
                 vel.residualImpulse.e[1] = 0;
 
                 // do collision callback
-                // TODO need generic collision callback here
-                // if (hitinfo->isOtherSolid) {
-                //     auto otherSB = hitinfo.value().other.get<SolidCollider>();
-                //     if (otherSB.getOnCollisionEnter() != nullptr) {
-                //         otherSB.getOnCollisionEnter()(semisolid.value(), entity, hitinfo.value());
-                //     }
-                // }
+                if (hitinfo->isOtherSolid) {
+                    auto otherSB = hitinfo.value().other.get<SolidCollider>();
+                    if (otherSB.getOnCollisionEnter() != nullptr) {
+                        otherSB.getOnCollisionEnter()(semisolid.value(), entity, hitinfo.value());
+                    }
+                } else if (hitinfo->isOtherSemiSolid) {
+                    auto otherSS = hitinfo.value().other.get<SemiSolidCollider>();
+                    if (otherSS.getOnCollisionEnter() != nullptr) {
+                        otherSS.getOnCollisionEnter()(semisolid.value(), entity, hitinfo.value());
+                    }
+                }
             } else {
                 rb.value()->setNotGrounded();
             }
 
-            if (auto hitinfo = semisolid.value()->moveX(move.x(), nullptr); hitinfo && hitinfo->isOtherSolid) {
-                auto otherSB = hitinfo->other.get<SolidCollider>();
-
-                // TODO
-                // do collision callback
-                // if (otherSB.getOnCollisionEnter() != nullptr) {
-                //     otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
-                // }
+            // do X collision callback
+            if (auto hitinfo = semisolid.value()->moveX(move.x(), nullptr, ridingActors, ridingSemis); hitinfo) {
+                if (hitinfo->isOtherSolid) {
+                    auto otherSB = hitinfo->other.get<SolidCollider>();
+                    if (otherSB.getOnCollisionEnter() != nullptr) {
+                        otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
+                    }
+                } else if (hitinfo->isOtherSemiSolid) {
+                    auto otherSS = hitinfo.value().other.get<SemiSolidCollider>();
+                    if (otherSS.getOnCollisionEnter() != nullptr) {
+                        otherSS.getOnCollisionEnter()(semisolid.value(), entity, hitinfo.value());
+                    }
+                }
             }
             allSemiSolids.push_back(entity);
 
@@ -222,8 +236,10 @@ void PhysicsSystem::update() {
             }
 
         } else if (semisolid) {
-            semisolid.value()->moveX(move.x(), nullptr, false);
-            semisolid.value()->moveY(move.y(), nullptr, false);
+            auto ridingActors = semisolid.value()->getRidingActors();
+            auto ridingSemis = semisolid.value()->getRidingSemiSolids();
+            semisolid.value()->moveX(move.x(), nullptr, ridingActors, ridingSemis);
+            semisolid.value()->moveY(move.y(), nullptr, ridingActors, ridingSemis);
             allSemiSolids.push_back(entity);
 
         } else if (std::optional<SolidCollider*> solid = entity.tryGet<SolidCollider>(); solid) {
