@@ -28,6 +28,7 @@ static NameToCreator<ComponentAdder> S_COMPONENT_ENTRIES[] = {
     {"Component_RailsControl", addComponentRailsControl},
     // {"Animator", addComponentAnimator},
     {"Component_ActorCollider", addComponentActorCollider},
+    {"Component_SemiSolidCollider", addComponentSemiSolidCollider},
     {"Component_SolidCollider", addComponentSolidCollider},
     {"Component_Draw", addComponentDraw},
     {"Component_Sprite_NoAnim", addComponentSprite},
@@ -76,6 +77,8 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
                 half.e[0] = member[KEY_VALUE];
             } else if (memberName == "halflenTexelsY") {
                 half.e[1] = member[KEY_VALUE];
+            } else if (memberName == "Material") {
+                DefaultActorCollider.setMaterial(member[KEY_VALUE]);
             } else {
                 print("Skipping member ", memberName, "for", componentName);
             }
@@ -92,6 +95,8 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
                 half.e[0] = member[KEY_VALUE];
             } else if (memberName == "halflenTexelsY") {
                 half.e[1] = member[KEY_VALUE];
+            } else if (memberName == "Material") {
+                DefaultSolidCollider.setMaterial(member[KEY_VALUE]);
             } else if (memberName == "CollisionDir") {
                 collisionDir = member[KEY_VALUE];
             } else {
@@ -101,6 +106,23 @@ void ComponentFactory::makeDefaultComponent(nlohmann::json property) {
         half = Transform::texels(half.x(), half.y()).position;
         DefaultSolidCollider.getColliderMut().setHalflen(half);
         DefaultSolidCollider.setCollisionDir(collisionDir);
+
+    } else if (componentName == "Component_SemiSolidCollider") {
+        Vector2i half;
+        for (auto& member : property[KEY_MEMBERS]) {
+            std::string memberName = member[KEY_NAME];
+            if (memberName == "halflenTexelsX") {
+                half.e[0] = member[KEY_VALUE];
+            } else if (memberName == "halflenTexelsY") {
+                half.e[1] = member[KEY_VALUE];
+            } else if (memberName == "Material") {
+                DefaultSemiSolidCollider.setMaterial(member[KEY_VALUE]);
+            } else {
+                print("Skipping member ", memberName, "for", componentName);
+            }
+        }
+        half = Transform::texels(half.x(), half.y()).position;
+        DefaultSemiSolidCollider.getColliderMut().setHalflen(half);
 
     } else if (componentName == "Component_Draw") {
         for (auto& member : property[KEY_MEMBERS]) {
@@ -270,11 +292,54 @@ void addComponentSprite(nlohmann::json& values, nlohmann::json& allObjects, std:
     }
 }
 
+void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
+                               ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
+    ActorCollider actor = ComponentFactory::DefaultActorCollider;
+    Vector2i halflenTexels = actor.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
+    Material material = actor.getMaterial();
+
+    if (values.contains("halflenTexelsX")) {
+        halflenTexels.e[0] = values["halflenTexelsX"];
+    }
+    if (values.contains("halflenTexelsY")) {
+        halflenTexels.e[1] = values["halflenTexelsY"];
+    }
+    if (values.contains("Material")) {
+        material = values["Material"];
+    }
+
+    Vector2i half = Transform::texels(halflenTexels.x(), halflenTexels.y()).position;
+    Vector2i center = entity.get<Transform>().position + Vector2i(0, half.y());
+    entity.add(ActorCollider(toFloatVec(center), half, material));
+}
+
+void addComponentSemiSolidCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
+                                   ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
+    SemiSolidCollider semi = ComponentFactory::DefaultSemiSolidCollider;
+    Vector2i halflenTexels = semi.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
+    Material material = semi.getMaterial();
+
+    if (values.contains("halflenTexelsX")) {
+        halflenTexels.e[0] = values["halflenTexelsX"];
+    }
+    if (values.contains("halflenTexelsY")) {
+        halflenTexels.e[1] = values["halflenTexelsY"];
+    }
+    if (values.contains("Material")) {
+        material = values["Material"];
+    }
+
+    Vector2i half = Transform::texels(halflenTexels.x(), halflenTexels.y()).position;
+    Vector2i center = entity.get<Transform>().position + Vector2i(0, half.y());
+    entity.add(SemiSolidCollider(toFloatVec(center), half, material));
+}
+
 void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                                ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
     SolidCollider solid = ComponentFactory::DefaultSolidCollider;
     Vector2i halflenTexels = solid.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
     CollisionDir collisionDir = solid.getCollisionDir();
+    Material material = solid.getMaterial();
 
     if (values.contains("halflenTexelsX")) {
         halflenTexels.e[0] = values["halflenTexelsX"];
@@ -285,27 +350,13 @@ void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObject
     if (values.contains("CollisionDir")) {
         collisionDir = values["CollisionDir"];
     }
-
-    Vector2i half = Transform::texels(halflenTexels.x(), halflenTexels.y()).position;
-    Vector2i center = entity.get<Transform>().position + Vector2i(0, half.y());
-    entity.add(SolidCollider(toFloatVec(center), half, Material::None, nullptr, collisionDir));
-}
-
-void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
-                               ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
-    ActorCollider actor = ComponentFactory::DefaultActorCollider;
-    Vector2i halflenTexels = actor.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
-
-    if (values.contains("halflenTexelsX")) {
-        halflenTexels.e[0] = values["halflenTexelsX"];
-    }
-    if (values.contains("halflenTexelsY")) {
-        halflenTexels.e[1] = values["halflenTexelsY"];
+    if (values.contains("Material")) {
+        material = values["Material"];
     }
 
     Vector2i half = Transform::texels(halflenTexels.x(), halflenTexels.y()).position;
     Vector2i center = entity.get<Transform>().position + Vector2i(0, half.y());
-    entity.add(ActorCollider(toFloatVec(center), half));
+    entity.add(SolidCollider(toFloatVec(center), half, material, nullptr, collisionDir));
 }
 
 void addComponentFollow(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,

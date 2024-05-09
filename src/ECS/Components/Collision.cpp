@@ -23,7 +23,7 @@ void defaultSquishSemiSolid(SemiSolidCollider* selfCollider, ecs::Entity self, H
     selfCollider->squish(hitinfo);
 }
 
-ActorCollider::ActorCollider(Vector2f position, Vector2i half) : IUseCollision(AABB(half)) {
+ActorCollider::ActorCollider(Vector2f position, Vector2i half, Material material) : IUseCollision(AABB(half), material) {
     mCollider.setPosition(position);
 }
 

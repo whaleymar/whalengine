@@ -20,11 +20,10 @@ class Entity;
 using ActorCollisionCallback = void (*)(ActorCollider* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo);
 using SemiSolidCollisionCallback = void (*)(SemiSolidCollider* selfCollider, ecs::Entity ssEntity, HitInfo hitinfo);
 
-// TODO material in constructor
 class ActorCollider : public IUseCollision {
 public:
     ActorCollider() = default;
-    ActorCollider(Vector2f position, Vector2i half);
+    ActorCollider(Vector2f position, Vector2i half, Material material = Material::None);
 
     std::optional<HitInfo> moveX(const Vector2f amount, const ActorCollisionCallback callback);
     std::optional<HitInfo> moveY(const Vector2f amount, const ActorCollisionCallback callback);

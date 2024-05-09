@@ -13,6 +13,7 @@ public:
     const AABB& getCollider() const { return mCollider; }
     AABB& getColliderMut() { return mCollider; }
     Material getMaterial() const { return mMaterial; }
+    void setMaterial(Material material) { mMaterial = material; }
     ecs::Entity getEntity() const { return mSelf; }
     bool isCollidable() const { return mIsCollidable; }
     void setPosition(Vector2i center) { mCollider.setPosition(center); }

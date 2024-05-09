@@ -32,6 +32,7 @@ public:
     inline static Velocity DefaultVelocity;
     inline static RailsControl DefaultRailsControl;
     inline static ActorCollider DefaultActorCollider;
+    inline static SemiSolidCollider DefaultSemiSolidCollider;
     inline static SolidCollider DefaultSolidCollider;
     inline static RigidBody DefaultRigidBody;
     inline static Draw DefaultDraw;
@@ -45,6 +46,8 @@ void addComponentRailsControl(nlohmann::json& values, nlohmann::json& allObjects
                               ActiveLevel& level, ecs::Entity entity, LayerData layerData);
 void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                                ActiveLevel& level, ecs::Entity entity, LayerData layerData);
+void addComponentSemiSolidCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
+                                   ActiveLevel& level, ecs::Entity entity, LayerData layerData);
 void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                                ActiveLevel& level, ecs::Entity entity, LayerData layerData);
 void addComponentRigidBody(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,

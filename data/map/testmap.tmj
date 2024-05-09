@@ -378,8 +378,58 @@
                  "type":"Entity",
                  "visible":true,
                  "width":8,
-                 "x":160,
-                 "y":82
+                 "x":18,
+                 "y":98
+                }, 
+                {
+                 "height":8,
+                 "id":30,
+                 "name":"SemiSolidTest",
+                 "properties":[
+                        {
+                         "name":"RigidBody",
+                         "propertytype":"Component_RigidBody",
+                         "type":"class",
+                         "value":
+                            {
+
+                            }
+                        }, 
+                        {
+                         "name":"SemiSolidCollider",
+                         "propertytype":"Component_SemiSolidCollider",
+                         "type":"class",
+                         "value":
+                            {
+                             "halflenTexelsX":4,
+                             "halflenTexelsY":4
+                            }
+                        }, 
+                        {
+                         "name":"Sprite",
+                         "propertytype":"Component_Sprite_NoAnim",
+                         "type":"class",
+                         "value":
+                            {
+                             "Color":"#ff8c00ff",
+                             "Sprite":"tile\/dirtblock"
+                            }
+                        }, 
+                        {
+                         "name":"Velocity",
+                         "propertytype":"Component_Velocity",
+                         "type":"class",
+                         "value":
+                            {
+                             "velX":0
+                            }
+                        }],
+                 "rotation":0,
+                 "type":"Entity",
+                 "visible":true,
+                 "width":8,
+                 "x":158,
+                 "y":70
                 }, 
                 {
                  "gid":2,
@@ -500,7 +550,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":28,
+ "nextobjectid":31,
  "orientation":"orthogonal",
  "properties":[
         {
