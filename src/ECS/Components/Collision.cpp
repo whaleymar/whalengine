@@ -9,7 +9,6 @@
 #include "Physics/IUseCollision.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
-#include "Util/Print.h"
 
 namespace whal {
 
@@ -518,6 +517,7 @@ std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const SemiSoli
 
     // move one pixel at a time, checking for collision with solids
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
+    auto const& semiSolids = SemiSolidsManager::getInstance()->getAllSemiSolids();
     std::optional<HitInfo> hitInfo;
     bool neverMoved = true;
     s32 toMoveOriginal = toMove;
@@ -525,6 +525,9 @@ std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const SemiSoli
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveNormal;
         hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
+        if (!hitInfo) {
+            hitInfo = checkCollisionSemiSolids(semiSolids, nextPos);
+        }
         if (!hitInfo) {
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
@@ -561,20 +564,35 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const SemiSoli
     mYRemainder += amount;
     s32 toMove = std::round(mYRemainder);
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
+    auto const& semis = SemiSolidsManager::getInstance()->getAllSemiSolids();
 
-    auto groundedCheck = [this](const f32 amount, const std::vector<SolidCollider*>& solids) -> std::optional<HitInfo> {
+    auto groundedCheck = [this](const f32 amount, const std::vector<SolidCollider*>& solids,
+                                const std::vector<SemiSolidCollider*>& semis) -> std::optional<HitInfo> {
         IUseCollision* groundCollider = nullptr;
-        if (amount <= 0 && checkIsGrounded(solids, &groundCollider)) {
+        if (amount > 0) {
+            return std::nullopt;
+        }
+
+        if (checkIsGrounded(solids, &groundCollider)) {
             HitInfo hitinfo(Vector2i(0, -1));
             hitinfo.other = groundCollider->getEntity();
             hitinfo.otherMaterial = groundCollider->getMaterial();
+            hitinfo.isOtherSolid = true;
             return hitinfo;
         }
+        if (checkIsGroundedOnSemiSolids(semis, &groundCollider)) {
+            HitInfo hitinfo(Vector2i(0, -1));
+            hitinfo.other = groundCollider->getEntity();
+            hitinfo.otherMaterial = groundCollider->getMaterial();
+            hitinfo.isOtherSemiSolid = true;
+            return hitinfo;
+        }
+
         return std::nullopt;
     };
 
     if (toMove == 0) {
-        return groundedCheck(amount, solids);
+        return groundedCheck(amount, solids, semis);
     }
 
     mYRemainder -= toMove;
@@ -589,10 +607,12 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const SemiSoli
     std::optional<HitInfo> hitInfo;
     bool neverMoved = true;
     s32 toMoveOriginal = toMove;
-    // TODO check for collision with other SemiSolids
     while (toMove != 0) {
         auto nextPos = mCollider.getPosition() + moveNormal;
         hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
+        if (!hitInfo) {
+            hitInfo = checkCollisionSemiSolids(semis, nextPos);
+        }
         if (!hitInfo) {
             mCollider.setPosition(nextPos);
             toMove -= moveSign;
@@ -623,7 +643,7 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const SemiSoli
 
     mIsCollidable = wasCollidable;
     if (!hitInfo) {
-        return groundedCheck(amount, solids);
+        return groundedCheck(amount, solids, semis);
     }
     return hitInfo;
 }
@@ -677,6 +697,16 @@ bool SemiSolidCollider::checkIsGrounded(const std::vector<SolidCollider*>& solid
     for (auto& solid : solids) {
         if (solid->isCollidable() && solid->isGround() && isRiding(solid)) {
             *groundCollider = solid;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SemiSolidCollider::checkIsGroundedOnSemiSolids(const std::vector<SemiSolidCollider*>& semis, IUseCollision** groundCollider) {
+    for (auto& semi : semis) {
+        if (semi != this && semi->isCollidable() && isRiding(semi)) {
+            *groundCollider = semi;
             return true;
         }
     }

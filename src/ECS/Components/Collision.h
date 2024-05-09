@@ -107,7 +107,7 @@ public:
     std::optional<HitInfo> checkCollisionSemiSolids(const std::vector<SemiSolidCollider*>& solids, const Vector2i position) const;
 
     bool checkIsGrounded(const std::vector<SolidCollider*>& solids, IUseCollision** groundCollider);
-    // TODO checkIsGroundedOnSemiSolids
+    bool checkIsGroundedOnSemiSolids(const std::vector<SemiSolidCollider*>& solids, IUseCollision** groundCollider);
 
     // still not sure if/how/should i use component inheritance with my ECS, but I'll stay consistent for now
     virtual void squish(const HitInfo hitInfo);
