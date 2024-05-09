@@ -60,7 +60,7 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const Collisi
     return std::nullopt;
 }
 
-std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const CollisionCallback callback) {
+std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const CollisionCallback callback, bool isGroundedCheckNeeded) {
     // RESEARCH doesn't handle colliding with other actors
 
     // include fractional movement from previous calls
@@ -95,7 +95,10 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
     };
 
     if (toMove == 0) {
-        return groundedCheck(amount.y(), solids, semiSolids);
+        if (isGroundedCheckNeeded) {
+            return groundedCheck(amount.y(), solids, semiSolids);
+        }
+        return std::nullopt;
     }
 
     mYRemainder -= toMove;
@@ -123,7 +126,10 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
         }
     }
 
-    return groundedCheck(amount.y(), solids, semiSolids);
+    if (isGroundedCheckNeeded) {
+        return groundedCheck(amount.y(), solids, semiSolids);
+    }
+    return std::nullopt;
 }
 
 void ActorCollider::setMomentum(const f32 momentum, const bool isXDirection) {
@@ -555,7 +561,7 @@ std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const Collisio
 }
 
 std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const CollisionCallback callback, std::vector<ActorCollider*>& ridingActors,
-                                                std::vector<SemiSolidCollider*>& ridingSemis, bool isManualMove) {
+                                                std::vector<SemiSolidCollider*>& ridingSemis, bool isManualMove, bool isGroundedCheckNeeded) {
     mYRemainder += amount;
     s32 toMove = std::round(mYRemainder);
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
@@ -587,7 +593,10 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const Collisio
     };
 
     if (toMove == 0) {
-        return groundedCheck(amount, solids, semis);
+        if (isGroundedCheckNeeded) {
+            return groundedCheck(amount, solids, semis);
+        }
+        return std::nullopt;
     }
 
     mYRemainder -= toMove;
@@ -632,7 +641,7 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const Collisio
     }
 
     mIsCollidable = wasCollidable;
-    if (!hitInfo) {
+    if (!hitInfo && isGroundedCheckNeeded) {
         return groundedCheck(amount, solids, semis);
     }
     return hitInfo;

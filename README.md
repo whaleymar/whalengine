@@ -5,7 +5,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 
 ## Current Goal: 
 - int in collider constructors
-- mb i can pass a isGroundedCheckNeeded to moveY so i only check for rigidbodies?
 - put velocity in texels/second instead of tiles/second
 
 ## Camera / Follow

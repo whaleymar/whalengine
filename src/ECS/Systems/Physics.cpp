@@ -102,7 +102,7 @@ void PhysicsSystem::update() {
             // MOVEMENT + GROUNDED CHECKS
             //// no callback needed when actor moves into solid
             const bool wasGrounded = rb.value()->isGrounded;
-            if (auto hitinfo = actor.value()->moveY(move, nullptr); hitinfo) {
+            if (auto hitinfo = actor.value()->moveY(move, nullptr, true); hitinfo) {
                 if (move.y() <= 0) {
                     rb.value()->setGrounded(hitinfo.value().otherMaterial);
                 } else {
@@ -181,7 +181,7 @@ void PhysicsSystem::update() {
             const bool wasGrounded = rb.value()->isGrounded;
             auto ridingActors = semisolid.value()->getRidingActors();
             auto ridingSemis = semisolid.value()->getRidingSemiSolids();
-            if (auto hitinfo = semisolid.value()->moveY(move.y(), nullptr, ridingActors, ridingSemis); hitinfo) {
+            if (auto hitinfo = semisolid.value()->moveY(move.y(), nullptr, ridingActors, ridingSemis, false, true); hitinfo) {
                 if (move.y() <= 0) {
                     rb.value()->setGrounded(hitinfo.value().otherMaterial);
                 } else {

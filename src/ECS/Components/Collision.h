@@ -25,7 +25,7 @@ public:
     ActorCollider(Vector2f position, Vector2i half, Material material = Material::None);
 
     std::optional<HitInfo> moveX(const Vector2f amount, const CollisionCallback callback);
-    std::optional<HitInfo> moveY(const Vector2f amount, const CollisionCallback callback);
+    std::optional<HitInfo> moveY(const Vector2f amount, const CollisionCallback callback, bool isGroundedCheckNeeded = false);
     void setMomentum(const f32 momentum, const bool isXDirection);
     void addMomentum(const f32 momentum, const bool isXDirection);
     void maintainMomentum(const bool isXDirection);
@@ -98,7 +98,7 @@ public:
     std::optional<HitInfo> moveX(const f32 amount, const CollisionCallback callback, std::vector<ActorCollider*>& riding,
                                  std::vector<SemiSolidCollider*>& ridingSemis, bool isManualMove = false);
     std::optional<HitInfo> moveY(const f32 amount, const CollisionCallback callback, std::vector<ActorCollider*>& riding,
-                                 std::vector<SemiSolidCollider*>& ridingSemis, bool isManualMove = false);
+                                 std::vector<SemiSolidCollider*>& ridingSemis, bool isManualMove = false, bool isGroundedCheckNeeded = false);
 
     std::optional<HitInfo> checkCollisionSolids(const std::vector<SolidCollider*>& solids, const Vector2i position, const Vector2i moveNormal) const;
     std::optional<HitInfo> checkCollisionSemiSolids(const std::vector<SemiSolidCollider*>& solids, const Vector2i position) const;
