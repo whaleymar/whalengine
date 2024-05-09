@@ -68,8 +68,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 - Logger queue that runs on another thread
 - rework controller system to be manually called by Event
 - hot-reloading code (youtube video is bookmarked)
-- convenience methods to get bottom position of a collider component && get center from transform + yhalf
-    - do this like how i did the constructor for TriggerZone
 - a lot of physics stuff (like velocity) is stored as floats even though it could be fixed precision (like nearest tenth of a texel) --> I should use ints for this? #CLEANUP
 - velocity is in TILES per second which is a huge footgun #CLEANUP
 
