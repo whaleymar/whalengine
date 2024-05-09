@@ -144,7 +144,8 @@ void killEntityCallback(IUseCollision* selfCollider, ecs::Entity actorEntity, Hi
 
 void createTestPlatform() {
     for (s32 x = 2; x < 6; x += 3) {
-        auto platform = createBlock(Transform::tiles(x, -15)).value();
+        auto trans = Transform::tiles(x, -15);
+        auto platform = createBlock(trans).value();
         auto pathControl = RailsControl(14,
                                         {
                                             {Transform::tiles(x, -15).position, RailsControl::Movement::LINEAR},
@@ -157,8 +158,7 @@ void createTestPlatform() {
         // platform.get<SolidCollider>().setCollisionCallback(&killEntityCallback);
 
         platform.remove<SolidCollider>();
-        platform.add(
-            SemiSolidCollider(toFloatVec(Transform::tiles(x, -15).position + Vector2i(0, 8)), Vector2i(8, 8), Material::None, &startRailsMovement));
+        platform.add(SemiSolidCollider(trans, Vector2i(8, 8), Material::None, &startRailsMovement));
     }
 }
 
@@ -194,7 +194,7 @@ void createTestSemiSolid() {
     // newEntity.add(pathControl);
     newEntity.add<Velocity>();
     newEntity.add<RigidBody>();
-    auto collider = SemiSolidCollider(toFloatVec(trans.position + Vector2i(0, 8)), Vector2i(8, 8), Material::None, nullptr);
+    auto collider = SemiSolidCollider(trans, Vector2i(8, 8), Material::None, nullptr);
     newEntity.add(collider);
 
     newEntity = ecs::ECS::getInstance().entity().value();

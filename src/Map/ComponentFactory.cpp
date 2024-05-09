@@ -295,7 +295,7 @@ void addComponentSprite(nlohmann::json& values, nlohmann::json& allObjects, std:
 void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                                ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
     ActorCollider actor = ComponentFactory::DefaultActorCollider;
-    Vector2i halflenTexels = actor.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
+    Vector2i halflenTexels = actor.getCollider().half / SPIXELS_PER_TEXEL;
     Material material = actor.getMaterial();
 
     if (values.contains("halflenTexelsX")) {
@@ -308,15 +308,13 @@ void addComponentActorCollider(nlohmann::json& values, nlohmann::json& allObject
         material = values["Material"];
     }
 
-    Vector2i half = Transform::texels(halflenTexels.x(), halflenTexels.y()).position;
-    Vector2i center = entity.get<Transform>().position + Vector2i(0, half.y());
-    entity.add(ActorCollider(toFloatVec(center), half, material));
+    entity.add(ActorCollider(entity.get<Transform>(), halflenTexels * SPIXELS_PER_TEXEL, material));
 }
 
 void addComponentSemiSolidCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                                    ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
     SemiSolidCollider semi = ComponentFactory::DefaultSemiSolidCollider;
-    Vector2i halflenTexels = semi.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
+    Vector2i halflenTexels = semi.getCollider().half / SPIXELS_PER_TEXEL;
     Material material = semi.getMaterial();
 
     if (values.contains("halflenTexelsX")) {
@@ -329,15 +327,13 @@ void addComponentSemiSolidCollider(nlohmann::json& values, nlohmann::json& allOb
         material = values["Material"];
     }
 
-    Vector2i half = Transform::texels(halflenTexels.x(), halflenTexels.y()).position;
-    Vector2i center = entity.get<Transform>().position + Vector2i(0, half.y());
-    entity.add(SemiSolidCollider(toFloatVec(center), half, material));
+    entity.add(SemiSolidCollider(entity.get<Transform>(), halflenTexels * SPIXELS_PER_TEXEL, material));
 }
 
 void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId,
                                ActiveLevel& level, ecs::Entity entity, LayerData layerData) {
     SolidCollider solid = ComponentFactory::DefaultSolidCollider;
-    Vector2i halflenTexels = solid.getCollider().half * static_cast<s32>(PIXELS_PER_TEXEL);
+    Vector2i halflenTexels = solid.getCollider().half / SPIXELS_PER_TEXEL;
     CollisionDir collisionDir = solid.getCollisionDir();
     Material material = solid.getMaterial();
 
@@ -354,9 +350,7 @@ void addComponentSolidCollider(nlohmann::json& values, nlohmann::json& allObject
         material = values["Material"];
     }
 
-    Vector2i half = Transform::texels(halflenTexels.x(), halflenTexels.y()).position;
-    Vector2i center = entity.get<Transform>().position + Vector2i(0, half.y());
-    entity.add(SolidCollider(toFloatVec(center), half, material, nullptr, collisionDir));
+    entity.add(SolidCollider(entity.get<Transform>(), halflenTexels * SPIXELS_PER_TEXEL, material, nullptr, collisionDir));
 }
 
 void addComponentFollow(nlohmann::json& values, nlohmann::json& allObjects, std::unordered_map<s32, s32>& idToIndex, s32 thisId, ActiveLevel& level,

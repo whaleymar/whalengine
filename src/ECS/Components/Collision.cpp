@@ -19,9 +19,7 @@ void defaultSquish(IUseCollision* selfCollider, ecs::Entity self, HitInfo hitinf
     selfCollider->squish(hitinfo);
 }
 
-ActorCollider::ActorCollider(Vector2f position, Vector2i half, Material material) : IUseCollision(AABB(half), material) {
-    mCollider.setPosition(position);
-}
+ActorCollider::ActorCollider(Transform transform, Vector2i half, Material material) : IUseCollision(AABB(transform, half), material) {}
 
 std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const CollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
@@ -344,10 +342,8 @@ bool ActorCollider::tryCornerCorrectionSemiSolids(const std::vector<SemiSolidCol
     return false;
 }
 
-SolidCollider::SolidCollider(Vector2f position, Vector2i half, Material material, CollisionCallback onCollisionEnter_, CollisionDir collisionDir)
-    : IUseCollision(AABB(half), material), mCollisionDir(collisionDir), mOnCollisionEnter(onCollisionEnter_) {
-    mCollider.setPosition(position);
-}
+SolidCollider::SolidCollider(Transform transform, Vector2i half, Material material, CollisionCallback onCollisionEnter_, CollisionDir collisionDir)
+    : IUseCollision(AABB(transform, half), material), mCollisionDir(collisionDir), mOnCollisionEnter(onCollisionEnter_) {}
 
 void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
     mXRemainder += x;
@@ -504,8 +500,8 @@ bool SolidCollider::isGround() const {
     return mCollisionDir == CollisionDir::ALL || mCollisionDir == CollisionDir::UP;
 }
 
-SemiSolidCollider::SemiSolidCollider(Vector2f position, Vector2i half, Material material, CollisionCallback onCollisionEnter_)
-    : SolidCollider(position, half, material, onCollisionEnter_) {}
+SemiSolidCollider::SemiSolidCollider(Transform transform, Vector2i half, Material material, CollisionCallback onCollisionEnter_)
+    : SolidCollider(transform, half, material, onCollisionEnter_) {}
 
 std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const CollisionCallback callback, std::vector<ActorCollider*>& ridingActors,
                                                 std::vector<SemiSolidCollider*>& ridingSemis, bool isManualMove) {

@@ -23,7 +23,7 @@ Expected<ecs::Entity> createBlock(Transform transform) {
 
     const s32 widthTileHL = PIXELS_PER_TEXEL * TEXELS_PER_TILE / 2;
     const s32 heightTileHL = PIXELS_PER_TEXEL * TEXELS_PER_TILE / 2;
-    block.add(SolidCollider(toFloatVec(transform.position) + Vector2f(0, heightTileHL), Vector2i(widthTileHL, heightTileHL)));
+    block.add(SolidCollider(transform, Vector2i(widthTileHL, heightTileHL)));
 
     return block;
 }
@@ -42,7 +42,7 @@ Expected<ecs::Entity> createBlock(Transform transform, Draw draw) {
 
     const s32 widthTileHL = PIXELS_PER_TEXEL * TEXELS_PER_TILE / 2;
     const s32 heightTileHL = PIXELS_PER_TEXEL * TEXELS_PER_TILE / 2;
-    block.add(SolidCollider(toFloatVec(transform.position) + Vector2f(0, heightTileHL), Vector2i(widthTileHL, heightTileHL)));
+    block.add(SolidCollider(transform, Vector2i(widthTileHL, heightTileHL)));
 
     return block;
 }
@@ -61,7 +61,7 @@ Expected<ecs::Entity> createBlock(Transform transform, Sprite sprite, Material m
 
     const s32 widthTileHL = PIXELS_PER_TEXEL * TEXELS_PER_TILE / 2;
     const s32 heightTileHL = PIXELS_PER_TEXEL * TEXELS_PER_TILE / 2;
-    block.add(SolidCollider(toFloatVec(transform.position) + Vector2f(0, heightTileHL), Vector2i(widthTileHL, heightTileHL), material));
+    block.add(SolidCollider(transform, Vector2i(widthTileHL, heightTileHL), material));
 
     return block;
 }

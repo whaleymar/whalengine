@@ -4,7 +4,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 # To Do 
 
 ## Current Goal: 
-- int in collider constructors
 - put velocity in texels/second instead of tiles/second
 
 ## Camera / Follow

@@ -147,18 +147,13 @@ void removeEntityFromLevel(ecs::Entity entity) {
 void addCollider(ActiveLevel& lvl, std::pair<s32, s32> startPoint, std::pair<s32, s32> endPoint) {
     s32 meshWidthTiles = endPoint.first - startPoint.first + 1;
     s32 meshHeightTiles = endPoint.second - startPoint.second + 1;
-    constexpr f32 pixelsPerTexel = static_cast<f32>(PIXELS_PER_TEXEL);
-    constexpr f32 pixelsPerTile = pixelsPerTexel * TEXELS_PER_TILE;
-    constexpr s32 s_pixelsPerTile = static_cast<s32>(TEXELS_PER_TILE) * static_cast<s32>(PIXELS_PER_TEXEL);
 
-    f32 centerX = lvl.worldPosOriginTexels.x() * pixelsPerTexel + static_cast<f32>(startPoint.first) * pixelsPerTile +
-                  static_cast<f32>(meshWidthTiles - 1) * pixelsPerTile * 0.5;
-    f32 centerY = lvl.worldPosOriginTexels.y() * pixelsPerTexel - static_cast<f32>(startPoint.second) * pixelsPerTile -
-                  static_cast<f32>(meshHeightTiles - 2) * pixelsPerTile * 0.5;
+    s32 centerX = lvl.worldPosOriginTexels.x() * SPIXELS_PER_TEXEL + startPoint.first * PIXELS_PER_TILE + (meshWidthTiles - 1) * PIXELS_PER_TILE / 2;
+    s32 centerY =
+        lvl.worldPosOriginTexels.y() * SPIXELS_PER_TEXEL - startPoint.second * PIXELS_PER_TILE - (meshHeightTiles - 2) * PIXELS_PER_TILE / 2;
 
-    Vector2f center = {centerX, centerY};
-    Vector2i halflen = {meshWidthTiles * s_pixelsPerTile / 2, meshHeightTiles * s_pixelsPerTile / 2};
-    SolidCollider collider = SolidCollider(center, halflen);
+    Vector2i halflen = {meshWidthTiles * PIXELS_PER_TILE / 2, meshHeightTiles * PIXELS_PER_TILE / 2};
+    SolidCollider collider = SolidCollider(Transform({centerX, centerY}), halflen);
 
     auto eEntity = ecs::ECS::getInstance().entity();
     if (!eEntity.isExpected()) {
