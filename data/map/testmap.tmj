@@ -145,7 +145,7 @@
                             {
                              "Checkpoints":9,
                              "isCycle":true,
-                             "speed":10,
+                             "speed":160,
                              "waitTime":1
                             }
                         }],
@@ -190,7 +190,7 @@
                             {
                              "Checkpoints":18,
                              "isCycle":true,
-                             "speed":20,
+                             "speed":160,
                              "waitTime":1
                             }
                         }],
