@@ -6,12 +6,19 @@
 
 namespace whal {
 
+class IUseCollision;
+
+using CollisionCallback = void (*)(ecs::Entity callbackEntity, ecs::Entity other, IUseCollision* callbackEntityCollider, IUseCollision* otherCollider,
+                                   Vector2i hitNormal);
+
 class IUseCollision {
 public:
     IUseCollision() = default;
-    IUseCollision(AABB collider, Material material = Material::None) : mCollider(collider), mMaterial(material){};
+    IUseCollision(AABB collider, Material material = Material::None, CollisionCallback callback = nullptr);
     const AABB& getCollider() const { return mCollider; }
     AABB& getColliderMut() { return mCollider; }
+    CollisionCallback getOnCollisionEnter() const { return mOnCollisionEnter; }
+    virtual void setCollisionCallback(CollisionCallback callback);
     Material getMaterial() const { return mMaterial; }
     void setMaterial(Material material) { mMaterial = material; }
     ecs::Entity getEntity() const { return mSelf; }
@@ -20,13 +27,14 @@ public:
     void setPositionFromBottom(Vector2i bottom) { mCollider.setPositionFromBottom(bottom); }
     void setEntity(ecs::Entity entity) { mSelf = entity; }
 
-    virtual void squish(HitInfo hitinfo) { getEntity().kill(); }
+    virtual void squish() { getEntity().kill(); }
 
 protected:
     AABB mCollider;
     ecs::Entity mSelf;
     f32 mXRemainder = 0.0;
     f32 mYRemainder = 0.0;
+    CollisionCallback mOnCollisionEnter;
     Material mMaterial;
     bool mIsTrigger = false;
     bool mIsCollidable = true;

@@ -74,6 +74,10 @@ private:
     EntityID mId = 0;
 };
 
+struct EntityHash {
+    u32 operator()(ecs::Entity entity) const { return entity.id(); }
+};
+
 // methods run in a loop by component manager need to be virtual
 class IComponentArray {
 public:

@@ -15,6 +15,7 @@ enum class InputType {
     JUMP,
     PAUSE,
     QUIT,
+    SHOOT,
     DEBUG,
     GROWX,
     GROWY,

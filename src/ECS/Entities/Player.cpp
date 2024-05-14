@@ -2,6 +2,7 @@
 
 #include "ECS/Components/AnimUtil.h"
 #include "ECS/Components/Animator.h"
+#include "ECS/Components/Blaster.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Name.h"
@@ -114,6 +115,8 @@ Expected<ecs::Entity> createPlayerWithSprite(Sprite sprite) {
     player.add<Velocity>();
     player.add<PlayerControlRB>();
     // player.add<PlayerControlFree>();
+
+    player.add<Blaster>();
 
     if (!getCamera()) {
         createCamera(player);

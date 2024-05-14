@@ -15,11 +15,13 @@ namespace whal {
 constexpr s32 MOMENTUM_LIFETIME_FRAMES = 10;
 constexpr s32 CORNERCORRECTIONWIGGLE = 3 * SPIXELS_PER_TEXEL;
 
-void defaultSquish(IUseCollision* selfCollider, ecs::Entity self, HitInfo hitinfo) {
-    selfCollider->squish(hitinfo);
+void defaultSquish(ecs::Entity callbackEntity, ecs::Entity other, IUseCollision* callbackEntityCollider, IUseCollision* otherCollider,
+                   Vector2i moveNormal) {
+    callbackEntityCollider->squish();
 }
 
-ActorCollider::ActorCollider(Transform transform, Vector2i half, Material material) : IUseCollision(AABB(transform, half), material) {}
+ActorCollider::ActorCollider(Transform transform, Vector2i half, Material material, CollisionCallback onCollisionEnter_)
+    : IUseCollision(AABB(transform, half), material, onCollisionEnter_) {}
 
 std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const CollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
@@ -50,7 +52,7 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const Collisi
             toMove -= moveSign;
         } else {
             if (callback != nullptr) {
-                callback(this, getEntity(), hitInfo.value());
+                callback(getEntity(), hitInfo->other, this, nullptr, moveNormal);  // TODO nullptr shouldn't be here
             }
             return hitInfo;
         }
@@ -118,7 +120,7 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
                 continue;  // avoided collision
             }
             if (callback != nullptr) {
-                callback(this, getEntity(), hitInfo.value());
+                callback(getEntity(), hitInfo->other, this, nullptr, moveNormal);  // TODO nullptr shouldn't be here
             }
             return hitInfo;
         }
@@ -343,7 +345,7 @@ bool ActorCollider::tryCornerCorrectionSemiSolids(const std::vector<SemiSolidCol
 }
 
 SolidCollider::SolidCollider(Transform transform, Vector2i half, Material material, CollisionCallback onCollisionEnter_, CollisionDir collisionDir)
-    : IUseCollision(AABB(transform, half), material), mCollisionDir(collisionDir), mOnCollisionEnter(onCollisionEnter_) {}
+    : IUseCollision(AABB(transform, half), material, onCollisionEnter_), mCollisionDir(collisionDir) {}
 
 void SolidCollider::move(f32 x, f32 y, bool isManualMove) {
     mXRemainder += x;
@@ -528,7 +530,7 @@ std::optional<HitInfo> SemiSolidCollider::moveX(const f32 amount, const Collisio
             neverMoved = false;
         } else {
             if (callback != nullptr) {
-                callback(this, getEntity(), hitInfo.value());
+                callback(getEntity(), hitInfo->other, this, nullptr, moveNormal);  // TODO nullptr shouldn't be here
             }
             break;
         }
@@ -612,7 +614,7 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const Collisio
             neverMoved = false;
         } else {
             if (callback != nullptr) {
-                callback(this, getEntity(), hitInfo.value());
+                callback(getEntity(), hitInfo->other, this, nullptr, moveNormal);  // TODO nullptr shouldn't be here
             }
             break;
         }
@@ -721,6 +723,11 @@ bool SemiSolidCollider::isRiding(const SolidCollider* solid) const {
         return true;
     }
     return false;
+}
+
+void SemiSolidCollider::setCollisionCallback(CollisionCallback callback) {
+    mOnCollisionEnter = callback;
+    SemiSolidsManager::getInstance()->setUpdateNeeded();
 }
 
 void SemiSolidCollider::moveSemiSolids(bool isXDirection, s32 toMoveRounded, s32 solidEdge, EdgeGetter edgeFunc,

@@ -16,12 +16,10 @@ namespace ecs {
 class Entity;
 }
 
-using CollisionCallback = void (*)(IUseCollision* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo);
-
 class ActorCollider : public IUseCollision {
 public:
     ActorCollider() = default;
-    ActorCollider(Transform transform, Vector2i half, Material material = Material::None);
+    ActorCollider(Transform transform, Vector2i half, Material material = Material::None, CollisionCallback onCollisionEnter_ = nullptr);
 
     std::optional<HitInfo> moveX(const Vector2f amount, const CollisionCallback callback);
     std::optional<HitInfo> moveY(const Vector2f amount, const CollisionCallback callback, bool isGroundedCheckNeeded = false);
@@ -64,9 +62,8 @@ public:
     void move(f32 x, f32 y, bool isManualMove = false);
     std::vector<ActorCollider*> getRidingActors() const;
     std::vector<SemiSolidCollider*> getRidingSemiSolids() const;
-    void setCollisionCallback(CollisionCallback callback);
+    void setCollisionCallback(CollisionCallback callback) override;
     bool isGround() const;
-    CollisionCallback getOnCollisionEnter() const { return mOnCollisionEnter; }
     CollisionDir getCollisionDir() const { return mCollisionDir; }
     void setCollisionDir(CollisionDir dir) { mCollisionDir = dir; }
 
@@ -79,7 +76,6 @@ protected:
 
 private:
     CollisionDir mCollisionDir;
-    CollisionCallback mOnCollisionEnter;
 };
 
 // A collider which acts like a Solid when interacting with Actors, but acts like an Actor when interacting with solids
@@ -107,12 +103,13 @@ public:
 
     // still not sure if/how/should i use component inheritance with my ECS, but I'll stay consistent for now
     virtual bool isRiding(const SolidCollider* solid) const;
+    void setCollisionCallback(CollisionCallback callback) override;
 
 protected:
     void moveSemiSolids(bool isXDirection, s32 toMoveRounded, s32 solidEdge, EdgeGetter edgeFunc, std::vector<SemiSolidCollider*>& riding,
                         bool isManualMove) override;
 };
 
-void defaultSquish(IUseCollision* selfCollider, ecs::Entity self, HitInfo hitinfo);
+void defaultSquish(ecs::Entity self, ecs::Entity other, IUseCollision* selfCollider, IUseCollision* otherCollision, Vector2i moveNormal);
 
 }  // namespace whal

@@ -37,10 +37,10 @@ std::optional<Error> loadTestMap() {
     }
     // createTestPlatform();
     auto err = loadMap();
-    // createTestPlatform();
+    createTestPlatform();
     // createTestTrigger();
     // createTestSemiSolid();
-    createDepthTest();
+    // createDepthTest();
     return err;
 }
 
@@ -131,16 +131,15 @@ std::optional<Error> loadDebugScene() {
     return std::nullopt;
 }
 
-void startRailsMovement(IUseCollision* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo) {
-    ecs::Entity solidEntity = hitinfo.other;
-    auto& rails = solidEntity.get<RailsControl>();
+void startRailsMovement(ecs::Entity self, ecs::Entity other, IUseCollision* selfCollider, IUseCollision* otherCollider, Vector2i moveNormal) {
+    auto& rails = self.get<RailsControl>();
     if (rails.isWaiting && rails.curTarget == 0) {
         rails.startManually();
     }
 }
 
-void killEntityCallback(IUseCollision* selfCollider, ecs::Entity actorEntity, HitInfo hitinfo) {
-    actorEntity.kill();
+void killEntityCallback(ecs::Entity self, ecs::Entity other, IUseCollision* selfCollider, IUseCollision* otherCollider, Vector2i moveNormal) {
+    other.kill();
 }
 
 void createTestPlatform() {
@@ -155,17 +154,17 @@ void createTestPlatform() {
                                         2, false);
         platform.add<RailsControl>(pathControl);
         platform.add(Name("callback platform"));
-        // platform.get<SolidCollider>().setCollisionCallback(&startRailsMovement);
+        platform.get<SolidCollider>().setCollisionCallback(&startRailsMovement);
         // platform.get<SolidCollider>().setCollisionCallback(&killEntityCallback);
 
-        platform.remove<SolidCollider>();
-        platform.add(SemiSolidCollider(trans, Vector2i(8, 8), Material::None, &startRailsMovement));
+        // platform.remove<SolidCollider>();
+        // platform.add(SemiSolidCollider(trans, Vector2i(8, 8), Material::None, &startRailsMovement));
     }
 }
 
 void createTestTrigger() {
     // TriggerCallback callback = [](ecs::Entity entity) { System::audio.play(Sfx::ENEMY_CRY); };
-    TriggerCallback callback = [](ecs::Entity entity) { entity.kill(); };
+    TriggerCallback callback = [](ecs::Entity self, ecs::Entity other) { other.kill(); };
 
     // TriggerZone trigger = TriggerZone(Transform::tiles(5, -5), {4, 4}, callback);
     // TriggerZone trigger = TriggerZone(Transform::tiles(5, -9), {4, 4}, nullptr);

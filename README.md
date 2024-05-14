@@ -55,10 +55,6 @@ A WIP 2D game framework written in C++ with OpenGL and SDL, backed by a simple E
 
 ## Non-ECS Systems
 - chunk loading/unloading (quad tree?)
-- loading entity/map from file
-    - definitely figure out level editor first
-    - Scenes
-        - hot reloading
 - text rendering\*\*
 - Level editor\*\*
 

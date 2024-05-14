@@ -14,6 +14,6 @@ public:
     void update() override;
 };
 
-class MovingActorTracker : public ecs::ISystem<Transform, Velocity, ActorCollider> {};
+class MovableActorTracker : public ecs::ISystem<Transform, Velocity, ActorCollider> {};
 
 }  // namespace whal

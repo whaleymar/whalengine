@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "Game/Events.h"
 #include "System.h"
 
 namespace whal {
@@ -40,6 +41,23 @@ void InputHandler::set(InputType input) {
     case InputType::QUIT:
         mIsQuit = true;
         break;
+
+    case InputType::SHOOT: {
+        Vector2i moveNormal = {0, 0};
+        if (isLeft()) {
+            moveNormal.e[0] = -1;
+        } else if (isRight()) {
+            moveNormal.e[0] = 1;
+        }
+
+        if (isDown()) {
+            moveNormal.e[1] = -1;
+        } else if (isUp()) {
+            moveNormal.e[1] = 1;
+        }
+        System::eventMgr.triggerEvent(Event::SHOOT_EVENT, moveNormal);
+        break;
+    }
 
 #ifndef NDEBUG
     case InputType::DEBUG:
@@ -151,6 +169,7 @@ void InputHandler::loadMappings() const {
     KeyMap.insert({SDLK_s, InputType::DOWN});
     KeyMap.insert({SDLK_SPACE, InputType::JUMP});
     KeyMap.insert({SDLK_ESCAPE, InputType::QUIT});
+    KeyMap.insert({SDLK_f, InputType::SHOOT});
 
 #ifndef NDEBUG
     KeyMap.insert({SDLK_0, InputType::DEBUG});

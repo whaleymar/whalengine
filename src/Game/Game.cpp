@@ -4,6 +4,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "ECS/Components/Blaster.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Entities/Camera.h"
 #include "ECS/Systems/CallbackSystem.h"
@@ -111,7 +112,7 @@ void Game::mainloop() {
     auto drawSystem = ecs.registerSystem<DrawSystem>();
     auto animationSystem = ecs.registerSystem<AnimationSystem>();
     auto lifetimeSystem = ecs.registerSystem<LifetimeSystem>();
-    ecs.registerSystem<MovingActorTracker>();  // dependency of TriggerSystem
+    ecs.registerSystem<MovableActorTracker>();  // dependency of TriggerSystem
     auto triggerSystem = ecs.registerSystem<TriggerSystem>();
     auto frameEndSystem = ecs.registerSystem<OnFrameEndSystem>();
 
@@ -120,12 +121,14 @@ void Game::mainloop() {
     auto solidsMgr = SolidsManager::getInstance();
     auto semiSolidsMgr = SemiSolidsManager::getInstance();
     auto followMgr = ecs.registerSystem<FollowSystem>();
+
     // these don't have update methods:
     auto spriteMgr = ecs.registerSystem<SpriteManager>();
     auto drawMgr = ecs.registerSystem<DrawManager>();
     auto playerMgr = PlayerSystem::instance();
     auto cameraMgr = CameraSystem::instance();
     auto childMgr = EntityChildSystem::instance();
+    ecs.registerSystem<ProjectileSystem>();
 
     // load scene // TODO separate function
     auto err = loadTestMap();

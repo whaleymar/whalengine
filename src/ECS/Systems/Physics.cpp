@@ -1,6 +1,7 @@
 #include "Physics.h"
 
 #include <cmath>
+#include <functional>
 
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/RigidBody.h"
@@ -27,6 +28,8 @@ constexpr f32 JUMP_PEAK_SPEED_MAX = -28;  // once Y velocity is below this, no l
 
 constexpr s32 MOMENTUM_COOLDOWN_FRAMES = 10;
 
+using BoundCollisionCallback = std::function<void()>;
+
 void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
     bool isInJumpPeak = isJumping && isBetween(velocity.total.y(), JUMP_PEAK_SPEED_MAX, 0.0f);
     f32 peakMultiplier = 1 - static_cast<f32>(isInJumpPeak) * (1 - JUMP_PEAK_GRAVITY_MULT);
@@ -35,6 +38,19 @@ void applyGravity(Velocity& velocity, f32 dt, bool isJumping) {
 
 void applyFriction(Vector2f& velocity, f32 frictionMultiplier) {
     velocity.e[0] = approach(velocity.x(), 0, frictionMultiplier);
+}
+
+void addIfUnique(std::vector<std::pair<ecs::Entity, BoundCollisionCallback>>& entityList, ecs::Entity callbackOwner, ecs::Entity other,
+                 IUseCollision* callbackOwnerCollider, IUseCollision* otherCollider, Vector2i moveNormal) {
+    for (auto [entity, _] : entityList) {
+        if (entity == other) {
+            return;
+        }
+    }
+
+    BoundCollisionCallback boundFunc =
+        std::bind(callbackOwnerCollider->getOnCollisionEnter(), callbackOwner, other, callbackOwnerCollider, otherCollider, moveNormal);
+    entityList.push_back({other, boundFunc});
 }
 
 void PhysicsSystem::update() {
@@ -58,6 +74,35 @@ void PhysicsSystem::update() {
             semisolid.value()->setPositionFromBottom(trans.position);
         }
     }
+
+    using CallbackMap = std::unordered_map<ecs::Entity, std::vector<std::pair<ecs::Entity, BoundCollisionCallback>>, ecs::EntityHash>;
+    CallbackMap collisionCallbacks;
+
+    auto checkOthersCallback = [](CallbackMap& collisionCallbacks, HitInfo hitinfo, ecs::Entity entity, IUseCollision* selfCollider) {
+        IUseCollision* callbackOwnerCollider = nullptr;
+        if (hitinfo.isOtherSolid) {
+            callbackOwnerCollider = &hitinfo.other.get<SolidCollider>();
+        } else if (hitinfo.isOtherSemiSolid) {
+            callbackOwnerCollider = &hitinfo.other.get<SemiSolidCollider>();
+        } else {
+            return;
+        }
+        if (callbackOwnerCollider->getOnCollisionEnter() != nullptr) {
+            addIfUnique(collisionCallbacks[hitinfo.other], hitinfo.other, entity, callbackOwnerCollider, selfCollider, hitinfo.normal);
+        }
+    };
+
+    auto checkSelfCallback = [](CallbackMap& collisionCallbacks, HitInfo hitinfo, ecs::Entity entity, IUseCollision* selfCollider) {
+        if (selfCollider->getOnCollisionEnter() != nullptr) {
+            IUseCollision* otherCollider = nullptr;
+            if (hitinfo.isOtherSolid) {
+                otherCollider = &hitinfo.other.get<SolidCollider>();
+            } else if (hitinfo.isOtherSemiSolid) {
+                otherCollider = &hitinfo.other.get<SemiSolidCollider>();
+            }  // no need to handle actor colliders because they don't have callbacks
+            addIfUnique(collisionCallbacks[entity], entity, hitinfo.other, selfCollider, otherCollider, hitinfo.normal);
+        }
+    };
 
     for (auto& [entityid, entity] : getEntitiesRef()) {
         f32 dt;
@@ -99,6 +144,8 @@ void PhysicsSystem::update() {
         if (rb && actor) {
             // MOVEMENT + GROUNDED CHECKS
             //// no callback needed when actor moves into solid
+
+            // Y movement
             const bool wasGrounded = rb.value()->isGrounded;
             if (auto hitinfo = actor.value()->moveY(move, nullptr, true); hitinfo) {
                 if (move.y() <= 0) {
@@ -109,36 +156,18 @@ void PhysicsSystem::update() {
                 rb.value()->isJumping = false;
                 vel.residualImpulse.e[1] = 0;
 
-                // do collision callback
-                if (hitinfo->isOtherSolid) {
-                    auto otherSB = hitinfo.value().other.get<SolidCollider>();
-                    if (otherSB.getOnCollisionEnter() != nullptr) {
-                        otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
-                    }
-                } else if (hitinfo->isOtherSemiSolid) {
-                    auto otherSS = hitinfo.value().other.get<SemiSolidCollider>();
-                    if (otherSS.getOnCollisionEnter() != nullptr) {
-                        otherSS.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
-                    }
-                }
+                checkSelfCallback(collisionCallbacks, *hitinfo, entity, *actor);
+                checkOthersCallback(collisionCallbacks, *hitinfo, entity, *actor);
             } else {
                 rb.value()->setNotGrounded();
             }
 
-            // do collision callback in X direction
+            // X movement
             if (auto hitinfo = actor.value()->moveX(move, nullptr); hitinfo) {
-                if (hitinfo->isOtherSolid) {
-                    auto otherSB = hitinfo.value().other.get<SolidCollider>();
-                    if (otherSB.getOnCollisionEnter() != nullptr) {
-                        otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
-                    }
-                } else if (hitinfo->isOtherSemiSolid) {
-                    auto otherSS = hitinfo.value().other.get<SemiSolidCollider>();
-                    if (otherSS.getOnCollisionEnter() != nullptr) {
-                        otherSS.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
-                    }
-                }
+                checkSelfCallback(collisionCallbacks, *hitinfo, entity, *actor);
+                checkOthersCallback(collisionCallbacks, *hitinfo, entity, *actor);
             }
+
             allActors.push_back(entity);
 
             // RIGIDBODY FLAGS, MOMENTUM, AND COYOTE TIME
@@ -169,13 +198,21 @@ void PhysicsSystem::update() {
             }
 
         } else if (actor) {
-            actor.value()->moveX(move, nullptr);
-            actor.value()->moveY(move, nullptr);
+            if (auto hitinfo = actor.value()->moveX(move, nullptr); hitinfo) {
+                checkSelfCallback(collisionCallbacks, *hitinfo, entity, *actor);
+                checkOthersCallback(collisionCallbacks, *hitinfo, entity, *actor);
+            }
+            if (auto hitinfo = actor.value()->moveY(move, nullptr); hitinfo) {
+                checkSelfCallback(collisionCallbacks, *hitinfo, entity, *actor);
+                checkOthersCallback(collisionCallbacks, *hitinfo, entity, *actor);
+            }
             allActors.push_back(entity);
 
         } else if (semisolid && rb) {
             // MOVEMENT + GROUNDED CHECKS
             //// no callback needed when semisolid moves into solid
+
+            // Y movement
             const bool wasGrounded = rb.value()->isGrounded;
             auto ridingActors = semisolid.value()->getRidingActors();
             auto ridingSemis = semisolid.value()->getRidingSemiSolids();
@@ -188,36 +225,18 @@ void PhysicsSystem::update() {
                 rb.value()->isJumping = false;
                 vel.residualImpulse.e[1] = 0;
 
-                // do collision callback
-                if (hitinfo->isOtherSolid) {
-                    auto otherSB = hitinfo.value().other.get<SolidCollider>();
-                    if (otherSB.getOnCollisionEnter() != nullptr) {
-                        otherSB.getOnCollisionEnter()(semisolid.value(), entity, hitinfo.value());
-                    }
-                } else if (hitinfo->isOtherSemiSolid) {
-                    auto otherSS = hitinfo.value().other.get<SemiSolidCollider>();
-                    if (otherSS.getOnCollisionEnter() != nullptr) {
-                        otherSS.getOnCollisionEnter()(semisolid.value(), entity, hitinfo.value());
-                    }
-                }
+                checkSelfCallback(collisionCallbacks, *hitinfo, entity, *semisolid);
+                checkOthersCallback(collisionCallbacks, *hitinfo, entity, *semisolid);
             } else {
                 rb.value()->setNotGrounded();
             }
 
-            // do X collision callback
+            // X movement
             if (auto hitinfo = semisolid.value()->moveX(move.x(), nullptr, ridingActors, ridingSemis); hitinfo) {
-                if (hitinfo->isOtherSolid) {
-                    auto otherSB = hitinfo->other.get<SolidCollider>();
-                    if (otherSB.getOnCollisionEnter() != nullptr) {
-                        otherSB.getOnCollisionEnter()(actor.value(), entity, hitinfo.value());
-                    }
-                } else if (hitinfo->isOtherSemiSolid) {
-                    auto otherSS = hitinfo.value().other.get<SemiSolidCollider>();
-                    if (otherSS.getOnCollisionEnter() != nullptr) {
-                        otherSS.getOnCollisionEnter()(semisolid.value(), entity, hitinfo.value());
-                    }
-                }
+                checkSelfCallback(collisionCallbacks, *hitinfo, entity, *semisolid);
+                checkOthersCallback(collisionCallbacks, *hitinfo, entity, *semisolid);
             }
+
             allSemiSolids.push_back(entity);
 
             // RESEARCH this makes me think i should separate jumping/coyote stuff into its own platformer component
@@ -236,11 +255,24 @@ void PhysicsSystem::update() {
         } else if (semisolid) {
             auto ridingActors = semisolid.value()->getRidingActors();
             auto ridingSemis = semisolid.value()->getRidingSemiSolids();
-            semisolid.value()->moveX(move.x(), nullptr, ridingActors, ridingSemis);
-            semisolid.value()->moveY(move.y(), nullptr, ridingActors, ridingSemis);
+
+            // X movement
+            auto hitinfo = semisolid.value()->moveX(move.x(), nullptr, ridingActors, ridingSemis);
+            if (hitinfo) {
+                checkSelfCallback(collisionCallbacks, *hitinfo, entity, *semisolid);
+                checkOthersCallback(collisionCallbacks, *hitinfo, entity, *semisolid);
+            }
+
+            // Y movement
+            hitinfo = semisolid.value()->moveY(move.y(), nullptr, ridingActors, ridingSemis);
+            if (hitinfo) {
+                checkSelfCallback(collisionCallbacks, *hitinfo, entity, *semisolid);
+                checkOthersCallback(collisionCallbacks, *hitinfo, entity, *semisolid);
+            }
             allSemiSolids.push_back(entity);
 
         } else if (std::optional<SolidCollider*> solid = entity.tryGet<SolidCollider>(); solid) {
+            // TODO collision callback when we push/carry something -- i guess
             solid.value()->move(move.x(), move.y());
             trans.position = solid.value()->getCollider().getPositionEdge(Vector2i::unitDown);
 
@@ -295,6 +327,13 @@ void PhysicsSystem::update() {
 
         // position is bottom-middle of collider
         trans.position = semi.getCollider().getPositionEdge(Vector2i::unitDown);
+    }
+
+    // do collision callbacks
+    for (auto& [callbackEntity, hitList] : collisionCallbacks) {
+        for (auto& [otherEntity, callback] : hitList) {
+            callback();
+        }
     }
 }
 

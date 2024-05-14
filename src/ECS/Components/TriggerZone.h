@@ -10,7 +10,7 @@ namespace ecs {
 class Entity;
 }
 
-using TriggerCallback = void (*)(ecs::Entity entity);
+using TriggerCallback = void (*)(ecs::Entity self, ecs::Entity other);
 
 // a bounding box which executes callbacks on the actors it holds
 struct TriggerZone : public AABB {

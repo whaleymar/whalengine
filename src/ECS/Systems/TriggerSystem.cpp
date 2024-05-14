@@ -11,16 +11,16 @@ void TriggerSystem::update() {
         std::vector<ecs::Entity> newInsideList;
         auto& trigger = entity.get<TriggerZone>();
 
-        for (auto [actorid, actor] : MovingActorTracker::getEntitiesRef()) {
+        for (auto [actorid, actor] : MovableActorTracker::getEntitiesRef()) {
             bool wasInside = std::find(trigger.insideEntities.begin(), trigger.insideEntities.end(), actor) != trigger.insideEntities.end();
 
             if (actor.get<ActorCollider>().getCollider().isOverlapping(trigger)) {
                 newInsideList.push_back(actor);
                 if (!wasInside && trigger.onTriggerEnter != nullptr) {
-                    trigger.onTriggerEnter(actor);
+                    trigger.onTriggerEnter(entity, actor);
                 }
             } else if (wasInside && trigger.onTriggerExit != nullptr) {
-                trigger.onTriggerExit(actor);
+                trigger.onTriggerExit(entity, actor);
             }
         }
 
