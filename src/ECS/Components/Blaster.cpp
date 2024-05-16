@@ -1,37 +1,49 @@
 #include "ECS/Components/Blaster.h"
 
 #include "ECS/Components/Transform.h"
+#include "ECS/Components/Velocity.h"
 #include "ECS/Entities/Projectile.h"
 #include "Game/Events.h"
 #include "Gfx/GfxUtil.h"
 #include "Systems/Event.h"
 #include "Util/Vector.h"
 
+// TODO this shouldn't run in a loop. Make the logic a function that takes an entity & call it from player control system or AI control system
 void onBlasterFired(whal::Vector2i moveNormal) {
+    using namespace whal;
     for (auto& [entityid, entity] : ProjectileSystem::getEntitiesRef()) {
-        whal::Transform trans = entity.get<whal::Transform>();
+        Transform trans = entity.get<Transform>();
 
-        s32 direction;
+        s32 shotDirectionX;
         if (moveNormal.x() != 0) {
-            direction = moveNormal.x();
+            shotDirectionX = moveNormal.x();
         } else {
-            direction = trans.facing == whal::Facing::Left ? -1 : 1;
+            shotDirectionX = trans.facing == Facing::Left ? -1 : 1;
         }
-        whal::Vector2i offset;
+        Vector2i offset;
         if (moveNormal.y() != -1) {
-            offset.e[1] = 3 * whal::PIXELS_PER_TILE / 2;
+            offset.e[1] = 3 * PIXELS_PER_TILE / 2;
         } else {
-            offset.e[1] = whal::PIXELS_PER_TILE / 4;
+            offset.e[1] = PIXELS_PER_TILE / 4;
         }
 
-        whal::Vector2f velocity;
+        Vector2f velocity;
+        Vector2i shotNormal;
+        Blaster& blaster = entity.get<Blaster>();
         if (moveNormal.x() == 0 && moveNormal.y() == 0) {
-            velocity = whal::Vector2f(direction, 0) * entity.get<Blaster>().projectileSpeed;
+            velocity = Vector2f(shotDirectionX, 0) * blaster.projectileSpeed;
+            shotNormal = {shotDirectionX, 0};
         } else {
-            velocity = whal::toFloatVec(moveNormal).norm() * entity.get<Blaster>().projectileSpeed;
+            velocity = toFloatVec(moveNormal).norm() * blaster.projectileSpeed;
+            shotNormal = moveNormal;
         }
 
         makeProjectile(trans.position + offset, velocity);
+
+        // push shooter in opposite direction of projectile
+        if (auto velOpt = entity.tryGet<Velocity>(); velOpt) {
+            velOpt.value()->stable += toFloatVec(shotNormal * -1) * blaster.shotKnockback;
+        }
     }
 }
 

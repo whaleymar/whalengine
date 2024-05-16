@@ -3,19 +3,21 @@
 #include "ECS/Lib/ECS.h"
 #include "Systems/Event.h"
 
-// TODO game specific components/systems should go somewhere else
+// TODO game specific components/systems should go in another folder
 
 namespace whal {
 struct Transform;
 }
 
+// TODO explosion strength
 struct Blaster {
     f32 projectileSpeed = 160;  // same as terminal velocity
+    f32 shotKnockback = 50;
 };
 
 void onBlasterFired();
 
-// TODO should require a generic PlayerControl component too, and can have a separate system for NPCs
+// TODO should require a generic PlayerControl component too, and can have a separate system for NPCs -- see note in Blaster.cpp
 class ProjectileSystem : public whal::ecs::ISystem<Blaster, whal::Transform> {
 public:
     ProjectileSystem();

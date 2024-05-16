@@ -130,15 +130,18 @@ void unloadLevel(ActiveLevel& level) {
 }
 
 void removeEntityFromLevel(ecs::Entity entity) {
-    if (entity.has<Name>()) {
-        print("erasing entity", entity.get<Name>(), "from child lists");
-    }
     Scene& scene = Game::instance().getScene();
     if (scene.childEntities.erase(entity)) {
+        if (entity.has<Name>()) {
+            print("erasing entity", entity.get<Name>(), "from child lists");
+        }
         return;
     }
     for (auto& lvl : scene.loadedLevels) {
         if (lvl.childEntities.erase(entity)) {
+            if (entity.has<Name>()) {
+                print("erasing entity", entity.get<Name>(), "from child lists");
+            }
             break;
         }
     }

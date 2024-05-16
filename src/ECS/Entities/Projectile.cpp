@@ -12,7 +12,7 @@
 #include "Physics/IUseCollision.h"
 
 constexpr f32 PROJECTILE_LIFETIME_SECONDS = 10.0f;
-constexpr s32 PROJECTILE_EXPLOSION_RADIUS = 8;
+constexpr s32 PROJECTILE_EXPLOSION_RADIUS = whal::PIXELS_PER_TILE / 2;
 
 namespace whal {
 
@@ -20,7 +20,10 @@ void Explode(ecs::Entity self, ecs::Entity other, IUseCollision* selfCollider, I
     // TODO
     // sfx
     // particles
-    // knockback
+
+    // make 2 knockback zones. One centered at the point of collision, and one with its far edge aligned with the collision edge
+    makeExplosionZone(selfCollider->getCollider().getPositionEdge(moveNormal) - moveNormal * PROJECTILE_EXPLOSION_RADIUS,
+                      PROJECTILE_EXPLOSION_RADIUS);
     makeExplosionZone(selfCollider->getCollider().getPositionEdge(moveNormal), PROJECTILE_EXPLOSION_RADIUS);
     self.kill();
 }
