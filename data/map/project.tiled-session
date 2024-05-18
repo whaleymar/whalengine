@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "testmap.tmj",
+    "activeFile": "testmap2.tmj",
     "expandedProjectPaths": [
         "templates",
         "."
@@ -17,8 +17,8 @@
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 139.5,
-                "y": 112.25
+                "x": 206,
+                "y": 111.75
             }
         },
         "testmap2.tmj": {
@@ -28,8 +28,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": -180,
-                "y": 112.75
+                "x": -16,
+                "y": 111.25
             }
         },
         "tile-collision.tsj": {
@@ -73,10 +73,10 @@
     "project": "project.tiled-project",
     "property.type": "Material",
     "recentFiles": [
+        "testmap.tmj",
         "tile-collision.tsj",
         "widemap.tmj",
         "tileset-small.tsj",
-        "testmap2.tmj",
-        "testmap.tmj"
+        "testmap2.tmj"
     ]
 }

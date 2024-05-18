@@ -15,16 +15,20 @@ void onBlasterFired(whal::Vector2i moveNormal) {
         Transform trans = entity.get<Transform>();
 
         s32 shotDirectionX;
+        Vector2i offset;
         if (moveNormal.x() != 0) {
             shotDirectionX = moveNormal.x();
         } else {
             shotDirectionX = trans.facing == Facing::Left ? -1 : 1;
         }
-        Vector2i offset;
-        if (moveNormal.y() != -1) {
+
+        // idk
+        if (moveNormal.y() == 0) {
             offset.e[1] = 3 * PIXELS_PER_TILE / 2;
+        } else if (moveNormal.y() > 0) {
+            offset.e[1] = 3 * PIXELS_PER_TILE / 2 * moveNormal.y();
         } else {
-            offset.e[1] = PIXELS_PER_TILE / 4;
+            offset.e[1] = 1 * PIXELS_PER_TILE / 2 * moveNormal.y();
         }
 
         Vector2f velocity;

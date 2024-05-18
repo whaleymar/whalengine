@@ -19,7 +19,8 @@ class Entity;
 class ActorCollider : public IUseCollision {
 public:
     ActorCollider() = default;
-    ActorCollider(Transform transform, Vector2i half, Material material = Material::None, CollisionCallback onCollisionEnter_ = nullptr);
+    ActorCollider(Transform transform, Vector2i half, Material material = Material::None, CollisionCallback onCollisionEnter_ = nullptr,
+                  bool collidesWithActors = false);
 
     std::optional<HitInfo> moveX(const Vector2f amount, const CollisionCallback callback);
     std::optional<HitInfo> moveY(const Vector2f amount, const CollisionCallback callback, bool isGroundedCheckNeeded = false);
@@ -50,6 +51,7 @@ private:
 
     Vector2f mStoredMomentum = {0, 0};
     Vector2i mMomentumFramesLeft = {0, 0};
+    bool mCanCollideWithActors;
     // f32 mMass = 1; // could give solids a mass and use mass ratio to calculate force
 };
 

@@ -26,6 +26,7 @@ struct HitInfo {
     ecs::Entity other;
     bool isOtherSolid = false;
     bool isOtherSemiSolid = false;
+    bool isOtherActor = false;
     Material otherMaterial = Material::None;
 
     HitInfo();

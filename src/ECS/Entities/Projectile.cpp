@@ -43,7 +43,7 @@ Expected<ecs::Entity> makeProjectile(Vector2i position, Vector2f velocity) {
     entity.add(trans);
     entity.add(vel);
     entity.add(Draw(RGB::fromInts(200, 0, 0), {len, len}));
-    entity.add(ActorCollider(trans, {halflenPixels, halflenPixels}, Material::None, &Explode));
+    entity.add(ActorCollider(trans, {halflenPixels, halflenPixels}, Material::None, &Explode, true));
     entity.add(Name("PROJECTILE"));
     entity.add(Lifetime(PROJECTILE_LIFETIME_SECONDS));
 

@@ -20,8 +20,8 @@ void defaultSquish(ecs::Entity callbackEntity, ecs::Entity other, IUseCollision*
     callbackEntityCollider->squish();
 }
 
-ActorCollider::ActorCollider(Transform transform, Vector2i half, Material material, CollisionCallback onCollisionEnter_)
-    : IUseCollision(AABB(transform, half), material, onCollisionEnter_) {}
+ActorCollider::ActorCollider(Transform transform, Vector2i half, Material material, CollisionCallback onCollisionEnter_, bool canCollideWithActors)
+    : IUseCollision(AABB(transform, half), material, onCollisionEnter_), mCanCollideWithActors(canCollideWithActors) {}
 
 std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const CollisionCallback callback) {
     // RESEARCH doesn't handle colliding with other actors
@@ -35,7 +35,7 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const Collisi
     }
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
     auto const& semiSolids = SemiSolidsManager::getInstance()->getAllSemiSolids();
-    // auto const& actors = ActorsManager::getInstance()->getAllActors();
+    auto const& actors = ActorsManager::getInstance()->getAllActors();
 
     mXRemainder -= toMove;
     const s32 moveSign = sign(toMove);
@@ -45,6 +45,9 @@ std::optional<HitInfo> ActorCollider::moveX(const Vector2f amount, const Collisi
         auto hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
         if (!hitInfo) {
             hitInfo = checkCollisionSemiSolids(semiSolids, nextPos);
+        }
+        if (!hitInfo && mCanCollideWithActors) {
+            hitInfo = checkCollisionActors(actors, nextPos);
         }
 
         if (!hitInfo) {
@@ -68,6 +71,7 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
     s32 toMove = std::round(mYRemainder);
     auto const& solids = SolidsManager::getInstance()->getAllSolids();
     auto const& semiSolids = SemiSolidsManager::getInstance()->getAllSemiSolids();
+    auto const& actors = ActorsManager::getInstance()->getAllActors();
 
     auto groundedCheck = [this](f32 amountY, const std::vector<SolidCollider*>& solids,
                                 const std::vector<SemiSolidCollider*>& semis) -> std::optional<HitInfo> {
@@ -109,6 +113,9 @@ std::optional<HitInfo> ActorCollider::moveY(const Vector2f amount, const Collisi
         auto hitInfo = checkCollisionSolids(solids, nextPos, moveNormal);
         if (!hitInfo) {
             hitInfo = checkCollisionSemiSolids(semiSolids, nextPos);
+        }
+        if (!hitInfo && mCanCollideWithActors) {
+            hitInfo = checkCollisionActors(actors, nextPos);
         }
 
         if (!hitInfo) {
@@ -275,6 +282,7 @@ std::optional<HitInfo> ActorCollider::checkCollisionActors(const std::vector<Act
         if (hitInfo != std::nullopt) {
             hitInfo->other = actor->getEntity();
             hitInfo->otherMaterial = actor->getMaterial();
+            hitInfo->isOtherActor = true;
             return hitInfo;
         }
     }

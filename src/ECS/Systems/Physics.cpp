@@ -84,6 +84,8 @@ void PhysicsSystem::update() {
             callbackOwnerCollider = &hitinfo.other.get<SolidCollider>();
         } else if (hitinfo.isOtherSemiSolid) {
             callbackOwnerCollider = &hitinfo.other.get<SemiSolidCollider>();
+        } else if (hitinfo.isOtherActor) {
+            callbackOwnerCollider = &hitinfo.other.get<ActorCollider>();
         } else {
             return;
         }
@@ -99,7 +101,9 @@ void PhysicsSystem::update() {
                 otherCollider = &hitinfo.other.get<SolidCollider>();
             } else if (hitinfo.isOtherSemiSolid) {
                 otherCollider = &hitinfo.other.get<SemiSolidCollider>();
-            }  // no need to handle actor colliders because they don't have callbacks
+            } else if (hitinfo.isOtherActor) {
+                otherCollider = &hitinfo.other.get<ActorCollider>();
+            }
             addIfUnique(collisionCallbacks[entity], entity, hitinfo.other, selfCollider, otherCollider, hitinfo.normal);
         }
     };
