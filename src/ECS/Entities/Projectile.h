@@ -9,6 +9,6 @@ namespace ecs {
 class Entity;
 }
 
-Expected<ecs::Entity> makeProjectile(Vector2i position, Vector2f velocity);
+Expected<ecs::Entity> makeProjectile(Vector2i position, Vector2f velocity, f32 lifetimeSeconds, f32 explosionRadius);
 
 }  // namespace whal

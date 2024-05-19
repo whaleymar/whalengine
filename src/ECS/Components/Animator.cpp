@@ -49,6 +49,9 @@ bool Animator::setAnimation(s32 id) {
 }
 
 void Animator::nextFrame() {
+    if (curFrameIx + 1 == getAnimation().getFrameCount() && !isLooping) {
+        return;
+    }
     curFrameIx = (curFrameIx + 1) % getAnimation().getFrameCount();
     curFrameDuration = 0.0;
 }
@@ -57,6 +60,10 @@ void Animator::resetAnimation() {
     curAnimDuration = 0;
     curFrameIx = 0;
     curFrameDuration = System::rng.uniform() * 0.5;
+}
+
+void Animator::setLooping(bool loop) {
+    isLooping = loop;
 }
 
 Animation::Animation() : frames({}), id(-1){};

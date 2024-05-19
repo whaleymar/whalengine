@@ -7,8 +7,13 @@ namespace whal {
 void OnFrameEndSystem::update() {
     for (auto [entityid, entity] : getEntitiesCopy()) {
         // not bothering with a null check
-        entity.get<OnFrameEnd>().callback(entity);
-        entity.remove<OnFrameEnd>();
+
+        const auto& onFrameEnd = entity.get<OnFrameEnd>();
+        onFrameEnd.callback(entity);
+
+        if (onFrameEnd.removeSelf) {
+            entity.remove<OnFrameEnd>();
+        }
     }
 }
 

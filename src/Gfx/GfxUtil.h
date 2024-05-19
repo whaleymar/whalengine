@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Util/Types.h"
+#include "Util/Vector.h"
 
 namespace whal {
 // TODO create u32/s32/f32 for most of these
@@ -67,5 +68,7 @@ inline const char* SPRITE_TEXTURE_PATH = "data/sprite/atlas0.png";
 inline const char* ATLAS_METADATA_PATH = "data/sprite/atlas.xml";
 
 inline const char* TEXNAME_SPRITE = "sprite";
+
+Vector2i screenToWorldCoords(Vector2i screenCoords);
 
 }  // namespace whal

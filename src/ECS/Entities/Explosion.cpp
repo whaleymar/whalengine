@@ -1,6 +1,8 @@
 #include "Explosion.h"
 
+#include "ECS/Components/AnimUtil.h"
 #include "ECS/Components/Collision.h"
+#include "ECS/Components/Draw.h"
 #include "ECS/Components/Lifetime.h"
 #include "ECS/Components/Transform.h"
 #include "ECS/Components/TriggerZone.h"
@@ -8,7 +10,6 @@
 #include "ECS/Lib/ECS.h"
 #include "Gfx/GfxUtil.h"
 #include "Util/MathUtil.h"
-#include "Util/Print.h"
 #include "Util/Vector.h"
 
 Expected<whal::ecs::Entity> makeExplosionZone(whal::Vector2i center, s32 halflen) {
@@ -41,14 +42,27 @@ Expected<whal::ecs::Entity> makeExplosionZone(whal::Vector2i center, s32 halflen
         // print("distance2D:", distanceTexels);
         // print("halflen:", halflenTexels);
         // print("mult", multX, multY, "\n");
-        constexpr f32 pushStrengthMax = 100.0f;
+        const Vector2f pushStrengthMax = {150, 100};
 
         Velocity& vel = other.get<Velocity>();
         vel.stable += unitDelta * pushStrengthMax * Vector2f(multX, multY);
     };
     auto trigger = TriggerZone(trans, {halflen, halflen}, pushEntityAway);
     entity.add(trigger);
-    entity.add(Lifetime(0.5));
+
+    constexpr f32 lifetime = 0.5;
+    constexpr s32 nFrames = 6;
+    constexpr f32 frameTime = lifetime / static_cast<f32>(nFrames);
+    static const AnimInfo animInfo = {{"effect/explosion", 0, nFrames, frameTime}};
+    Animator animator;
+    loadAnimations(animator, animInfo);
+    animator.setLooping(false);
+    entity.add(animator);
+    entity.add(Sprite(Depth::Foreground1, animator.getFrame()));
+
+    entity.add(Lifetime(lifetime));
+
+    System::audio.play(Sfx::EXPLOSION, 0.2);
 
     return entity;
 }

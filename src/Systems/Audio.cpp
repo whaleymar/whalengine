@@ -151,11 +151,16 @@ std::optional<Error> Sfx::load() {
     if (errOpt)
         return errOpt;
 
-    errOpt = ENEMY_CRY.load("data/minecwaftZombieBruh.mp3");
+    errOpt = EXPLOSION.load("data/audio/sfx/explosion.wav");
     if (errOpt)
         return errOpt;
 
-    errOpt = FOOTSTEPTEST.load("data/test-footstep.mp3");
+    errOpt = FOOTSTEPTEST.load("data/audio/sfx/test-footstep.mp3");
+    if (errOpt) {
+        return errOpt;
+    }
+
+    errOpt = SHOTFIRED.load("data/audio/sfx/shotfired.wav");
     if (errOpt) {
         return errOpt;
     }

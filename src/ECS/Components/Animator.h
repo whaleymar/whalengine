@@ -35,12 +35,14 @@ struct Animator {
     f32 curAnimDuration = 0.0;
     s32 curFrameIx = 0;
     f32 curFrameDuration = 0.0;
+    bool isLooping = true;
 
     Frame getFrame() const;
     Animation& getAnimation();
     bool setAnimation(s32 id);
     void nextFrame();
     void resetAnimation();
+    void setLooping(bool loop);
 };
 
 // an animation is a sequence of same-sized frames

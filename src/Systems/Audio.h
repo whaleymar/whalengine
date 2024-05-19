@@ -90,8 +90,9 @@ public:
     }
 
     inline static AudioClip GAMEOVER;
-    inline static AudioClip ENEMY_CRY;
+    inline static AudioClip EXPLOSION;
     inline static AudioClip FOOTSTEPTEST;
+    inline static AudioClip SHOTFIRED;
 
     std::optional<Error> load();
 

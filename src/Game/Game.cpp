@@ -162,7 +162,6 @@ void Game::mainloop() {
         if (System::frame.getFrame() == 0) {
             Vector2f cameraPos = toFloatVec(getCameraPosition());
             updateLoadedLevels(cameraPos);
-            // print(cameraPos);
         }
 
         // randomFallingTile(1);

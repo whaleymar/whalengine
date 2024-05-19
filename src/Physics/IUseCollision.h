@@ -23,6 +23,7 @@ public:
     void setMaterial(Material material) { mMaterial = material; }
     ecs::Entity getEntity() const { return mSelf; }
     bool isCollidable() const { return mIsCollidable; }
+    void setIsCollidable(bool isCollidable) { mIsCollidable = isCollidable; }
     void setPosition(Vector2i center) { mCollider.setPosition(center); }
     void setPositionFromBottom(Vector2i bottom) { mCollider.setPositionFromBottom(bottom); }
     void setEntity(ecs::Entity entity) { mSelf = entity; }

@@ -1,5 +1,6 @@
 #include "Game/DebugScene.h"
 
+#include "ECS/Components/Callback.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Name.h"
@@ -22,6 +23,7 @@ void createTestPlatform();
 void createTestTrigger();
 void createTestSemiSolid();
 void createDepthTest();
+void createTestMouseTracker();
 
 std::optional<Error> loadMap() {
     using namespace whal;
@@ -38,6 +40,7 @@ std::optional<Error> loadTestMap() {
     // createTestPlatform();
     auto err = loadMap();
     createTestPlatform();
+    createTestMouseTracker();
     // createTestTrigger();
     // createTestSemiSolid();
     // createDepthTest();
@@ -214,4 +217,13 @@ void createDepthTest() {
     newEntity = ecs::ECS::getInstance().entity().value();
     newEntity.add(Draw(RGB(0.2, 0.5, .8), {8, 8}, Depth::Foreground1));
     newEntity.add(Transform::tiles(8, -14));
+}
+
+void createTestMouseTracker() {
+    auto newEntity = ecs::ECS::getInstance().entity().value();
+    newEntity.add<Transform>();
+    newEntity.add(Draw(RGB(0.2, 0.5, .6), {8, 8}, Depth::Debug));
+
+    auto setPositionToCamera = [](ecs::Entity entity) { entity.set(Transform(screenToWorldCoords(System::input.MousePosition))); };
+    newEntity.add(OnFrameEnd(setPositionToCamera, false));
 }

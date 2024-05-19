@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL.h>
 #include <unordered_map>
+#include "Util/Vector.h"
 
 namespace whal {
 
@@ -62,6 +63,7 @@ public:
 #endif
 
     inline static std::unordered_map<int, InputType> KeyMap;
+    inline static Vector2i MousePosition;
 
 private:
     InputHandler();

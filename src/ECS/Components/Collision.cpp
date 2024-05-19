@@ -3,12 +3,14 @@
 #include <algorithm>
 #include <cmath>
 
+#include "ECS/Components/Name.h"
 #include "ECS/Systems/CollisionManager.h"
 #include "Gfx/GfxUtil.h"
 #include "Physics/Collision/HitInfo.h"
 #include "Physics/IUseCollision.h"
 #include "Systems/System.h"
 #include "Util/MathUtil.h"
+#include "Util/Print.h"
 
 namespace whal {
 
@@ -228,6 +230,9 @@ bool ActorCollider::checkIsGroundedOnActors(const std::vector<ActorCollider*>& a
 
 std::optional<HitInfo> ActorCollider::checkCollisionSolids(const std::vector<SolidCollider*>& solids, const Vector2i position,
                                                            const Vector2i moveNormal) const {
+    if (!isCollidable()) {
+        return std::nullopt;
+    }
     auto movedCollider = AABB(position, mCollider.half);
     for (auto& collider : solids) {
         if (!collider->isCollidable()) {
@@ -253,6 +258,9 @@ std::optional<HitInfo> ActorCollider::checkCollisionSolids(const std::vector<Sol
 }
 
 std::optional<HitInfo> ActorCollider::checkCollisionSemiSolids(const std::vector<SemiSolidCollider*>& semis, const Vector2i position) const {
+    if (!isCollidable()) {
+        return std::nullopt;
+    }
     auto movedCollider = AABB(position, mCollider.half);
     for (auto& collider : semis) {
         if (!collider->isCollidable()) {
@@ -272,6 +280,10 @@ std::optional<HitInfo> ActorCollider::checkCollisionSemiSolids(const std::vector
 }
 
 std::optional<HitInfo> ActorCollider::checkCollisionActors(const std::vector<ActorCollider*>& actors, const Vector2i position) const {
+    if (!isCollidable()) {
+        return std::nullopt;
+    }
+
     auto movedCollider = AABB(position, mCollider.half);
     for (auto& actor : actors) {
         if (!actor->isCollidable() || this == actor) {
@@ -658,6 +670,9 @@ std::optional<HitInfo> SemiSolidCollider::moveY(const f32 amount, const Collisio
 
 std::optional<HitInfo> SemiSolidCollider::checkCollisionSolids(const std::vector<SolidCollider*>& solids, const Vector2i position,
                                                                const Vector2i moveNormal) const {
+    if (!isCollidable()) {
+        return std::nullopt;
+    }
     auto movedCollider = AABB(position, mCollider.half);
     for (auto& collider : solids) {
         if (!collider->isCollidable()) {
@@ -683,6 +698,9 @@ std::optional<HitInfo> SemiSolidCollider::checkCollisionSolids(const std::vector
 }
 
 std::optional<HitInfo> SemiSolidCollider::checkCollisionSemiSolids(const std::vector<SemiSolidCollider*>& semisolids, const Vector2i position) const {
+    if (!isCollidable()) {
+        return std::nullopt;
+    }
     auto movedCollider = AABB(position, mCollider.half);
     for (auto& semi : semisolids) {
         if (!semi->isCollidable() || this == semi) {

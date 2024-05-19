@@ -9,6 +9,9 @@ void LifetimeSystem::update() {
         auto& lifetime = entity.get<Lifetime>();
         lifetime.secondsRemaining -= dt;
         if (lifetime.secondsRemaining <= 0) {
+            if (lifetime.onDeath != nullptr) {
+                lifetime.onDeath(entity);
+            }
             entity.kill();
         }
     }

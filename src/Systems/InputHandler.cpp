@@ -1,11 +1,16 @@
 #include "InputHandler.h"
 
 #include <SDL2/SDL.h>
+#include <SDL_events.h>
 
 #include "Game/Events.h"
+#include "Gfx/GfxUtil.h"
 #include "System.h"
+#include "Util/Print.h"
 
 namespace whal {
+
+enum Mouse : u8 { LEFT = 1, MIDDLE = 2, RIGHT = 3 };
 
 InputHandler::InputHandler() {
     loadMappings();
@@ -43,19 +48,7 @@ void InputHandler::set(InputType input) {
         break;
 
     case InputType::SHOOT: {
-        Vector2i moveNormal = {0, 0};
-        if (isLeft()) {
-            moveNormal.e[0] = -1;
-        } else if (isRight()) {
-            moveNormal.e[0] = 1;
-        }
-
-        if (isDown()) {
-            moveNormal.e[1] = -1;
-        } else if (isUp()) {
-            moveNormal.e[1] = 1;
-        }
-        System::eventMgr.triggerEvent(Event::SHOOT_EVENT, moveNormal);
+        System::eventMgr.triggerEvent(Event::SHOOT_EVENT, screenToWorldCoords(MousePosition));
         break;
     }
 
@@ -169,7 +162,7 @@ void InputHandler::loadMappings() const {
     KeyMap.insert({SDLK_s, InputType::DOWN});
     KeyMap.insert({SDLK_SPACE, InputType::JUMP});
     KeyMap.insert({SDLK_ESCAPE, InputType::QUIT});
-    KeyMap.insert({SDLK_f, InputType::SHOOT});
+    KeyMap.insert({Mouse::LEFT, InputType::SHOOT});
 
 #ifndef NDEBUG
     KeyMap.insert({SDLK_0, InputType::DEBUG});
@@ -189,18 +182,28 @@ void InputHandler::useJump() {
 }
 
 void keyCallback(SDL_Event& event) {
+    // SDL_MOUSEBUTTONDOWN
     if (event.type == SDL_KEYDOWN && event.key.repeat != 0) {
         return;
     }
-    auto search = InputHandler::KeyMap.find(event.key.keysym.sym);
+
+    int key;
+    if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
+        key = event.button.button;
+        InputHandler::MousePosition = {event.button.x, event.button.y};
+    } else {
+        key = event.key.keysym.sym;
+    }
+
+    auto search = InputHandler::KeyMap.find(key);
     if (search == InputHandler::KeyMap.end()) {
         return;
     }
 
     InputType input = search->second;
-    if (event.type == SDL_KEYDOWN) {
+    if (event.type == SDL_KEYDOWN || event.type == SDL_MOUSEBUTTONDOWN) {
         System::input.set(input);
-    } else if (event.type == SDL_KEYUP) {
+    } else if (event.type == SDL_KEYUP || event.type == SDL_MOUSEBUTTONUP) {
         System::input.reset(input);
     }
 }

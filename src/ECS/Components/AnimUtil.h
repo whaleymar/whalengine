@@ -13,7 +13,7 @@ namespace whal {
 
 using AnimInfo = std::vector<std::tuple<const char*, s32, s32, f32>>;
 
-void loadAnimations(Animator& animator, const AnimInfo& animInfo) {
+inline void loadAnimations(Animator& animator, const AnimInfo& animInfo) {
     auto& spriteTexture = GLResourceManager::getInstance().getTexture(TEXNAME_SPRITE);
 
     for (auto [animBaseName, id, count, secsPerFrame] : animInfo) {
