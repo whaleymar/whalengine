@@ -12,6 +12,7 @@ enum Facing : u8 {
 // entity position in pixels
 struct Transform {
     Vector2i position;
+    f32 rotationDegrees = 0.0;     // counterclockwise
     Facing facing = Facing::Left;  // draw calls flipped if facing right
     bool isDirectionChanged = false;
     bool isManuallyMoved = true;  // tells physics system to sync collider position

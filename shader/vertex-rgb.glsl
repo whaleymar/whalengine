@@ -3,6 +3,7 @@
 uniform mat4 projection;
 
 uniform vec2 offset;
+uniform mat4 transform;
 uniform vec2 cameraPos;
 
 in vec3 vert;

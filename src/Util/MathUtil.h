@@ -8,6 +8,7 @@
 namespace whal {
 
 inline constexpr f32 PI = 3.14159265358979323846;
+inline constexpr f32 RAD_TO_DEG = 180.0f / PI;
 
 template <class T>
 concept SignedNumber = std::signed_integral<T> || std::floating_point<T>;

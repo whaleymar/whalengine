@@ -75,6 +75,7 @@ struct Vector2 {
     inline T y() const { return e[1]; }
 
     inline T dot(const Vector2<T> other) const { return e[0] * other.e[0] + e[1] * other.e[1]; }
+    inline T det(const Vector2<T> other) const { return e[0] * other.e[1] - e[1] * other.e[0]; }
     inline T len() const { return std::sqrt(e[0] * e[0] + e[1] * e[1]); }
     inline Vector2<T> norm() const {
         T divisor = 1 / len();

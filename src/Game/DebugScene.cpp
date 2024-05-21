@@ -40,7 +40,7 @@ std::optional<Error> loadTestMap() {
     // createTestPlatform();
     auto err = loadMap();
     createTestPlatform();
-    createTestMouseTracker();
+    // createTestMouseTracker();
     // createTestTrigger();
     // createTestSemiSolid();
     // createDepthTest();

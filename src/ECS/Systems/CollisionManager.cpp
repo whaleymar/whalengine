@@ -5,10 +5,12 @@
 #include "ECS/Systems/TagTrackers.h"
 #include "ECS/Systems/TriggerSystem.h"
 #include "Game/Events.h"
+#include "Gfx/GLResourceManager.h"
 
 #include <glad/gl.h>
 
-#include "Gfx/GLResourceManager.h"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace whal {
 
@@ -143,6 +145,11 @@ void drawCollider(ShaderProgram program, const AABB& aabb, const RGB color) {
 
     Vector2f floatPos(aabb.left(), aabb.top());
     glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
+
+    glm::mat4 transMatrix(1.0f);
+    transMatrix = glm::rotate(transMatrix, glm::radians(0.0f), glm::vec3(0.0, 0.0, 1.0));
+    glUniformMatrix4fv(program.transformUniform, 1, GL_FALSE, glm::value_ptr(transMatrix));
+
     Vector2f size = Vector2f(aabb.half.x(), aabb.half.y()) * 2;
     glUniform2fv(program.sizeUniform, 1, size.e);
 

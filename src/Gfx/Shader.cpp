@@ -102,6 +102,7 @@ void ShaderProgram::init() {
     useProgram();
 
     drawOffsetUniform = glGetUniformLocation(mHandle, "offset");
+    transformUniform = glGetUniformLocation(mHandle, "transform");
     cameraPositionUniform = glGetUniformLocation(mHandle, "cameraPos");
 
     if (uvOffset > 0) {

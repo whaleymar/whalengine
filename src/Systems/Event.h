@@ -33,7 +33,6 @@ template <typename... T>
 class EventListener {
 public:
     friend EventManager;
-    // TODO this needs something like a `template <class C, typename... T> void (C::*)(T... args)` so class methods work
     using callbackFunc = void (*)(T... args);
     EventListener(callbackFunc func) : mCallback(func) {}
 

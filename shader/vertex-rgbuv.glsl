@@ -3,6 +3,7 @@
 uniform mat4 projection;
 
 uniform vec2 offset;
+uniform mat4 transform;
 uniform vec2 cameraPos;
 uniform vec2 objSize;
 
@@ -21,7 +22,8 @@ void main() {
 
     vec2 localOffset = offset - cameraPos;
     vec4 totalOffset = projection * vec4(localOffset.x, -1.*localOffset.y, 0., 0.) + vec4(1., -1., 0., 0.);
-    gl_Position = projection * vec4(vert.xyz, 1.) + totalOffset;
+    vec4 penultimatePos = projection * transform * vec4(vert.xyz, 1.) + totalOffset;
+    gl_Position = penultimatePos;
 
     fragColor = vertColor;
     fragTexCoord = vertTexCoord;

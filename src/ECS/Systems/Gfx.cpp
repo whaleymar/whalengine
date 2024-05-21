@@ -5,11 +5,12 @@
 #include "Gfx/GfxUtil.h"
 #include "Gfx/Shader.h"
 #include "Gfx/VertexObject.h"
-#include "Util/Print.h"
 #include "Util/Vector.h"
+#include "glm/ext/matrix_transform.hpp"
 
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Transform.h"
+#include "glm/gtc/type_ptr.hpp"
 
 #include <glad/gl.h>
 
@@ -39,6 +40,10 @@ void drawEntity(ShaderProgram& program, Transform& trans, IDraw& draw, f32* pVer
     Vector2f floatPos = (toFloatVec(trans.position) + drawOffset);
 
     glUniform2fv(program.drawOffsetUniform, 1, floatPos.e);
+
+    glm::mat4 transMatrix(1.0f);
+    transMatrix = glm::rotate(transMatrix, glm::radians(trans.rotationDegrees), glm::vec3(0.0, 0.0, 1.0));
+    glUniformMatrix4fv(program.transformUniform, 1, GL_FALSE, glm::value_ptr(transMatrix));
 
     draw.vao.bind();
     draw.vbo.buffer(pVertices, nVertices * sizeof(float));

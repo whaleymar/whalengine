@@ -28,6 +28,7 @@ public:
     u32 sizeUniform;
     u32 textureUniform;
     u32 rgbUniform;
+    u32 transformUniform;
     u32 millis;
 
     // dependent on screen size:

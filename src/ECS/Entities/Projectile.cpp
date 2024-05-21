@@ -1,5 +1,7 @@
 #include "Projectile.h"
 
+#include "ECS/Components/AnimUtil.h"
+#include "ECS/Components/Animator.h"
 #include "ECS/Components/Collision.h"
 #include "ECS/Components/Draw.h"
 #include "ECS/Components/Lifetime.h"
@@ -11,6 +13,7 @@
 #include "ECS/Lib/ECS.h"
 #include "Gfx/GfxUtil.h"
 #include "Physics/IUseCollision.h"
+#include "Util/MathUtil.h"
 
 namespace whal {
 
@@ -48,17 +51,33 @@ Expected<ecs::Entity> makeProjectile(Vector2i position, Vector2f velocity, f32 l
     }
 
     auto entity = expected.value();
-    Transform trans(position);
+
+    // the sprite is pointing down by default. Get angle between for rotation
+    Vector2f moveNormal = velocity.norm();
+    // Vector2f moveNormal = Vector2f::unitDown;
+    Vector2f referenceAngle = Vector2f::unitDown;
+    f32 dot = moveNormal.dot(referenceAngle);
+    f32 det = moveNormal.det(referenceAngle);
+    f32 angleRadians = std::atan2(det, dot);
+    Transform trans(position, angleRadians * RAD_TO_DEG);
+
     Velocity vel(velocity);
     s32 len = 4;
     s32 halflenPixels = len / 2 * SPIXELS_PER_TEXEL;
 
     entity.add(trans);
     entity.add(vel);
-    entity.add(Draw(RGB::fromInts(200, 0, 0), {len, len}));
     entity.add(Name("PROJECTILE"));
     entity.add(Lifetime(lifetimeSeconds, &makeDefaultExplosion));
     entity.add(Radius(explosionRadius));
+
+    static const AnimInfo animInfo = {{"effect/bluefire", 0, 4, 0.1}};
+    Animator animator;
+    loadAnimations(animator, animInfo);
+    entity.add(animator);
+    Sprite sprite = Sprite(Depth::Player, animator.getFrame());
+    sprite.scale = {0.5, 0.5};
+    entity.add(sprite);
 
     // add collider slightly after creation so it doesn't collide with shooter
     // TODO this still sucks, should use a layer mask or something so it can't collide with shooter

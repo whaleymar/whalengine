@@ -8,6 +8,7 @@
 #include "ECS/Components/TriggerZone.h"
 #include "ECS/Components/Velocity.h"
 #include "ECS/Lib/ECS.h"
+#include "ECS/Systems/TagTrackers.h"
 #include "Gfx/GfxUtil.h"
 #include "Util/MathUtil.h"
 #include "Util/Vector.h"
@@ -62,7 +63,12 @@ Expected<whal::ecs::Entity> makeExplosionZone(whal::Vector2i center, s32 halflen
 
     entity.add(Lifetime(lifetime));
 
-    System::audio.play(Sfx::EXPLOSION, 0.2);
+    // scale volume with distance from camera
+    f32 distance = toFloatVec(getCameraPosition() - trans.position).len();
+    f32 maxVolume = 0.2f;
+    f32 maxDistance = 1500.0f;
+    f32 volume = easeOutQuad(maxVolume, 0.0f, distance / maxDistance);
+    System::audio.play(Sfx::EXPLOSION, volume);
 
     return entity;
 }
